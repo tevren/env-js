@@ -3113,6 +3113,7 @@ XMLP.prototype._replaceEntity = function(strD, iB, iE) {
         case "gt":   strEnt = ">";  break;
         case "apos": strEnt = "'";  break;
         case "quot": strEnt = "\""; break;
+        case "nbsp": strEnt = " "; break;
         default:
             if(strD.charAt(iB) == "#") {
                 strEnt = String.fromCharCode(parseInt(strD.substring(iB + 1, iE)))+'';
