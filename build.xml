@@ -58,8 +58,10 @@
             <fileset dir="${SRC_DIR}" includes="build.js" />
             <fileset dir="${SRC_DIR}" includes="intro.js" />
             <fileset dir="${SRC_DIR}" includes="window/window.js" />
+            <!--
             <fileset dir="${SRC_DIR}" includes="platform/xmlsax.js" />
             <fileset dir="${SRC_DIR}" includes="platform/xmlw3cdom.js" />
+            -->
             <fileset dir="${SRC_DIR}" includes="dom/nodelist.js" />
             <fileset dir="${SRC_DIR}" includes="dom/namednodemap.js" />
             <fileset dir="${SRC_DIR}" includes="dom/node.js" />
