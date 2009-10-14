@@ -1,9 +1,5 @@
-
-load("dist/env.rhino.js");    // Init
-
-
 window.onload = function(){
-  print("\n\nTesting with '" + whichJarFile + "' JavaScript interpreter jar");
+  print("\n\nTesting with " + whichInterpreter);
   print("Handling onload for test.js");
   load("test/testrunner.js");
   print("Loaded test runner. Loading tests.");
