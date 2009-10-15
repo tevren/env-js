@@ -55,8 +55,10 @@
                     <token key="VERSION" value="${BUILD}"/>
                 </replacetokens>
             </filterchain>
+            <!--
             <fileset dir="${SRC_DIR}" includes="build.js" />
             <fileset dir="${SRC_DIR}" includes="intro.js" />
+            -->
             <fileset dir="${SRC_DIR}" includes="window/window.js" />
             <!--
             <fileset dir="${SRC_DIR}" includes="platform/xmlsax.js" />
@@ -147,7 +149,6 @@
             <fileset dir="${SRC_DIR}" includes="profile/profile.js" />
             <fileset dir="${SRC_DIR}" includes="window/document.js" />
             <fileset dir="${SRC_DIR}" includes="html/cookie.js" />
-            <fileset dir="${SRC_DIR}" includes="outro.js" />
         </concat>
         <echo message="${ENV_DIST} built." />
         <copy tofile="${ENV_LATEST_DIST}" file="${ENV_DIST}"/>
@@ -160,10 +161,12 @@
                     <token key="VERSION" value="${BUILD}"/>
                 </replacetokens>
             </filterchain>
-            <fileset dir="${SRC_DIR}"  includes="build.js" />
+            <fileset dir="${DIST_DIR}" includes="build.js" />
+            <fileset dir="${DIST_DIR}" includes="intro.js" />
             <fileset dir="${SRC_DIR}"  includes="platform/core.js" />
             <fileset dir="${SRC_DIR}"  includes="platform/rhino.js" />
             <fileset dir="${DIST_DIR}" includes="env.js" />
+            <fileset dir="${SRC_DIR}" includes="outro.js" />
         </concat>
         <echo message="${ENV_RHINO} built." />
         <copy tofile="${ENV_LATEST_RHINO}" file="${ENV_RHINO}"/>

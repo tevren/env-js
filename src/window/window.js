@@ -1,3 +1,7 @@
+// print("SMP Y",this);
+// print("SMP YY",$w);
+// print("SMP Z",$env);
+
 /*
 *	window.js
 *   - this file will be wrapped in a closure providing the window object as $w

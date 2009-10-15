@@ -6,11 +6,19 @@ require 'johnson/cli'
 require 'envjs/runtime'
 
 RUNTIME = js = Johnson::Runtime.new
-RUNTIME.extend Envjs::Runtime
-RUNTIME.load "dist/env.johnson.js"
 RUNTIME.evaluate(Johnson::CLI::JS)
+RUNTIME.extend Envjs::Runtime
 
-ARGV.each do |file|
-  RUNTIME.load file
+RUNTIME.load "dist/env.johnson.js"
+
+begin
+  ARGV.each do |file|
+    RUNTIME.load file
+  end
+rescue Johnson::Error => je
+  if je.message.match /<SystemExit: exit>/
+    exit
+  end
+  raise je
 end
 

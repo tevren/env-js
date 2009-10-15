@@ -28,6 +28,7 @@ EOJS
       set_window_string.call(global,global.object_id)
 
       global_proto.globalize = lambda do
+        puts "SMPG"
         g = new_global global_proto
         set_window_string.call(g,g.object_id)
         $stderr.print "kkkk ng ", global_proto, "\n"
@@ -35,6 +36,7 @@ EOJS
         $stderr.print "kkkk ng ", g, "\n"
         g
       end
+      global_proto.getFreshScopeObj = global_proto.globalize
 
       global_proto.setScope = lambda do |f, scope|
         prev = f
@@ -69,8 +71,13 @@ EOJS
           set_parent( pair[0], pair[1] )
         end
       end
+
+      global_proto.configureScope = lambda { |f, scopes| }
+      global_proto.restoreScope = lambda { |scopes| }
+      global_proto.setScope = lambda { |f, scope| }
+      global_proto.getScope = lambda { |f, nothing| }
       
-      global_proto.load = lambda do |f|
+      global_proto.loadxx = lambda do |f|
         self.require f
       end
 

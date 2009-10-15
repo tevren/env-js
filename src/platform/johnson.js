@@ -14,11 +14,32 @@
     var extract_line =
         Ruby.eval(
 "lambda { |e| \
-  e.to_s.split(%(\n))[1].match(/:([^:]*)$/)[1]; \
-}")
+  e.stack.to_s.split(%(\n))[1].match(/:([^:]*)$/)[1]; \
+}");
+
+    var print_exception =
+        Ruby.eval(" \
+lambda { |e| \
+  print(%(Exception: ),e,%(\n)); \
+  e.stack.to_s.split(%(\n)).each do |line| \
+    m = line.match(/(.*)@([^@]*)$/); \
+    s = m[1]; \
+    limit = 50; \
+    if ( s.length > limit ); \
+      s = s[0,limit] + %(...); \
+    end; \
+    print(m[2],%( ),s,%(\n)); \
+  end \
+} \
+");
 
     $env.lineSource = function(e){
-        return extract_line.call(e.stack);
+        if(e){
+            print_exception.call(e);
+            return extract_line.call(e);
+        } else {
+            return "";
+        }
     };
     
     $env.location = function(path, base){
@@ -136,9 +157,7 @@
     
     //Used to delete a local file
     $env.deleteFile = function(url){
-        Ruby.raise("java");
-        var file = new java.io.File( new java.net.URI( url ) );
-        file["delete"]();
+        Ruby.File.unlink(url);
     };
     
     $env.connection = function(xhr, responseHandler, data){
@@ -374,6 +393,8 @@
         $env.deleteFile(tmpFile);
     };
     
+    $env.getFreshScopeObj = getFreshScopeObj;
+
 })(Envjs);
 
 // Local Variables:

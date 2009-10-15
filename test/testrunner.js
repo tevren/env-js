@@ -186,14 +186,19 @@ function logError(e) {
 
 function results(){
 	print( pass + " Passed, " + fail + " Failed, " + errors + " Errors, " + total + " Total Tests" );
-	
+        var exit;
+        try {
+          exit = java.lang.System.exit;
+        } catch(e) {
+          try {
+            exit = Ruby.Kernel.exit;
+          } catch(e) {}
+        }
+
 	if(fail + errors > 0) {
-		//Error exit code
-		java.lang.System.exit(1);
-	}
-	else {
-		//Successful exit code
-		java.lang.System.exit(0);
+          exit(1);
+	} else {
+          exit(0);
 	}
 }
 
@@ -233,3 +238,8 @@ function triggerEvent( elem, type, event ) {
 function url(value) {
 	return value + (/\?/.test(value) ? "&" : "?") + new Date().getTime() + "" + parseInt(Math.random()*100000);
 }
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// End:

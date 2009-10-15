@@ -1,15 +1,21 @@
+print("SMPJ",this);
+print("SMPJ",window);
 window.onload = function(){
   print("\n\nTesting with " + whichInterpreter);
   print("Handling onload for test.js");
   load("test/testrunner.js");
   print("Loaded test runner. Loading tests.");
+  
+  // load( "test/unit/onload.js");
 
-  load(
+  // return;
+
+  if(false) load(
       "test/unit/dom.js",
       "test/unit/window.js",
       "test/unit/elementmembers.js"
   );
-  if (multiwindow)
+  if(false) if (multiwindow)
     load(
       "test/unit/onload.js",
       "test/unit/scope.js",   // must come before frame.js changes page content
@@ -17,7 +23,7 @@ window.onload = function(){
       "test/unit/events.js",
       "test/unit/multi-window.js"
     );
-  load(
+  if(true)load(
       "test/unit/parser.js",
       "test/unit/timer.js",
 

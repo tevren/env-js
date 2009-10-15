@@ -2,25 +2,9 @@
 /**
  * @author thatcher
  */
-var Envjs = function(){
-    if(arguments.length === 2){
-        for ( var i in arguments[1] ) {
-    		var g = arguments[1].__lookupGetter__(i), 
-                s = arguments[1].__lookupSetter__(i);
-    		if ( g || s ) {
-    			if ( g ) Envjs.__defineGetter__(i, g);
-    			if ( s ) Envjs.__defineSetter__(i, s);
-    		} else
-    			Envjs[i] = arguments[1][i];
-    	}
-    }
-
-    if (arguments[0] != null && arguments[0] != "")
-        window.location = arguments[0];
-};
 
 /*
-*	env.rhino.js
+*	core.js
 */
 (function($env){
     
@@ -63,6 +47,8 @@ var Envjs = function(){
     };
     
     $env.info("Initializing Core Platform Env");
+
+  print(getFreshScopeObj);
 
 
     // if we're running in an environment without env.js' custom extensions
@@ -236,7 +222,16 @@ var Envjs = function(){
         newWindow.document._parentWindow = oldWindowProxy;
     };
 
-    $env.makeNewWindowMaybeLoad = function(openingWindow, parentArg, url){
+    $env.makeNewWindowMaybeLoad = function(opener, parent, url){
+        var window = $env.getFreshScopeObj();
+        windowfn.call(window,window,parent?parent:window,opener,parent.top,false);
+        if (url) {
+          window.__loadAWindowsDocument__(url);
+        }
+        return window;
+    };
+
+    $env._makeNewWindowMaybeLoad = function(openingWindow, parentArg, url){
         var newWindow = $env.getFreshScopeObj();
         var newProxy  = $env.getProxyFor(newWindow);
         newWindow.$thisWindowsProxyObject = newProxy;

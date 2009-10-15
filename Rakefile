@@ -30,12 +30,11 @@ namespace :johnson do
       files =
         XPath.match( concat, "fileset/attribute::includes" ).
           map { |a| a.value }
-      files.reject! { |f| f == "env.js" }
       groups[name] = files
     end
 
-    files = groups["${ENV_RHINO}"] + groups["${ENV_DIST}"] 
-
+    files = groups["${ENV_RHINO}"];
+    files.map! { |f| f == "env.js" ? groups["${ENV_DIST}"] : f }.flatten!
     files.map! { |f| f.sub!( "rhino", "johnson" ); "src/" + f }
 
     system "rm -f dist/env.johnson.js"
