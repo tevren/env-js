@@ -3,5 +3,6 @@
 
 whichJarFile = "envjs"
 whichInterpreter = whichJarFile + " interpreter jar";
+multiwindow = true;
 load("dist/env.rhino.js");
 load("test/primaryTests.js");

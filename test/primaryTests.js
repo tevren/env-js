@@ -9,7 +9,7 @@ window.onload = function(){
       "test/unit/window.js",
       "test/unit/elementmembers.js"
   );
-  if (whichJarFile == "envjs")
+  if (multiwindow)
     load(
       "test/unit/onload.js",
       "test/unit/scope.js",   // must come before frame.js changes page content
