@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'johnson/tracemonkey'
+require 'johnson/cli'
+require 'envjs/runtime'
+
+RUNTIME = js = Johnson::Runtime.new
+RUNTIME.extend Envjs::Runtime
+RUNTIME.load "dist/env.johnson.js"
+RUNTIME.evaluate(Johnson::CLI::JS)
+
+ARGV.each do |file|
+  RUNTIME.load file
+end
+

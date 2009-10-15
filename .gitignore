@@ -1,6 +1,8 @@
-dist/env.*.*.*.js
-dist/env.rhino.*.*.*.js
-dist/env-js.*.jar
+/dist/env.*.*.*.js
+/dist/env.rhino.*.*.*.js
+/dist/env-js.*.jar
 *~
-rhino/build
-jshost
+/rhino/build
+/jshost
+/dist/env.johnson.js
+/vendor
