@@ -32,39 +32,61 @@
     
     var timers = [];
 
-    //For Java the window.timer is created using the java.lang.Thread in combination
-    //with the java.lang.Runnable
-    $env.timer = function(fn, time){
-       var running = true;
-        
-        var run = sync(function(){ //while happening only thing in this timer    
-    	    //$env.debug("running timed function");
-            fn();
-        });
-        var _this = this;
-        var thread = new java.lang.Thread(new java.lang.Runnable({
-            run: function(){
-                try {
-                    while (running){
-                        java.lang.Thread.currentThread().sleep(time);
-                        run.apply(_this);
-                    }
-                }catch(e){
-                    $env.debug("interuption running timed function");
-                    _this.stop();
-                    $env.onInterrupt();
-                };
-            }
-        }));
-        this.start = function(){ 
-            thread.start(); 
-        };
-        this.stop = sync(function(num){
-            running = false;
-            thread.interrupt();
-        })
-    };
-    
+  $env.timer = function(fn, interval){
+    this.fn = fn;
+    this.interval = interval;
+    this.at = Date.now() + interval;
+    this.index = timers.length;
+    timers[this.index] = this;
+  };
+  
+  $env.timer.prototype.start = function(){};
+  $env.timer.prototype.stop = function(){
+    delete timers[this.index];
+  };
+  
+  // wait === null: execute any immediately runnable timers and return
+  // wait(n) (n > 0): execute any timers as they fire but no longer than n ms
+  // wait(0): execute any timers as they fire, waiting until there are none left
+  $env.wait = function(wait) {
+    var i;
+    var empty;
+    var after;
+    var now;
+    var timer;
+    var sleep;
+    if (wait !== 0 && wait !== null && wait !== undefined){
+      wait += Date.now();
+    }
+    for (;;) {
+      for (i in timers){
+        timer = timers[i];
+        now = Date.now();
+        if (timer.at <= now){
+          f = timer.fn;
+          f();
+          timer.at = Date.now() + timer.interval;
+        }
+      }
+      empty = true;
+      sleep = null;
+      now = Date.now();
+      for (i in timers){
+        empty = false;
+        timer = timers[i];
+        after = timer.at - now;
+        sleep = (sleep === null || after < sleep) ? after : sleep;
+      }
+      sleep = sleep < 0 ? 0 : sleep;
+      if (empty || ( wait !== 0 ) && ( ( sleep > 0 && !wait ) || ( Date.now() + sleep > wait ) ) ) {
+        break;
+      }
+      if (sleep) {
+        java.lang.Thread.currentThread().sleep(sleep);
+      }
+    }
+  };
+
     //Since we're running in rhino I guess we can safely assume
     //java is 'enabled'.  I'm sure this requires more thought
     //than I've given it here

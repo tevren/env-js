@@ -8603,7 +8603,7 @@ XMLHttpRequest.prototype = {
                                     $debug("parsing response text into xml document");
                                     responseXML = $domparser.parseFromString(_this.responseText+"");
                                     return responseXML;
-                                } catch(e) { 
+                                } catch(e) {
                                     $error('response XML does not apear to be well formed xml', e);
                                     responseXML = $domparser.parseFromString("<html>"+
                                         "<head/><body><p> parse error </p></body></html>");

@@ -84,6 +84,7 @@
     //For Java the window.timer is created using the java.lang.Thread in combination
     //with the java.lang.Runnable
     $env.timer = function(fn, time){};	
+    $env.wait = function(fn, time){};	
     
     $env.javaEnabled = false;	
     

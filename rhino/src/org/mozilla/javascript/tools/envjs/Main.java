@@ -15,6 +15,15 @@ package org.mozilla.javascript.tools.envjs;
 public class Main extends org.mozilla.javascript.tools.shell.Main
 {
 
+    private static class Quitter implements
+        org.mozilla.javascript.tools.shell.QuitAction
+    {
+        public void quit(org.mozilla.javascript.Context cx, int exitCode)
+        {
+            System.exit(exitCode);
+        }
+    }
+
     static
     {           
         // replace the generic Global object, instantiated in
@@ -31,5 +40,6 @@ public class Main extends org.mozilla.javascript.tools.shell.Main
         // "Sharing Scopes" in
         // https://developer.mozilla.org/En/Rhino_documentation/Scopes_and_Contexts
         global = new Global(window);
+        global.initQuitAction(new Quitter());
     }
 }
