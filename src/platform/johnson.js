@@ -63,41 +63,68 @@ lambda { |e| \
     
     var timers = [];
 
-    //For Java the window.timer is created using the java.lang.Thread in combination
-    //with the java.lang.Runnable
-    $env.timer = function(fn, time){
-       var running = true;
-        
-        var run = sync(function(){ //while happening only thing in this timer    
-    	    //$env.debug("running timed function");
-            fn();
-        });
-        var _this = this;
-        Ruby.raise("java");
-        var thread = new java.lang.Thread(new java.lang.Runnable({
-            run: function(){
-                try {
-                    while (running){
-                        Ruby.raise("java");
-                        java.lang.Thread.currentThread().sleep(time);
-                        run.apply(_this);
-                    }
-                }catch(e){
-                    $env.debug("interuption running timed function");
-                    _this.stop();
-                    $env.onInterrupt();
-                };
-            }
-        }));
-        this.start = function(){ 
-            thread.start(); 
-        };
-        this.stop = sync(function(num){
-            running = false;
-            thread.interrupt();
-        })
+    $env.timer = function(fn, interval){
+        this.fn = fn;
+        this.interval = interval;
+        this.at = Date.now() + interval;
+        this.index = timers.length;
+        timers[this.index] = this;
     };
     
+    $env.timer.prototype.start = function(){};
+    $env.timer.prototype.stop = function(){
+        delete timers[this.index];
+    };
+    
+    // wait === null: execute any immediately runnable timers and return
+    // wait(n) (n > 0): execute any timers as they fire but no longer than n ms
+    // wait(0): execute any timers as they fire, waiting until there are none left
+    $env.wait = function(wait) {
+        var i;
+        var after;
+        var now;
+        var timer;
+        var sleep;
+        var earliest;
+        var fired;
+        if (wait !== 0 && wait !== null && wait !== undefined){
+            wait += Date.now();
+        }
+        for (;;) {
+            earliest = undefined
+            fired = false;
+            for (i in timers){
+                if( !timers.hasOwnProperty(i) ) {
+                    continue;
+                }
+                timer = timers[i];
+                if(!earliest || timer.at < earliest) {
+                    earliest = timer.at
+                }
+                now = Date.now();
+                if (timer.at <= now){
+                    f = timer.fn;
+                    f();
+                    timer.at = Date.now() + timer.interval;
+                }
+            }
+            if ( fired ) {
+                continue;
+            }
+            now = Date.now();
+            if ( earliest && ( earliest <= now ) ) {
+                continue;
+            }
+            sleep = earliest - now;
+            if ( !earliest || ( wait !== 0 ) && ( !wait || ( Date.now() + sleep > wait ) ) ) {
+                break;
+            }
+            if (sleep) {
+                Ruby.sleep(sleep/1000000.);
+            }
+        }
+    };
+
     //Since we're running in rhino I guess we can safely assume
     //java is 'enabled'.  I'm sure this requires more thought
     //than I've given it here

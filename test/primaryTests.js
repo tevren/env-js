@@ -1,16 +1,17 @@
-print("SMPJ",this);
-print("SMPJ",window);
-window.onload = function(){
+load("test/qunit.js");
+
+window.addEventListener("load",function(){
   print("\n\nTesting with " + whichInterpreter);
   print("Handling onload for test.js");
-  load("test/testrunner.js");
-  print("Loaded test runner. Loading tests.");
-  
-  // load( "test/unit/onload.js");
+  print("Loading tests.");
 
-  // return;
+  // load("test/unit/timer.js");
 
-  if(false) load(
+  print("Load complete. Running tests.");
+
+//   return;
+
+  if(true) load(
       "test/unit/dom.js",
       "test/unit/window.js",
       "test/unit/elementmembers.js"
@@ -25,15 +26,11 @@ window.onload = function(){
     );
   if(true)load(
       "test/unit/parser.js",
-      "test/unit/timer.js",
-
-      //NOTE: keep this test last because Prototype pollutes
-      //the namespace and several DOM objects
-      "test/unit/prototypecompat.js"
+      "test/unit/timer.js"
   );
 
-  results();    // Display
-};
+  print("Load complete. Running tests.");
+});
 
 window.location = "test/index.html";
 

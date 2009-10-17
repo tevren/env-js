@@ -90,7 +90,7 @@ $w.__defineGetter__("location", function(url){
 				this.search + this.hash;
 		},
 		get protocol(){
-			return protocol.exec(this.href)[0];
+			return this.href && protocol.exec(this.href)[0];
 		},
 		set protocol(_protocol){
 			$w.location = _protocol + this.host + this.pathname + 

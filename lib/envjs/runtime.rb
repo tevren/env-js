@@ -1,4 +1,4 @@
-module Envjs; end
+require 'envjs'
 
 module Envjs::Runtime
 

@@ -1,7 +1,6 @@
 require 'net/protocol'
 
-module Envjs; end
-module Envjs::Net; end
+require 'envjs/net'
 
 class Envjs::Net::File < Net::Protocol
 

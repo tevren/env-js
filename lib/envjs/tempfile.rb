@@ -1,6 +1,6 @@
 require 'tempfile'
 
-module Envjs; end
+require 'envjs'
 
 class Envjs::TempFile < Tempfile
 
