@@ -12,3 +12,4 @@ window.addEventListener("load",function(){
 
 window.location = "test/index.html";
 
+Envjs.wait(0);

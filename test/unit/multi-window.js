@@ -38,7 +38,7 @@ test("window.open()-related behavior and members", function() {
         "2nd window has correct contents");
     }catch(e){print(e);}
 
-    try{ ok(anotherWin.opener == this,
+    try{ ok(anotherWin.opener == window,
         "2nd window's .opener is original window");
     }catch(e){print(e);}
 

@@ -36,19 +36,30 @@ load("build/runtest/env.js");
                 var unsafeStop = stop,
                     unsafeStart = start,
                     isStopped = null;
-                    
-                stop = function(){
-                    if(isStopped === null || !isStopped === false){
+
+                var config_timeout;
+                stop = function(timeout){
+                    if(isStopped === null || isStopped === false){
                         $env.log('PAUSING QUNIT');
                         isStopped = true;
-                        unsafeStop(arguments);
+                        unsafeStop.call(this);
+                        timeout = ( timeout && timeout > 0 ) ? timeout : 10000;
+	                if (timeout)
+		          config_timeout = setTimeout(function() {
+			    QUnit.ok( false, "Test timed out" );
+			    start();
+		          }, timeout);
                     }
                 };
                 start = function(){
                     if(isStopped === null || isStopped === true ){
                         $env.log('RESTARTING QUNIT');
                         isStopped = false;
-                        unsafeStart(arguments);
+                        if(config_timeout) {
+                          clearTimeout(config_timeout);
+                          config_timeout = undefined;
+                        }
+                      unsafeStart.call(this);
                     }
                 };
                 //we know some ajax calls will fail becuase
@@ -82,3 +93,5 @@ load("build/runtest/env.js");
     });
     
 })(Envjs);
+
+Envjs.wait(0);

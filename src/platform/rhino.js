@@ -11,6 +11,8 @@
         return e&&e.rhinoException?e.rhinoException.lineSource():"(line ?)";
     };
     
+    $env.sync = sync;
+  
     //For Java the window.location object is a java.net.URL
     $env.location = function(path, base){
       var protocol = new RegExp('(^file\:|^http\:|^https\:)');
@@ -21,8 +23,8 @@
           return new java.net.URL(new java.net.URL(base), path).toString()+'';
         }else{
             //return an absolute url from a url relative to the window location
-            if(window.location.href.length > 0){
                 base = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+            if(window.location.href.length > 0){
                 return base + '/' + path;
             }else{
                 return new java.io.File(  path ).toURL().toString()+'';
@@ -30,69 +32,6 @@
         }
     };
     
-    var timers = [];
-
-  $env.timer = function(fn, interval){
-    this.fn = fn;
-    this.interval = interval;
-    this.at = Date.now() + interval;
-    this.index = timers.length;
-    timers[this.index] = this;
-  };
-  
-  $env.timer.prototype.start = function(){};
-  $env.timer.prototype.stop = function(){
-    delete timers[this.index];
-  };
-  
-    // wait === null: execute any immediately runnable timers and return
-    // wait(n) (n > 0): execute any timers as they fire but no longer than n ms
-    // wait(0): execute any timers as they fire, waiting until there are none left
-    $env.wait = function(wait) {
-        var i;
-        var after;
-        var now;
-        var timer;
-        var sleep;
-        var earliest;
-        var fired;
-        if (wait !== 0 && wait !== null && wait !== undefined){
-            wait += Date.now();
-        }
-        for (;;) {
-            earliest = undefined
-            fired = false;
-            for (i in timers){
-                if( !timers.hasOwnProperty(i) ) {
-                    continue;
-                }
-                timer = timers[i];
-                if(!earliest || timer.at < earliest) {
-                    earliest = timer.at
-                }
-                now = Date.now();
-                if (timer.at <= now){
-                    f = timer.fn;
-                    f();
-                    timer.at = Date.now() + timer.interval;
-                }
-            }
-            if ( fired ) {
-                continue;
-            }
-            now = Date.now();
-            if ( earliest && ( earliest <= now ) ) {
-                continue;
-            }
-            sleep = earliest - now;
-            if ( !earliest || ( wait !== 0 ) && ( !wait || ( Date.now() + sleep > wait ) ) ) {
-                break;
-            }
-            if (sleep) {
-                java.lang.Thread.currentThread().sleep(sleep);
-            }
-        }
-    };
     //Since we're running in rhino I guess we can safely assume
     //java is 'enabled'.  I'm sure this requires more thought
     //than I've given it here
@@ -111,15 +50,10 @@
             fn();
         });
         
-        var async = (new java.lang.Thread(new java.lang.Runnable({
-            run: run
-        })));
-        
         try{
-            async.start();
+            spawn(run);
         }catch(e){
             $env.error("error while running async", e);
-            async.interrupt();
             $env.onInterrupt();
         }
     };

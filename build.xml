@@ -185,6 +185,10 @@
         <arg value="test/envjs-call-load-test.js"/>
         <jvmarg value="-Dfile.encoding=utf-8"/>
       </java>
+      <java fork="true" jar="${RHINO_JAR}" failonerror="true">
+        <arg value="test/prototype.js"/>
+        <jvmarg value="-Dfile.encoding=utf-8"/>
+      </java>
     </target>
     
     </project>

@@ -5,12 +5,6 @@ window.addEventListener("load",function(){
   print("Handling onload for test.js");
   print("Loading tests.");
 
-  // load("test/unit/timer.js");
-
-  print("Load complete. Running tests.");
-
-//   return;
-
   if(true) load(
       "test/unit/dom.js",
       "test/unit/window.js",
@@ -34,3 +28,4 @@ window.addEventListener("load",function(){
 
 window.location = "test/index.html";
 
+Envjs.wait(0);

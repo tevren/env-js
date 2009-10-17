@@ -80,12 +80,11 @@
     
     //resolves location relative to base or window location
     $env.location = function(path, base){};
-    
-    //For Java the window.timer is created using the java.lang.Thread in combination
-    //with the java.lang.Runnable
-    $env.timer = function(fn, time){};	
-    $env.wait = function(fn, time){};	
-    
+    $env.sync = function(fn){
+      var self = this;
+      return function(){ return fn.apply(self,arguments); }
+    }
+  
     $env.javaEnabled = false;	
     
     //Used in the XMLHttpRquest implementation to run a

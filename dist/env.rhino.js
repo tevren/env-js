@@ -99,11 +99,12 @@ var Envjs = function(){
     
     //resolves location relative to base or window location
     $env.location = function(path, base){};
-    
-    //For Java the window.timer is created using the java.lang.Thread in combination
-    //with the java.lang.Runnable
-    $env.timer = function(fn, time){};	
-    
+  
+    $env.sync = function(fn){
+      var self = this;
+      return function(){ return fn.apply(self,arguments); }
+    }
+  
     $env.javaEnabled = false;	
     
     //Used in the XMLHttpRquest implementation to run a
@@ -307,6 +308,8 @@ var Envjs = function(){
         return e&&e.rhinoException?e.rhinoException.lineSource():"(line ?)";
     };
     
+    $env.sync = sync;
+  
     //For Java the window.location object is a java.net.URL
     $env.location = function(path, base){
       var protocol = new RegExp('(^file\:|^http\:|^https\:)');
@@ -317,48 +320,13 @@ var Envjs = function(){
           return new java.net.URL(new java.net.URL(base), path).toString()+'';
         }else{
             //return an absolute url from a url relative to the window location
-            if(window.location.href.length > 0){
                 base = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+            if(window.location.href.length > 0){
                 return base + '/' + path;
             }else{
                 return new java.io.File(  path ).toURL().toString()+'';
             }
         }
-    };
-    
-    var timers = [];
-
-    //For Java the window.timer is created using the java.lang.Thread in combination
-    //with the java.lang.Runnable
-    $env.timer = function(fn, time){
-       var running = true;
-        
-        var run = sync(function(){ //while happening only thing in this timer    
-    	    //$env.debug("running timed function");
-            fn();
-        });
-        var _this = this;
-        var thread = new java.lang.Thread(new java.lang.Runnable({
-            run: function(){
-                try {
-                    while (running){
-                        java.lang.Thread.currentThread().sleep(time);
-                        run.apply(_this);
-                    }
-                }catch(e){
-                    $env.debug("interuption running timed function");
-                    _this.stop();
-                    $env.onInterrupt();
-                };
-            }
-        }));
-        this.start = function(){ 
-            thread.start(); 
-        };
-        this.stop = sync(function(num){
-            running = false;
-            thread.interrupt();
-        })
     };
     
     //Since we're running in rhino I guess we can safely assume
@@ -379,15 +347,10 @@ var Envjs = function(){
             fn();
         });
         
-        var async = (new java.lang.Thread(new java.lang.Runnable({
-            run: run
-        })));
-        
         try{
-            async.start();
+            spawn(run);
         }catch(e){
             $env.error("error while running async", e);
-            async.interrupt();
             $env.onInterrupt();
         }
     };
@@ -8932,7 +8895,7 @@ $w.__defineGetter__("location", function(url){
 				this.search + this.hash;
 		},
 		get protocol(){
-			return protocol.exec(this.href)[0];
+			return this.href && protocol.exec(this.href)[0];
 		},
 		set protocol(_protocol){
 			$w.location = _protocol + this.host + this.pathname + 
@@ -9068,49 +9031,117 @@ $w.__defineGetter__("navigator", function(){
 /*
 *	timer.js
 */
-	
 
 $debug("Initializing Window Timer.");
 
 //private
-var $timers = [];
+var $timers = $env.timers = $env.timers || [];
+var $lock_timers = function(fn){
+  $env.sync.call($timers,fn)();
+};
+
+var $timer = function(fn, interval){
+  if ( (typeof interval) != "number" ) {
+    throw "bad argument to timer";
+  }
+  this.fn = fn;
+  this.interval = interval;
+  this.at = Date.now() + interval;
+};
+  
+$timer.prototype.start = function(){};
+$timer.prototype.stop = function(){};
 
 window.setTimeout = function(fn, time){
   var num;
-  return num = window.setInterval(function(){
-    fn();
-    window.clearInterval(num);
-  }, time);
+  $lock_timers(function(){
+    num = $timers.length+1;
+    var tfn;
+    if (typeof fn == 'string') {
+      tfn = function() {
+        eval(fn);
+        window.clearInterval(num);
+      };
+    } else {
+      tfn = function() {
+        fn();
+        window.clearInterval(num);
+      }
+    }
+    $debug("Creating timer number "+num);
+    $timers[num] = new $timer(tfn, time);
+    $timers[num].start();
+  });
+  return num;
 };
 
 window.setInterval = function(fn, time){
-	var num = $timers.length;
-	
-    if (typeof fn == 'string') {
-        var fnstr = fn; 
-        fn = function() { 
-            eval(fnstr); 
-        }; 
-    }
-	if(time===0){
-	    fn();
-	}else{
-	    //$debug("Creating timer number "+num);
-    	$timers[num] = new $env.timer(fn, time);
-    	$timers[num].start();
-	}
-	return num;
+  if (typeof fn == 'string') {
+    var fnstr = fn; 
+    fn = function() { 
+      eval(fnstr); 
+    }; 
+  }
+  var num;
+  $lock_timers(function(){
+    num = $timers.length+1;
+    //$debug("Creating timer number "+num);
+    $timers[num] = new $timer(fn, time);
+    $timers[num].start();
+  });
+  return num;
 };
 
 window.clearInterval = window.clearTimeout = function(num){
-	//$log("clearing interval "+num);
-	if ( $timers[num] ) {
-	    
-		$timers[num].stop();
-		delete $timers[num];
-	}
+  //$log("clearing interval "+num);
+  $lock_timers(function(){
+    if ( $timers[num] ) {
+      $timers[num].stop();
+      delete $timers[num];
+    }
+  });
 };	
-	/*
+
+// wait === null: execute any immediately runnable timers and return
+// wait(n) (n > 0): execute any timers as they fire but no longer than n ms
+// wait(0): execute any timers as they fire, waiting until there are none left
+
+// FIX: make a priority queue ...
+
+window.$wait = $env.wait = $env.wait || function(wait) {
+  if (wait !== 0 && wait !== null && wait !== undefined){
+    wait += Date.now();
+  }
+  for (;;) {
+    var earliest;
+    $lock_timers(function(){
+      earliest = undefined;
+      for(var i in $timers){
+        if( !$timers.hasOwnProperty(i) ) {
+          continue;
+        }
+        var timer = $timers[i];
+        if(!earliest || timer.at < earliest.at) {
+          earliest = timer;
+        }
+      }
+    });
+    var sleep = earliest && earliest.at - Date.now();
+    if ( earliest && sleep <= 0 ) {
+      var f = earliest.fn;
+      f();
+      earliest.at = Date.now() + earliest.interval;
+      continue;
+    }
+    if ( !earliest || ( wait !== 0 ) && ( !wait || ( Date.now() + sleep > wait ) ) ) {
+      break;
+    }
+    if (sleep) {
+      java.lang.Thread.currentThread().sleep(sleep);
+    }
+  }
+};
+/*
 * event.js
 */
 // Window Events

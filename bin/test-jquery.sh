@@ -24,6 +24,16 @@ ant concat
 
 if [ ! -d "$JQUERY_DIR" ]; then
   svn export http://jqueryjs.googlecode.com/svn/tags/$VERSION/ $JQUERY_DIR
+  case "$VERSION" in
+      "1.3.2")
+          rm -rf "$JQUERY_DIR/test/qunit"
+          svn export -r6173 http://jqueryjs.googlecode.com/svn/trunk/qunit $JQUERY_DIR/test/qunit
+          ;;
+      "1.3.1")
+          rm -rf "$JQUERY_DIR/test/qunit"
+          svn export -r6133 http://jqueryjs.googlecode.com/svn/trunk/qunit $JQUERY_DIR/test/qunit
+          ;;
+  esac
 fi
 
 cp dist/env.rhino.js $JQUERY_DIR/build/runtest/env.js
