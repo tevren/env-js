@@ -12,6 +12,9 @@
     };
     
     $env.sync = sync;
+    $env.sleep = function(t){
+      java.lang.Thread.currentThread().sleep(sleep);
+    }
   
     //For Java the window.location object is a java.net.URL
     $env.location = function(path, base){

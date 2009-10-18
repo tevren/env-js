@@ -7,6 +7,10 @@
     whichInterpreter = "Johnson";
     multiwindow = true;
 
+    $env.sleep = function(t){
+        Ruby.sleep(t/1000000.);
+    }
+
     $env.log = function(msg, level){
          print(' '+ (level?level:'LOG') + ':\t['+ new Date()+"] {ENVJS} "+msg);
     };
@@ -60,76 +64,6 @@ lambda { |e| \
             }
         }
     };
-    
-    var timers = [];
-
-    $env.timer = function(fn, interval){
-        this.fn = fn;
-        this.interval = interval;
-        this.at = Date.now() + interval;
-        this.index = timers.length;
-        timers[this.index] = this;
-    };
-    
-    $env.timer.prototype.start = function(){};
-    $env.timer.prototype.stop = function(){
-        delete timers[this.index];
-    };
-    
-    // wait === null: execute any immediately runnable timers and return
-    // wait(n) (n > 0): execute any timers as they fire but no longer than n ms
-    // wait(0): execute any timers as they fire, waiting until there are none left
-    $env.wait = function(wait) {
-        var i;
-        var after;
-        var now;
-        var timer;
-        var sleep;
-        var earliest;
-        var fired;
-        if (wait !== 0 && wait !== null && wait !== undefined){
-            wait += Date.now();
-        }
-        for (;;) {
-            earliest = undefined
-            fired = false;
-            for (i in timers){
-                if( !timers.hasOwnProperty(i) ) {
-                    continue;
-                }
-                timer = timers[i];
-                if(!earliest || timer.at < earliest) {
-                    earliest = timer.at
-                }
-                now = Date.now();
-                if (timer.at <= now){
-                    f = timer.fn;
-                    f();
-                    timer.at = Date.now() + timer.interval;
-                }
-            }
-            if ( fired ) {
-                continue;
-            }
-            now = Date.now();
-            if ( earliest && ( earliest <= now ) ) {
-                continue;
-            }
-            sleep = earliest - now;
-            if ( !earliest || ( wait !== 0 ) && ( !wait || ( Date.now() + sleep > wait ) ) ) {
-                break;
-            }
-            if (sleep) {
-                Ruby.sleep(sleep/1000000.);
-            }
-        }
-    };
-
-    //Since we're running in rhino I guess we can safely assume
-    //java is 'enabled'.  I'm sure this requires more thought
-    //than I've given it here
-    $env.javaEnabled = true;	
-    
     
     //Used in the XMLHttpRquest implementation to run a
     // request in a seperate thread

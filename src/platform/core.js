@@ -84,7 +84,8 @@
       var self = this;
       return function(){ return fn.apply(self,arguments); }
     }
-  
+    $env.sleep = function(){}
+
     $env.javaEnabled = false;	
     
     //Used in the XMLHttpRquest implementation to run a

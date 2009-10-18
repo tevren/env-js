@@ -10,7 +10,7 @@ window.addEventListener("load",function(){
       "test/unit/window.js",
       "test/unit/elementmembers.js"
   );
-  if(false) if (multiwindow)
+  if(true) if (multiwindow)
     load(
       "test/unit/onload.js",
       "test/unit/scope.js",   // must come before frame.js changes page content

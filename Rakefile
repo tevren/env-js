@@ -46,8 +46,8 @@ namespace :johnson do
   desc "run tests against johnson"
   task :test => :compile do
     ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/primaryTests.js"
-    ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/prototype.js"
-    ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/envjs-call-load-test.js"
+    # FIX ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/prototype.js"
+    # FIX ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/envjs-call-load-test.js"
   end
 
 end

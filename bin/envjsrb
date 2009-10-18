@@ -22,4 +22,4 @@ rescue Johnson::Error => je
   raise je
 end
 
-RUNTIME.evaluate("$wait(0)")
+RUNTIME.evaluate("Envjs.wait(0)")

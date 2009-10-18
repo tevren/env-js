@@ -45,8 +45,6 @@ window.setTimeout = function(fn, time){
   return num;
 };
 
-window.$wait = function(wait){ $env.wait(wait); }
-
 window.setInterval = function(fn, time){
   if (typeof fn == 'string') {
     var fnstr = fn; 
@@ -81,6 +79,7 @@ window.clearInterval = window.clearTimeout = function(num){
 // FIX: make a priority queue ...
 
 window.$wait = $env.wait = $env.wait || function(wait) {
+print("SMP!!!!!!!!!!!");
   if (wait !== 0 && wait !== null && wait !== undefined){
     wait += Date.now();
   }
@@ -109,7 +108,7 @@ window.$wait = $env.wait = $env.wait || function(wait) {
       break;
     }
     if (sleep) {
-      java.lang.Thread.currentThread().sleep(sleep);
+      $env.sleep(sleep);
     }
   }
 };

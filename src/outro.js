@@ -22,3 +22,7 @@ return windowfn;
     Envjs.error("ERROR LOADING ENV : " + e + "\nLINE SOURCE:\n" +
         Envjs.lineSource(e));
 }
+
+// Local Variables:
+// mode:auto-revert
+// End:
