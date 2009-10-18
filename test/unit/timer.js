@@ -46,6 +46,48 @@ test("clearTimeout cancels execution of setTimeout callback", function() {
     stop();
 });
 
+test("setTimeout callbacks that throw run once", function() {
+    expect(2);
+    stop();
+    var called = 0;
+    var id = setTimeout(function(){
+        ok( called == 0, "timeout called once" );
+        called++;
+        throw "an expected error";
+    }, 10);
+    setTimeout(function(){
+        ok( called == 1, "called timeout once double checked" );
+        clearTimeout(id);
+        start();
+    },100);
+});
+
+test("setInterval callbacks that are delayed execute immediately", function() {
+    expect(3);
+    stop();
+    var iteration = 0;
+    var last = Date.now();
+    var id = setInterval(function(){
+        var now = Date.now();
+        var since_last = now - last;
+        switch(iteration) {
+          case 0:
+            ok( since_last > 60 && since_last < 140, "first interval was correct" );
+            while( (Date.now() - last ) < 400 ) {}
+            break;
+          case 1:
+            ok( since_last < 40, "second interval was correct" );
+            break;
+        default:
+            ok(  since_last > 60 && since_last < 140, "third interval was correct" );
+            clearInterval(id);
+            start();
+        }
+        last = Date.now();
+        iteration++;
+    }, 100);
+});
+
 // Local Variables:
 // espresso-indent-level:4
 // c-basic-offset:4

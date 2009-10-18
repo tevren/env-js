@@ -6,14 +6,12 @@ $debug("Initializing Window Timer.");
 
 //private
 var $timers = $env.timers = $env.timers || [];
+var $event_loop_running = false;
 var $lock_timers = function(fn){
   $env.sync.call($timers,fn)();
 };
 
 var $timer = function(fn, interval){
-  if ( (typeof interval) != "number" ) {
-    throw "bad argument to timer";
-  }
   this.fn = fn;
   this.interval = interval;
   this.at = Date.now() + interval;
@@ -22,19 +20,39 @@ var $timer = function(fn, interval){
 $timer.prototype.start = function(){};
 $timer.prototype.stop = function(){};
 
+var convert_time = function(time) {
+  time = time*1;
+  if ( isNaN(time) || time < 0 ) {
+    time = 0;
+  }
+  if ( $event_loop_running && time < 4 ) {
+    time = 4;
+  }
+  return time;
+}
+
 window.setTimeout = function(fn, time){
   var num;
+  time = convert_time(time);
   $lock_timers(function(){
     num = $timers.length+1;
     var tfn;
     if (typeof fn == 'string') {
       tfn = function() {
-        eval(fn);
-        window.clearInterval(num);
+        try {
+          eval(fn);
+        } catch (e) {
+          $env.error(e);
+        }
+        window.clearInterval(num);          
       };
     } else {
       tfn = function() {
-        fn();
+        try {
+          fn();
+        } catch (e) {
+          $env.error(e);
+        }
         window.clearInterval(num);
       }
     }
@@ -46,10 +64,14 @@ window.setTimeout = function(fn, time){
 };
 
 window.setInterval = function(fn, time){
+  time = convert_time(time);
+  if ( time < 10 ) {
+    time = 10;
+  }
   if (typeof fn == 'string') {
     var fnstr = fn; 
     fn = function() { 
-      eval(fnstr); 
+      eval(fnstr);
     }; 
   }
   var num;
@@ -79,7 +101,7 @@ window.clearInterval = window.clearTimeout = function(num){
 // FIX: make a priority queue ...
 
 window.$wait = $env.wait = $env.wait || function(wait) {
-print("SMP!!!!!!!!!!!");
+  $event_loop_running = true; 
   if (wait !== 0 && wait !== null && wait !== undefined){
     wait += Date.now();
   }
@@ -101,7 +123,13 @@ print("SMP!!!!!!!!!!!");
     if ( earliest && sleep <= 0 ) {
       var f = earliest.fn;
       f();
-      earliest.at = Date.now() + earliest.interval;
+      var goal = earliest.at + earliest.interval;
+      var now = Date.now();
+      if ( goal < now ) {
+        earliest.at = now;
+      } else {
+        earliest.at = goal;
+      }
       continue;
     }
     if ( !earliest || ( wait !== 0 ) && ( !wait || ( Date.now() + sleep > wait ) ) ) {
@@ -111,4 +139,6 @@ print("SMP!!!!!!!!!!!");
       $env.sleep(sleep);
     }
   }
+  $event_loop_running = false;
 };
+

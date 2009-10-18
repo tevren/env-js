@@ -5,12 +5,14 @@ window.addEventListener("load",function(){
   print("Handling onload for test.js");
   print("Loading tests.");
 
-  if(true) load(
+  load("test/unit/proxy.js");
+
+  if(false) load(
       "test/unit/dom.js",
       "test/unit/window.js",
       "test/unit/elementmembers.js"
   );
-  if(true) if (multiwindow)
+  if(false) if (multiwindow)
     load(
       "test/unit/onload.js",
       "test/unit/scope.js",   // must come before frame.js changes page content
@@ -18,7 +20,7 @@ window.addEventListener("load",function(){
       "test/unit/events.js",
       "test/unit/multi-window.js"
     );
-  if(true)load(
+  if(false)load(
       "test/unit/parser.js",
       "test/unit/timer.js"
   );

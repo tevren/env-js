@@ -23,7 +23,7 @@ print = function() {
 };
 EOJS
 
-      self.global = new_global( global_proto )
+      self.global = new_proxy( global_proto, {} )
 
       set_window_string.call(global,global.object_id)
 
