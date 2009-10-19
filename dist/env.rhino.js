@@ -9045,6 +9045,7 @@ var $timer = function(fn, interval){
   this.fn = fn;
   this.interval = interval;
   this.at = Date.now() + interval;
+  this.running = false; // allows for calling wait() from callbacks
 };
   
 $timer.prototype.start = function(){};
@@ -9124,13 +9125,14 @@ window.clearInterval = window.clearTimeout = function(num){
   });
 };	
 
-// wait === null: execute any immediately runnable timers and return
-// wait(n) (n > 0): execute any timers as they fire but no longer than n ms
-// wait(0): execute any timers as they fire, waiting until there are none left
+// wait === null/undefined: execute any timers as they fire, waiting until there are none left
+// wait(n) (n > 0): execute any timers as they fire until there are none left, waiting at least n ms
+// wait(0): execute any immediately runnable timers and return
 
 // FIX: make a priority queue ...
 
 window.$wait = $env.wait = $env.wait || function(wait) {
+  var old_loop_running = $event_loop_running;
   $event_loop_running = true; 
   if (wait !== 0 && wait !== null && wait !== undefined){
     wait += Date.now();
@@ -9144,15 +9146,21 @@ window.$wait = $env.wait = $env.wait || function(wait) {
           continue;
         }
         var timer = $timers[i];
-        if(!earliest || timer.at < earliest.at) {
+        if( !timer.running && ( !earliest || timer.at < earliest.at) ) {
           earliest = timer;
         }
       }
     });
+
     var sleep = earliest && earliest.at - Date.now();
     if ( earliest && sleep <= 0 ) {
       var f = earliest.fn;
-      f();
+      try {
+        earliest.running = true;
+        f();
+      } finally {
+        earliest.running = false;
+      }
       var goal = earliest.at + earliest.interval;
       var now = Date.now();
       if ( goal < now ) {
@@ -9162,14 +9170,31 @@ window.$wait = $env.wait = $env.wait || function(wait) {
       }
       continue;
     }
-    if ( !earliest || ( wait !== 0 ) && ( !wait || ( Date.now() + sleep > wait ) ) ) {
-      break;
+
+    // bunch of subtle cases here ...
+    if ( !earliest ) {
+      // no events in the queue (but maybe XHR will bring in events, so ...
+      if ( !wait || wait < Date.now() ) {
+        // Loop ends if there are no events and a wait hasn't been requested or has expired
+        break;
+      }
+      // no events, but a wait requested: fall through to sleep
+    } else {
+      // there are events in the queue, but they aren't firable now
+      if ( wait === 0 ) {
+        // loop ends even if there are events, but user specifcally asked not to wait via wait(0)
+        break;
+      }
+      // there are events and the user wants to wait: fall through to sleep
     }
-    if (sleep) {
-      java.lang.Thread.currentThread().sleep(sleep);
+
+    // Releated to ajax threads ... hopefully can go away ..
+    if ( !sleep || sleep>100 ) {
+      sleep = 100;
     }
+    java.lang.Thread.currentThread().sleep(sleep);
   }
-  $event_loop_running = false;
+  $event_loop_running = old_loop_running;
 };
 
 /*

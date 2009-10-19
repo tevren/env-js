@@ -23,12 +23,16 @@ http://ejohn.org/projects/bringing-the-browser-to-the-server/
 Rhino (Java-based JavaScript engine)
 http://www.mozilla.org/rhino/
 
+Getting the code:
+
+* Check the code out from git: git clone git://github.com/thatcher/env-js.git
 
 Building:
 * run "ant concat"
 * Creates a platform-agnostic "dist/env.js" file and a Rhino-specific "dist/env.rhino.js" file.
 
 Testing:
+* Checkout qunit: "git submodule update --init"
 * run "ant test"
 
 Java command line:
@@ -80,7 +84,8 @@ Installing:
      // run any setup code for your framework
      // tell the framework that the document is loaded
 
-
+4) Invoke the Envjs event loop at the end of your script:
+   Envjs.wait();
     
 Testing jQuery Compatibility:
 * run ./bin/test-jquery.sh 1.3.2
@@ -88,3 +93,9 @@ Testing jQuery Compatibility:
 * run ./bin/test-jquery.sh 1.2.6
 * Checks out the given jQuery tag from Subversion into test/vendor/jQuery/[version], 
   moves dist/env.rhino.js into the correct location in their tree, and runs the test suites.
+
+Changes with new timer code:
+
+Previously with envjs, you could call Java's thread sleep() method to delay execution. This was mostly used in test suites. This may no
+longer work the same since it will inhibit all events from firing. You can now use the Envjs.wait(milliseconds) call to achieve an
+effect similar to calling sleep().

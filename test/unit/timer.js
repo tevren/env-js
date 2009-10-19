@@ -88,6 +88,15 @@ test("setInterval callbacks that are delayed execute immediately", function() {
     }, 100);
 });
 
+test("wait(n) waits at least n and then continues", function() {
+    stop();
+    expect(1);
+    var now = Date.now();
+    Envjs.wait(1000);
+    ok( Date.now() - now > 1000, "wait waited long enough" );
+    start();
+});
+
 // Local Variables:
 // espresso-indent-level:4
 // c-basic-offset:4

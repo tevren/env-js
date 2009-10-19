@@ -94,4 +94,4 @@ load("build/runtest/env.js");
     
 })(Envjs);
 
-Envjs.wait(0);
+Envjs.wait();

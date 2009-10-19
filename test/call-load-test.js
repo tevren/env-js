@@ -1,6 +1,12 @@
-<<<<<<< HEAD
+if(!this.whichJarFile){
+  whichJarFile = "rhino"
+}
+whichInterpreter = whichJarFile + " interpreter jar";
+if(!this.multiwindow){
+  multiwindow = false;
+}
+load("dist/env.rhino.js");
 load("test/qunit.js");
-
 Envjs("test/index.html", {});
 
 test("'index.html' loaded correctly via 'Envjs()' call", function(){
@@ -15,9 +21,4 @@ test("window.location= following Envjs() initialization flagged as error",
     expect(0);
 });
 
-Envjs.wait(0);
-=======
-whichJarFile = "envjs"
-multiwindow = true;
-load("test/call-load-test.js");
->>>>>>> timer
+Envjs.wait();
