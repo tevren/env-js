@@ -88,12 +88,24 @@ test("setInterval callbacks that are delayed execute immediately", function() {
     }, 100);
 });
 
-test("wait(n) waits at least n and then continues", function() {
+test("wait(n) waits at least n and then continues with nothing in the future", function() {
     stop();
     expect(1);
     var now = Date.now();
     Envjs.wait(1000);
     ok( Date.now() - now > 1000, "wait waited long enough" );
+    start();
+});
+
+test("wait(n) waits at least n and then continues with stuff in the future", function() {
+    stop();
+    expect(2);
+    var now = Date.now();
+    var t = setTimeout(function(){
+    },2000);
+    Envjs.wait(1000);
+    ok( Date.now() - now > 1000, "wait waited long enough" );
+    ok( Date.now() - now < 2000, "wait didn't wait too long" );
     start();
 });
 

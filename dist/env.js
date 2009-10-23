@@ -8417,9 +8417,7 @@ $debug("Initializing Window Timer.");
 //private
 var $timers = $env.timers = $env.timers || [];
 var $event_loop_running = false;
-var $lock_timers = function(fn){
-  $env.sync.call($timers,fn)();
-};
+$timers.lock = $env.sync(function(fn){fn();});
 
 var $timer = function(fn, interval){
   this.fn = fn;
@@ -8445,7 +8443,7 @@ var convert_time = function(time) {
 window.setTimeout = function(fn, time){
   var num;
   time = convert_time(time);
-  $lock_timers(function(){
+  $timers.lock(function(){
     num = $timers.length+1;
     var tfn;
     if (typeof fn == 'string') {
@@ -8465,7 +8463,7 @@ window.setTimeout = function(fn, time){
           $env.error(e);
         }
         window.clearInterval(num);
-      }
+      };
     }
     $debug("Creating timer number "+num);
     $timers[num] = new $timer(tfn, time);
@@ -8486,7 +8484,7 @@ window.setInterval = function(fn, time){
     }; 
   }
   var num;
-  $lock_timers(function(){
+  $timers.lock(function(){
     num = $timers.length+1;
     //$debug("Creating timer number "+num);
     $timers[num] = new $timer(fn, time);
@@ -8497,7 +8495,7 @@ window.setInterval = function(fn, time){
 
 window.clearInterval = window.clearTimeout = function(num){
   //$log("clearing interval "+num);
-  $lock_timers(function(){
+  $timers.lock(function(){
     if ( $timers[num] ) {
       $timers[num].stop();
       delete $timers[num];
@@ -8506,12 +8504,14 @@ window.clearInterval = window.clearTimeout = function(num){
 };	
 
 // wait === null/undefined: execute any timers as they fire, waiting until there are none left
-// wait(n) (n > 0): execute any timers as they fire until there are none left, waiting at least n ms
+// wait(n) (n > 0): execute any timers as they fire until there are none left waiting at least n ms
+// but no more, even if there are future events/current threads
 // wait(0): execute any immediately runnable timers and return
 
 // FIX: make a priority queue ...
 
 window.$wait = $env.wait = $env.wait || function(wait) {
+  var start = Date.now();
   var old_loop_running = $event_loop_running;
   $event_loop_running = true; 
   if (wait !== 0 && wait !== null && wait !== undefined){
@@ -8519,10 +8519,10 @@ window.$wait = $env.wait = $env.wait || function(wait) {
   }
   for (;;) {
     var earliest;
-    $lock_timers(function(){
+    $timers.lock(function(){
       earliest = undefined;
       for(var i in $timers){
-        if( !$timers.hasOwnProperty(i) ) {
+        if( isNaN(i*0) ) {
           continue;
         }
         var timer = $timers[i];
@@ -8531,12 +8531,12 @@ window.$wait = $env.wait = $env.wait || function(wait) {
         }
       }
     });
-
     var sleep = earliest && earliest.at - Date.now();
     if ( earliest && sleep <= 0 ) {
       var f = earliest.fn;
       try {
         earliest.running = true;
+        var h = Date.now();
         f();
       } finally {
         earliest.running = false;
@@ -8561,16 +8561,17 @@ window.$wait = $env.wait = $env.wait || function(wait) {
       // no events, but a wait requested: fall through to sleep
     } else {
       // there are events in the queue, but they aren't firable now
-      if ( wait === 0 ) {
-        // loop ends even if there are events, but user specifcally asked not to wait via wait(0)
+      if ( wait === 0 || ( wait > 0 && wait < Date.now () ) ) {
+        // loop ends even if there are events but the user specifcally asked not to wait too long
         break;
       }
       // there are events and the user wants to wait: fall through to sleep
     }
 
     // Releated to ajax threads ... hopefully can go away ..
-    if ( !sleep || sleep>100 ) {
-      sleep = 100;
+    var interval =  $wait.interval || 100;
+    if ( !sleep || sleep > interval ) {
+      sleep = interval;
     }
     java.lang.Thread.currentThread().sleep(sleep);
   }
