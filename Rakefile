@@ -70,8 +70,8 @@ begin
     s.email = "smparkes@smparkes.net" # Just for the ruby part ...
     s.homepage = "http://github.com/thatcher/env-js"
     s.description = "Browser environment for javascript interpreters"
-    s.authors = ["John Resig", "Chris Thatcher", "Glen E. Ivey" ]
-    s.add_development_dependency "smparkes.johnson", ">= 1.1.2.2"
+    s.authors = ["John Resig", "Chris Thatcher" ]
+    s.add_dependency "smparkes.johnson", ">= 1.1.2.2"
     s.files = 
       FileList[ "",
                 "{bin,generators,lib,test}/**/*", 'lib/jeweler/templates/.gitignore']
