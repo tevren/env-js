@@ -1,20 +1,24 @@
 require 'envjs'
+require "open-uri"
 
 module Envjs::Runtime
 
   def self.extended object
     object.instance_eval do
 
-      global_proto = global
-
-      set_window_string =
-        evaluate("function(o,id){o.toString=function(){return'[object Window '+id+']'}}")
-
       evaluate <<'EOJS'
 print = function() {
   var l = arguments.length
   for( var i = 0; i < l; i++ ) {
-    Ruby.print( arguments[i].toString() );
+    var s;
+    if ( arguments[i] === null ) {
+      s = "null";
+    } else if ( arguments[i] === undefined  ) {
+      s = "undefined"      
+    } else {
+      s = arguments[i].toString();
+    }
+    Ruby.print(s);
     if( i < l-1 ) {
       Ruby.print(" ");
     }
@@ -23,62 +27,84 @@ print = function() {
 };
 EOJS
 
-      self.global = new_proxy( global_proto, {} )
+      master = global["$master"] = evaluate("new Object")
+      master.symbols = [ "Johnson", "Ruby", "print", "load", "whichInterpreter", "multiwindow" ]
+      master.symbols.each { |symbol| master[symbol] = global[symbol] }
 
-      set_window_string.call(global,global.object_id)
+      master.whichInterpreter = "Johnson"
 
-      global_proto.globalize = lambda do
-        puts "SMPG"
-        g = new_global global_proto
-        set_window_string.call(g,g.object_id)
-        $stderr.print "kkkk ng ", global_proto, "\n"
-        $stderr.print "kkkk ng ", evaluate("this"), "\n"
-        $stderr.print "kkkk ng ", g, "\n"
-        g
-      end
-      global_proto.getFreshScopeObj = global_proto.globalize
+      master.multiwindow = true
 
-      global_proto.setScope = lambda do |f, scope|
-        prev = f
-        cur = get_parent( f )
-        while _next = get_parent( cur )
-          prev = cur
-          cur = _next
+      # calling this from JS is hosed; the ruby side is confused, maybe because HTTPHeaders is mixed in?
+      master.add_req_field = lambda { |r,k,v| r.add_field(k,v) }
+
+      master.load = lambda { |*files|
+        if files.length == 2 && !(String === files[1])
+          f = files[0]
+          w = files[1]
+          v = open(f).read.gsub(/\A#!.*$/, '')
+          evaluate(v, f, 1, w, w, f)
+        else
+          load *files
         end
-        set_parent( prev, scope )
+      }
+
+      master.evaluate = lambda { |v,w|
+        evaluate(v,"inline",1,w,w);
+      }
+
+      master.new_split_global_outer = lambda { new_split_global_outer }
+      master.new_split_global_inner = lambda { |outer,_| new_split_global_inner outer }
+
+      # create an proto window object and proxy
+
+      outer = new_split_global_outer
+      window = inner = new_split_global_inner( outer )
+
+      master.symbols.each do |symbol|
+        window[symbol] = master[symbol]
       end
 
-      global_proto.getScope = lambda do |f, nothing|
-        cur = f
-        while prev = get_parent( cur )
-          cur = prev
+      master.first_script_window = window
+
+      window["$master"] = master
+
+      window.load = lambda { |*files|
+        files.each do |f|
+          master.load.call f, window
         end
-        cur
+      }
+
+      ( class << self; self; end ).send :define_method, :wait do
+        master["finalize"] && master.finalize.call
       end
 
-      global_proto.configureScope = lambda do |f, scopes|
-        pairs = [ [ f, get_parent( f ) ] ]
-        set_parent( f, scopes[0] )
-        scopes.each_with_index do |scope, i|
-          pairs << [ scope, get_parent( scope ) ]
-          set_parent( scope, scopes[i+1] )
+      scripts = {}
+
+      ( class << self; self; end ).send :define_method, :evaluate do |*args|
+        ( script, file, line, global, scope, fn ) = *args
+        # print "eval in " + script[0,50].inspect + (scope ? scope.toString() : "nil") + "\n"
+        global = nil
+        scope ||= inner
+        if fn
+          compiled_script = scripts[fn]
         end
-        pairs
-      end
-
-      global_proto.restoreScope = lambda do |scopes|
-        scopes.each do |pair|
-          set_parent( pair[0], pair[1] )
+        # compiled_script = compile(script, file, line, global)
+        compiled_script ||= compile(script, file, line, global)
+        if fn && !scripts[fn]
+          scripts[fn] = compiled_script
         end
+        evaluate_compiled_script(compiled_script,scope)
       end
 
-      global_proto.configureScope = lambda { |f, scopes| }
-      global_proto.restoreScope = lambda { |scopes| }
-      global_proto.setScope = lambda { |f, scope| }
-      global_proto.getScope = lambda { |f, nothing| }
-      
-      global_proto.loadxx = lambda do |f|
-        self.require f
+      @envjs = inner
+
+      ( class << self; self; end ).send :define_method, :"[]" do |key|
+        key == "this" && evaluate("this") || @envjs[key]
+      end
+
+      ( class << self; self; end ).send :define_method, :"[]=" do |k,v|
+        @envjs[k] = v
       end
 
     end

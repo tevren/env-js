@@ -71,7 +71,7 @@
     <script>
         var usingEnvjsSpecificJar = false;
         try {
-          usingEnvjsSpecificJar = whichJarFile == "envjs";
+          usingEnvjsSpecificJar = (( this.whichJarFile == "envjs" ) || this.multiwindow);
         } catch (e){;}
         if (usingEnvjsSpecificJar){
           eventFrameLoaded = eventFrameClicked = 0;

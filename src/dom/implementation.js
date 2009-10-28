@@ -33,7 +33,14 @@ var __endHTMLElement__ = function(node, doc, p){
         if (node.src && node.src.length > 0){
             $debug("getting content document for (i)frame from " + node.src);
 
+            // any JS here is DOM-instigated, so the JS scope is the window, not the first script
+
+            var save = $master.first_script_window;
+            $master.first_script_window = window;
+
             $env.loadFrame(node, $env.location(node.src));
+
+            $master.first_script_window = save;
 
             var event = doc.createEvent();
             event.initEvent("load");

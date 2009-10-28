@@ -163,8 +163,8 @@
             </filterchain>
             <fileset dir="${DIST_DIR}" includes="build.js" />
             <fileset dir="${DIST_DIR}" includes="intro.js" />
-            <fileset dir="${SRC_DIR}"  includes="platform/core.js" />
             <fileset dir="${SRC_DIR}"  includes="platform/rhino.js" />
+            <fileset dir="${SRC_DIR}"  includes="platform/core.js" />
             <fileset dir="${DIST_DIR}" includes="env.js" />
             <fileset dir="${SRC_DIR}" includes="outro.js" />
         </concat>

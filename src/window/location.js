@@ -7,21 +7,13 @@ $debug("Initializing Window Location.");
 var $location = '';
 
 $w.__defineSetter__("location", function(url){
-    if ($w.$isOriginalWindow){
-        if ($w.$haveCalledWindowLocationSetter)
-            throw new Error("Cannot call 'window.location=' multiple times " +
-              "from the context used to load 'env.js'.  Try using " +
-              "'window.open()' to get a new context.");
-        $w.$haveCalledWindowLocationSetter = true;
-        $w.__loadAWindowsDocument__(url);
-    }
-    else {
-        $env.$unloadEventsFor($w);
-        var proxy = $w;
-        if (proxy.$thisWindowsProxyObject)
-            proxy = proxy.$thisWindowsProxyObject;
-        $env.reloadAWindowProxy(proxy, url);
-    }
+  if( !$location || $location == "about:blank" ) {
+    $w.__loadAWindowsDocument__(url);
+  } else {
+    $env.$unloadEventsFor($w);
+    var proxy = $w.window;
+    $env.reloadAWindowProxy(proxy, url);
+  }
 });
 
 $w.__loadAWindowsDocument__ = function(url){
@@ -111,8 +103,8 @@ $w.__defineGetter__("location", function(url){
             // ignore 'force': we don't implement a cache
             var thisWindow = $w;
             $env.$unloadEventsFor(thisWindow);
-            try { thisWindow = thisWindow.$thisWindowsProxyObject; }catch (e){}
-            $env.reloadAWindowProxy(thisWindow, thisWindow.location.href);
+            try { thisWindow = thisWindow.$thisWindowsProxyObject || thisWindow; }catch (e){}
+            $env.reloadAWindowProxy($window, thisWindow.location.href);
         },
         replace: function(url){
             $location = url;

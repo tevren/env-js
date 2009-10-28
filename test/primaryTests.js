@@ -5,29 +5,22 @@ window.addEventListener("load",function(){
   print("Handling onload for test.js");
   print("Loading tests.");
 
-  load("test/unit/proxy.js");
-
-  if(false) load(
-      "test/unit/dom.js",
-      "test/unit/window.js",
-      "test/unit/elementmembers.js"
-  );
-  if(false) if (multiwindow)
-    load(
-      "test/unit/onload.js",
-      "test/unit/scope.js",   // must come before frame.js changes page content
-      "test/unit/iframe.js",
-      "test/unit/events.js",
-      "test/unit/multi-window.js"
-    );
-  if(false)load(
-      "test/unit/parser.js",
-      "test/unit/timer.js"
-  );
-
+  load( "test/unit/dom.js");
+  load("test/unit/window.js");
+  load("test/unit/elementmembers.js");
+  if (multiwindow) {
+    load("test/unit/onload.js");
+    load("test/unit/scope.js");   // must come before frame.js changes page content
+    load("test/unit/iframe.js");
+    load("test/unit/events.js");
+    load("test/unit/multi-window.js");
+  }
+  load("test/unit/parser.js");
+  load("test/unit/timer.js");
+  
   print("Load complete. Running tests.");
 });
 
 window.location = "test/index.html";
 
-Envjs.wait();
+this.Envjs && this.Envjs.wait();

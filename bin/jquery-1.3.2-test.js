@@ -1,9 +1,10 @@
 //debugger;
 load("build/runtest/env.js");
 
-(function($env){
-    
-    $env("test/index.html", {
+(function(Envjs){
+    var $env = Envjs.$env;
+
+    Envjs("test/index.html", {
         //let it load the script from the html
 		logLevel: $env.INFO,
         scriptTypes: {

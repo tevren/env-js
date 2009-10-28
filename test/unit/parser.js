@@ -2,6 +2,7 @@
 $w = { }
 $env = { debug: function() {} }
 $openingWindow = $parentWindow = $initTop = null;
+this.options = this.options || {}
 
 load("src/window/window.js", "src/dom/parser.js", "src/dom/entities.js");
 

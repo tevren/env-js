@@ -19,7 +19,9 @@
       First paragraph in <code>iframe.3.html</code>.
     </p>
 
-    <iframe id="nested1Level" name="nested1Level" src="html/iframe2.html"></iframe>
+    <!-- CHECK: under java, this has been html/iframe2.html, but
+         shouldn't loc be relative to this window? -->
+    <iframe id="nested1Level" name="nested1Level" src="iframe2.html"></iframe>
 
     <p id="lastPara">
       Last paragraph in <code>iframe.3.html</code>.

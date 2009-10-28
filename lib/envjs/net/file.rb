@@ -22,10 +22,22 @@ class Envjs::Net::File < Net::Protocol
     self
   end
 
+  def finish
+  end
+
   class Response
     def initialize path
       @path = path
       @file = File.new @path
+      @body = @file.read
+      @file.close
+    end
+
+    def [] *args
+      nil
+    end
+
+    def each &block
     end
 
     def getHeaderFields
@@ -40,9 +52,15 @@ class Envjs::Net::File < Net::Protocol
       @file.nil? ? 404 : 200;
     end
 
-    def getInputStream
-      @file
+    def code
+      @file.nil? ? "404" : "200";
     end
+
+    def getInputStream
+      self
+    end
+
+    attr_reader :body
 
   end
 

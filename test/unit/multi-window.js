@@ -12,12 +12,17 @@ module("multi-window");
 test("2nd window.location= operation flagged as error", function() {
     expect(1);
 
-    var gotAnException = false;
-    window.onload = function(){;};
-    try{         window.location = "html/trivial.html";    }
-    catch (e){   gotAnException = true;                         }
-    try{ ok(gotAnException, "prohibited window.location setter call fails");
-    }catch(e){print(e);}
+    if ( window.Envjs.interpreter === "Johnson" ) {
+      ok(true,"we don't object to setting window.location in Johnson, which will blitz the tests");
+    } else {
+      var gotAnException = false;
+      window.onload = function(){;};
+      try {
+        window.location = "html/trivial.html";
+      } catch (e){   gotAnException = true;                         }
+      try{ ok(gotAnException, "prohibited window.location setter call fails");
+         }catch(e){print(e);}
+    }
 });
 
 test("window.open()-related behavior and members", function() {

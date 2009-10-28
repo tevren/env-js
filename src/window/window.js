@@ -1,7 +1,3 @@
-// print("SMP Y",this);
-// print("SMP YY",$w);
-// print("SMP Z",$env);
-
 /*
 *	window.js
 *   - this file will be wrapped in a closure providing the window object as $w
@@ -56,7 +52,8 @@ var $name;
 
 // a read/write reference to the Window object that contained the script that called open() to 
 //open this browser window.  This property is valid only for top-level window objects.
-var $opener = $openingWindow;
+
+var $opener = $openingWindow = options.opener;
 
 // Read-only properties that specify the total height and width, in pixels, of the browser window.
 // These dimensions include the height and width of the menu bar, toolbars, scrollbars, window
@@ -73,7 +70,7 @@ var $pageXOffset = 0, $pageYOffset = 0;
 // or frame.  If the window is a top-level window, parent refers to
 // the window itself.  If this window is a frame, this property refers
 // to the window or frame that conatins it.
-var $parent = $parentWindow;
+var $parent = options.parent || window;
 try {
     if ($parentWindow.$thisWindowsProxyObject)
         $parent = $parentWindow.$thisWindowsProxyObject;
@@ -94,7 +91,7 @@ var $status = '';
 // a read-only reference to the top-level window that contains this window.  If this
 // window is a top-level window it is simply a refernce to itself.  If this window 
 // is a frame, the top property refers to the top-level window that contains the frame.
-var $top = $initTop;
+var $top = $parent && $parent.top || this;
 
 // the window property is identical to the self property and to this obj
 var $window = $w;
@@ -102,7 +99,7 @@ try {
     if ($w.$thisWindowsProxyObject)
         $window = $w.$thisWindowsProxyObject;
 } catch(e){}
-
+options.proxy && ( $window = options.proxy );
 
 $debug("Initializing Window.");
 __extend__($w,{

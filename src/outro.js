@@ -1,27 +1,42 @@
-/*
-*	outro.js
-*/
+// faux-intro ...
+// (function(){
+//   (function(){
+//     function(){
 
+      if ( options.url ) {
+        $w.__loadAWindowsDocument__(options.url);
+      }
+    };
 
-    };// close function definition begun in 'intro.js'
+    return $env;
 
+  })(); // close function definition begun in 'intro.js'
 
-print ("SMP X",this);
+  // Initial window setup
+  $env.init.call(this);
 
-return windowfn;
-
-})().call(this,this,    // object to "window-ify"
-                 this,    // a root window's parent is itself
-                 null,    // "opener" for new window
-                 this,    // "top" for new window
-                 true     // identify this as the original (not reloadable) win
-                );
-
-} catch(e){
-  throw e;
-    Envjs.error("ERROR LOADING ENV : " + e + "\nLINE SOURCE:\n" +
-        Envjs.lineSource(e));
-}
+  // User accesible interface ...
+  Envjs = $env.Envjs = function(){
+    if(arguments.length === 2){
+      for ( var i in arguments[1] ) {
+    	var g = arguments[1].__lookupGetter__(i), 
+            s = arguments[1].__lookupSetter__(i);
+    	if ( g || s ) {
+    	  if ( g ) $env.__defineGetter__(i, g);
+    	  if ( s ) $env.__defineSetter__(i, s);
+    	} else
+    	  $env[i] = arguments[1][i];
+      }
+    }
+    if (arguments[0] != null && arguments[0] != "")
+      window.location = arguments[0];
+  };
+  Envjs.$env = $env;
+  Envjs.wait = $env.wait;
+  Envjs.interpreter = window.whichInterpreter;
+  Envjs.evaluate = $env.$master.evaluate;
+  
+})();
 
 // Local Variables:
 // mode:auto-revert

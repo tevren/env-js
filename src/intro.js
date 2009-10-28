@@ -1,54 +1,90 @@
-print("SMPI",this);
-
-try {
-
 (function(){
-    var windowfn = function($w,
-                            $parentWindow,
-                            $openingWindow,
-                            $initTop,
-                            $thisIsTheOriginalWindow){
 
-this.window = this;
-print("SMP0",this);
-print("SMP0",$w);
-print("SMP0",window);
-if(this!=$w){
-  print(this);
-  print($w);
-  Ruby.raise("Hell");
-}
+  var $env = (function(){
+    
+    var $env = {};
+    var $master;
 
-  var $env = Envjs = function(){
-    if(arguments.length === 2){
-        for ( var i in arguments[1] ) {
-    		var g = arguments[1].__lookupGetter__(i), 
-                s = arguments[1].__lookupSetter__(i);
-    		if ( g || s ) {
-    			if ( g ) Envjs.__defineGetter__(i, g);
-    			if ( s ) Envjs.__defineSetter__(i, s);
-    		} else
-    			Envjs[i] = arguments[1][i];
-    	}
-    }
+    var $public = (function(){
+      var $public = {};
+      return $public;
+    })();
 
-    if (arguments[0] != null && arguments[0] != "")
-        window.location = arguments[0];
-};
+    var $platform = function(master){
 
-      if ( false ) {
-      try { Ruby.raise("qqq"); } catch (e) { print("QQQ",e.stack) };
-      print("SMP new window t",this);
-      print("SMP new window w",$w);
-      print("SMP new window pw",$parentWindow);
-      print("SMP new window ow",$openingWindow);
+      var $platform = {};
+
+      $platform.new_global = function() {
+        return $master.new_global();
+      };
+
+      $platform.set_global = function(global) {
+        return $master.set_global(global);
+      };
+
+      $platform.new_split_global_outer = function() {
+        return $master.new_split_global_outer();
+      };
+
+      $platform.new_split_global_inner = function(proxy) {
+        return $master.new_split_global_inner(proxy,undefined);
+      };
+
+      ( master.window_index === undefined ) && ( master.window_index = 0 );
+
+      $platform.init_window = function(window) {
+        var index = master.window_index++;
+        window.toString = function(){
+          return "[object Window "+index+"]";
+        };
+      };
+
+      return $platform;
+    };
+
+    $env.new_window = function(proxy){
+      if(!proxy){
+        proxy = $platform.new_split_global_outer();
       }
+      $master.proxy = proxy;
+      new_window = $platform.new_split_global_inner(proxy,undefined);
+      new_window.$master = $master;
+      for(var index in $master.symbols) {
+        var symbol = $master.symbols[index];
+        new_window[symbol] = $master[symbol];
+      }
+      new_window.load = function(){
+        for(var i = 0; i < arguments.length; i++){
+          var f = arguments[i];
+          $master.load(f,new_window);
+        }
+      };
+      return [ proxy, new_window ];
+    };
 
-        // The Window Object
-        var __this__ = $w;
-        $w.__defineGetter__('window', function(){
-            return __this__;
-        });
-        $w.$isOriginalWindow = $thisIsTheOriginalWindow;
-        $w.$haveCalledWindowLocationSetter = false;
+    $env.init = function(){
+      $master = this.$master;
+      delete this.$master;
+      $platform = $platform($master);
+      var options = this.$options;
+      delete this.$options;
+      $env.$master = $master;
+      $env.init_window.call(this,options);
+    };
 
+    $env.init_window = function(options){
+      $platform.init_window(this);
+
+      var print = $master.print;
+
+      // print("set",this);
+      // print("set",this.window);
+      if ( !this.window) {
+        this.window = this;
+      }
+      // print("setx",this);
+      // print("setx",this.window);
+
+      options = options || {};
+
+      var $w = this;

@@ -93,6 +93,25 @@ test("Event handler attribute has access to (correct) 'this'", function() {
 });
 
 
+test("Event handler attribute has access to (correct) 'this'", function() {
+    expect(2);
+    // test:  div1a.onclick creates p2a
+
+    var idoc = document.getElementById('scopeFrame').contentDocument;
+    var mtch = idoc.getElementById('p2a');
+    try{ ok(mtch == undefined || mtch == null,
+        "div1a event handler didn't execute early");
+    }catch(e){print(e);}
+
+    var div1a = idoc.getElementById('div1a');
+    __click__(div1a);
+    mtch = idoc.getElementById('p2a').innerHTML.match(/div1a click/);
+    try{ ok(mtch && mtch.length > 0,
+        "div1a event handler executed correctly");
+    }catch(e){print(e);}
+});
+
+
 test("Event handler attribute has enclosing HTML elements in scope chain",
   function() {
     expect(2);

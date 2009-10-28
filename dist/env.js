@@ -1,29 +1,4 @@
 /*
- * Envjs env-js.1.0.rc7 
- * Pure JavaScript Browser Environment
- *   By John Resig <http://ejohn.org/>
- * Copyright 2008-2009 John Resig, under the MIT License
- */
-
-
-try {
-
-    Envjs.window = function($w,
-                            $env,
-                            $parentWindow,
-                            $openingWindow,
-                            $initTop,
-                            $thisIsTheOriginalWindow){
-
-        // The Window Object
-        var __this__ = $w;
-        $w.__defineGetter__('window', function(){
-            return __this__;
-        });
-        $w.$isOriginalWindow = $thisIsTheOriginalWindow;
-        $w.$haveCalledWindowLocationSetter = false;
-
-/*
 *	window.js
 *   - this file will be wrapped in a closure providing the window object as $w
 */
@@ -77,7 +52,8 @@ var $name;
 
 // a read/write reference to the Window object that contained the script that called open() to 
 //open this browser window.  This property is valid only for top-level window objects.
-var $opener = $openingWindow;
+
+var $opener = $openingWindow = options.opener;
 
 // Read-only properties that specify the total height and width, in pixels, of the browser window.
 // These dimensions include the height and width of the menu bar, toolbars, scrollbars, window
@@ -94,7 +70,7 @@ var $pageXOffset = 0, $pageYOffset = 0;
 // or frame.  If the window is a top-level window, parent refers to
 // the window itself.  If this window is a frame, this property refers
 // to the window or frame that conatins it.
-var $parent = $parentWindow;
+var $parent = options.parent || window;
 try {
     if ($parentWindow.$thisWindowsProxyObject)
         $parent = $parentWindow.$thisWindowsProxyObject;
@@ -115,7 +91,7 @@ var $status = '';
 // a read-only reference to the top-level window that contains this window.  If this
 // window is a top-level window it is simply a refernce to itself.  If this window 
 // is a frame, the top property refers to the top-level window that contains the frame.
-var $top = $initTop;
+var $top = $parent && $parent.top || this;
 
 // the window property is identical to the self property and to this obj
 var $window = $w;
@@ -123,7 +99,7 @@ try {
     if ($w.$thisWindowsProxyObject)
         $window = $w.$thisWindowsProxyObject;
 } catch(e){}
-
+options.proxy && ( $window = options.proxy );
 
 $debug("Initializing Window.");
 __extend__($w,{
@@ -2428,7 +2404,6 @@ XMLP.prototype.next = function() {
 };
 
 XMLP.prototype.appendFragment = function(xmlfragment) {
-
     var start = this.m_xml.slice(0,this.m_iP);
     var end = this.m_xml.slice(this.m_iP);
     this.m_xml = start+xmlfragment+end;
@@ -3637,7 +3612,13 @@ var __endHTMLElement__ = function(node, doc, p){
         if (node.src && node.src.length > 0){
             $debug("getting content document for (i)frame from " + node.src);
 
+          // FIX
+          var save = $master.first_script_window;
+          $master.first_script_window = window;
+
             $env.loadFrame(node, $env.location(node.src));
+
+          $master.first_script_window = save;
 
             var event = doc.createEvent();
             event.initEvent("load");
@@ -4874,6 +4855,7 @@ $w.Document = DOMDocument;
 	
 		if ( !doc ) {
 			if ( typeof DOMDocument != "undefined" ){
+print("BB");                          
 				doc = new DOMDocument();
 			}else if ( typeof document != "undefined" && document.implementation && document.implementation.createDocument ){
 				doc = document.implementation.createDocument("", "", null);
@@ -5363,7 +5345,7 @@ __extend__(HTMLElement.prototype, {
 	    }
 });
 
-var __eval__ = function(script, startingNode){
+var __eval__ = $env.__eval__ || function(script, startingNode){
     if (script == "")
         return;                    // don't assemble environment if no script...
 
@@ -6889,6 +6871,7 @@ __extend__(HTMLObjectElement.prototype, {
         this.setAttribute('width',value);
     },
     get contentDocument(){
+print("there");
         return this.ownerDocument;
     }
 });
@@ -8192,21 +8175,13 @@ $debug("Initializing Window Location.");
 var $location = '';
 
 $w.__defineSetter__("location", function(url){
-    if ($w.$isOriginalWindow){
-        if ($w.$haveCalledWindowLocationSetter)
-            throw new Error("Cannot call 'window.location=' multiple times " +
-              "from the context used to load 'env.js'.  Try using " +
-              "'window.open()' to get a new context.");
-        $w.$haveCalledWindowLocationSetter = true;
-        $w.__loadAWindowsDocument__(url);
-    }
-    else {
-        $env.$unloadEventsFor($w);
-        var proxy = $w;
-        if (proxy.$thisWindowsProxyObject)
-            proxy = proxy.$thisWindowsProxyObject;
-        $env.reloadAWindowProxy(proxy, url);
-    }
+  if( !$location || $location == "about:blank" ) {
+    $w.__loadAWindowsDocument__(url);
+  } else {
+    $env.$unloadEventsFor($w);
+    var proxy = $w.window;
+    $env.reloadAWindowProxy(proxy, url);
+  }
 });
 
 $w.__loadAWindowsDocument__ = function(url){
@@ -8296,8 +8271,8 @@ $w.__defineGetter__("location", function(url){
             // ignore 'force': we don't implement a cache
             var thisWindow = $w;
             $env.$unloadEventsFor(thisWindow);
-            try { thisWindow = thisWindow.$thisWindowsProxyObject; }catch (e){}
-            $env.reloadAWindowProxy(thisWindow, thisWindow.location.href);
+            try { thisWindow = thisWindow.$thisWindowsProxyObject || thisWindow; }catch (e){}
+            $env.reloadAWindowProxy($window, thisWindow.location.href);
         },
         replace: function(url){
             $location = url;
@@ -8415,7 +8390,7 @@ $w.__defineGetter__("navigator", function(){
 $debug("Initializing Window Timer.");
 
 //private
-var $timers = $env.timers = $env.timers || [];
+var $timers = $master.timers = $master.timers || [];
 var $event_loop_running = false;
 $timers.lock = $env.sync(function(fn){fn();});
 
@@ -8452,8 +8427,9 @@ window.setTimeout = function(fn, time){
           eval(fn);
         } catch (e) {
           $env.error(e);
+        } finally {
+          window.clearInterval(num);
         }
-        window.clearInterval(num);          
       };
     } else {
       tfn = function() {
@@ -8461,12 +8437,14 @@ window.setTimeout = function(fn, time){
           fn();
         } catch (e) {
           $env.error(e);
+        } finally {
+          window.clearInterval(num);
         }
-        window.clearInterval(num);
       };
     }
     $debug("Creating timer number "+num);
     $timers[num] = new $timer(tfn, time);
+    $timers[num].ofn = fn;
     $timers[num].start();
   });
   return num;
@@ -8488,6 +8466,7 @@ window.setInterval = function(fn, time){
     num = $timers.length+1;
     //$debug("Creating timer number "+num);
     $timers[num] = new $timer(fn, time);
+    $timers[num].ofn = fn;
     $timers[num].start();
   });
   return num;
@@ -8521,6 +8500,13 @@ window.$wait = $env.wait = $env.wait || function(wait) {
     var earliest;
     $timers.lock(function(){
       earliest = undefined;
+      var l = 0;
+      for(var i in $timers){
+        if( isNaN(i*0) ) {
+          continue;
+        }
+        l++;
+      }
       for(var i in $timers){
         if( isNaN(i*0) ) {
           continue;
@@ -8536,8 +8522,9 @@ window.$wait = $env.wait = $env.wait || function(wait) {
       var f = earliest.fn;
       try {
         earliest.running = true;
-        var h = Date.now();
         f();
+      } catch (e) {
+        $env.error(e);
       } finally {
         earliest.running = false;
       }
@@ -8573,7 +8560,7 @@ window.$wait = $env.wait = $env.wait || function(wait) {
     if ( !sleep || sleep > interval ) {
       sleep = interval;
     }
-    java.lang.Thread.currentThread().sleep(sleep);
+    $env.sleep(sleep);
   }
   $event_loop_running = old_loop_running;
 };
@@ -8631,6 +8618,7 @@ $w.dispatchEvent = function(event, bubbles){
     }
     $debug("event target: " + event.target);
     if ( event.type && (this.nodeType             ||
+                        this.window === window    ||
                         this === window           ||
                         this.__proto__ === window ||
                         this.$thisWindowsProxyObject === window)) {
@@ -9672,25 +9660,4 @@ try{
 }catch(e){
 	//TODO - fail gracefully
 }	
-	/*
-*	outro.js
-*/
-
-
-    };// close function definition begun in 'intro.js'
-
-
-    // turn "original" JS interpreter global object into the
-    // "root" window object
-    Envjs.window(this,    // object to "window-ify"
-                 Envjs,   // our scope for globals
-                 this,    // a root window's parent is itself
-                 null,    // "opener" for new window
-                 this,    // "top" for new window
-                 true     // identify this as the original (not reloadable) win
-                );
-
-} catch(e){
-    Envjs.error("ERROR LOADING ENV : " + e + "\nLINE SOURCE:\n" +
-        Envjs.lineSource(e));
-}
+	

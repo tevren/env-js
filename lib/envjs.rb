@@ -14,5 +14,10 @@ module Envjs
     end
     result
   end
+  
+  ENVJS = 
+    File.expand_path( File.join( File.dirname(__FILE__),
+                                  "envjs",
+                                  "env.js" ) )
 
 end

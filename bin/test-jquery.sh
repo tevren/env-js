@@ -44,8 +44,14 @@ if [ $DEBUG -eq 1 ]; then
     echo 'enabling rhino debugger'
     perl -pi~ -e "s/^JAR(.*)(-jar.*|-cp.*)/JAR\1 -cp \\$\{BUILD_DIR}\/js.jar org.mozilla.javascript.tools.debugger.Main/" $JQUERY_DIR/Makefile;
 else
-    echo 'running with rhino'
-    perl -pi~ -e "s/^JAR(.*)(-jar.*|-cp.*)/JAR\1 -cp \\$\{BUILD_DIR}\/js.jar org.mozilla.javascript.tools.envjs.Main/" $JQUERY_DIR/Makefile;
+    if [ "x$JOHNSON" == "x " ]; then
+        echo 'running with rhino'
+        perl -pi~ -e "s/^JAR(.*)(-jar.*|-cp.*)/JAR\1 -cp \\$\{BUILD_DIR}\/js.jar org.mozilla.javascript.tools.envjs.Main/" $JQUERY_DIR/Makefile;
+    else
+        echo 'running with johnson'
+        echo > $JQUERY_DIR/build/runtest/env.js
+        perl -pi~ -e "s/^JAR(.*)(-jar.*|-cp.*)/JAR = envjsrb/" $JQUERY_DIR/Makefile;
+    fi
 fi
 
 cd $JQUERY_DIR

@@ -37,17 +37,19 @@ namespace :johnson do
     files.map! { |f| f == "env.js" ? groups["${ENV_DIST}"] : f }.flatten!
     files.map! { |f| f.sub!( "rhino", "johnson" ); "src/" + f }
 
-    system "rm -f dist/env.johnson.js"
-    system "cat #{files.join(' ')} > dist/env.johnson.js"
-    system "chmod 444 dist/env.johnson.js"
+    # puts files.join(" ")
+
+    system "rm -f lib/envjs/env.js"
+    system "cat #{files.join(' ')} > lib/envjs/env.js"
+    system "chmod 444 lib/envjs/env.js"
 
   end
 
   desc "run tests against johnson"
   task :test => :compile do
     ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/primaryTests.js"
-    # FIX ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/prototype.js"
-    # FIX ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/envjs-call-load-test.js"
+    ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/prototype.js"
+    ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/call-load-test.js"
   end
 
 end

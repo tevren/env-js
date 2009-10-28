@@ -2,6 +2,22 @@
 /**
  * @author thatcher
  */
+var Envjs = function(){
+    if(arguments.length === 2){
+        for ( var i in arguments[1] ) {
+    		var g = arguments[1].__lookupGetter__(i), 
+                s = arguments[1].__lookupSetter__(i);
+    		if ( g || s ) {
+    			if ( g ) Envjs.__defineGetter__(i, g);
+    			if ( s ) Envjs.__defineSetter__(i, s);
+    		} else
+    			Envjs[i] = arguments[1][i];
+    	}
+    }
+
+    if (arguments[0] != null && arguments[0] != "")
+        window.location = arguments[0];
+};
 
 /*
 *	core.js
@@ -16,7 +32,7 @@
     //to profile
     $env.profile = false;
     
-    $env.log = function(msg, level){};
+    $env.log = $env.log || function(msg, level){};
 	
     $env.DEBUG  = 4;
     $env.INFO   = 3;
@@ -25,6 +41,7 @@
 	$env.NONE   = 0;
 	
     //set this if you want to get some internal log statements
+    $env.logLevel = $env.DEBUG;
     $env.logLevel = $env.INFO;
     
     $env.debug  = function(msg){
@@ -47,8 +64,6 @@
     };
     
     $env.info("Initializing Core Platform Env");
-
-  print(getFreshScopeObj);
 
 
     // if we're running in an environment without env.js' custom extensions
@@ -76,32 +91,37 @@
                   "not present in environment.  JavaScript execution may " +
                   "not occur correctly.");
 
-    $env.lineSource = function(e){};
+    $env.lineSource = $env.lineSource || function(e){};
     
     //resolves location relative to base or window location
-    $env.location = function(path, base){};
-    $env.sync = function(fn){
-      var self = this;
-      return function(){ return fn.apply(self,arguments); }
-    }
-    $env.sleep = function(){}
-
-    $env.javaEnabled = false;	
+    $env.location = $env.location || function(path, base){};
     
+    $env.sync = $env.sync || function(fn){
+      return function(){ return fn.apply(this,arguments); };
+    };
+
+    $env.spawn = $env.spawn || function(fn) {
+      setTimeout(fn,0);
+    };
+
+    $env.sleep = $env.sleep || function(){};
+
+    $env.javaEnabled = false;  
+
     //Used in the XMLHttpRquest implementation to run a
     // request in a seperate thread
-    $env.runAsync = function(fn){};
-    
+    $env.runAsync = $env.runAsync || function(fn){};
+        
     //Used to write to a local file
-    $env.writeToFile = function(text, url){};
-    
+    $env.writeToFile = $env.writeToFile || function(text, url){};
+        
     //Used to write to a local file
-    $env.writeToTempFile = function(text, suffix){};
+    $env.writeToTempFile = $env.writeToTempFile || function(text, suffix){};
     
     //Used to delete a local file
-    $env.deleteFile = function(url){};
+    $env.deleteFile = $env.deleteFile || function(url){};
     
-    $env.connection = function(xhr, responseHandler, data){};
+    $env.connection = $env.connection || function(xhr, responseHandler, data){};
     
     $env.parseHTML = function(htmlstring){};
     $env.parseXML = function(xmlstring){};
@@ -112,14 +132,14 @@
     $env.os_arch        = ''; 
     $env.os_version     = ''; 
     $env.lang           = ''; 
-    $env.platform       = "Rhino ";//how do we get the version
+    $env.platform       = "";
     
     $env.scriptTypes = {
         "text/javascript"   :false,
         "text/envjs"        :true
     };
     
-    $env.onScriptLoadError = function(){};
+    $env.onScriptLoadError = $env.onScriptLoadError || function(){};
     $env.loadLocalScript = function(script, parser){
         $env.debug("loading script ");
         var types, type, src, i, base, 
@@ -148,7 +168,7 @@
                                 }
                             }
                             base = "" + window.location;
-							load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
+                            load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
                             //lets you register a function to execute 
                             //after the script is loaded
                             if($env.afterScriptLoad){
@@ -185,9 +205,8 @@
             document.writeln = writeln;
         }
     };
-    
-    $env.loadInlineScript = function(script){};
-    
+        
+    $env.loadInlineScript = $env.loadInlineScript || function(script){};
     
     $env.getFreshScopeObj = function(){};
     $env.getProxyFor = function(){};
@@ -203,15 +222,17 @@
                 $env.$unloadEventsFor(frameElement._content);
                 $env.reloadAWindowProxy(frameElement._content, url);
             }
-            else
-                frameElement._content = $env.makeNewWindowMaybeLoad(this,
+            else {
+              var v = $env.makeNewWindowMaybeLoad(this,
                     frameElement.ownerDocument.parentWindow, url);
+              frameElement._content = v;
+            }
         } catch(e){
             $env.error("failed to load frame content: from " + url, e);
         }
     };
-
-    $env.reloadAWindowProxy = function(oldWindowProxy, url){
+    
+    $env.reloadAWindowProxy = $env.reloadAWindowProxy || function(oldWindowProxy, url){
         var newWindowProxy = $env.makeNewWindowMaybeLoad(
                                  oldWindowProxy.opener,
                                  oldWindowProxy.parent,
@@ -223,16 +244,7 @@
         newWindow.document._parentWindow = oldWindowProxy;
     };
 
-    $env.makeNewWindowMaybeLoad = function(opener, parent, url){
-        var window = $env.getFreshScopeObj();
-        windowfn.call(window,window,parent?parent:window,opener,parent.top,false);
-        if (url) {
-          window.__loadAWindowsDocument__(url);
-        }
-        return window;
-    };
-
-    $env._makeNewWindowMaybeLoad = function(openingWindow, parentArg, url){
+    $env.makeNewWindowMaybeLoad = $env.makeNewWindowMaybeLoad || function(openingWindow, parentArg, url){
         var newWindow = $env.getFreshScopeObj();
         var newProxy  = $env.getProxyFor(newWindow);
         newWindow.$thisWindowsProxyObject = newProxy;
@@ -283,5 +295,5 @@
         $env.setScope($env.loadIntoFnsScope,   scopes.global_load);
         $env.setScope($env.loadLocalScript,    scopes.local_load);
     }
-})(Envjs);
 
+})($env);

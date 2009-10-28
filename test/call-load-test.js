@@ -1,12 +1,5 @@
-if(!this.whichJarFile){
-  whichJarFile = "rhino"
-}
-whichInterpreter = whichJarFile + " interpreter jar";
-if(!this.multiwindow){
-  multiwindow = false;
-}
-load("dist/env.rhino.js");
 load("test/qunit.js");
+
 Envjs("test/index.html", {});
 
 test("'index.html' loaded correctly via 'Envjs()' call", function(){

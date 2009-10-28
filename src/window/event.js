@@ -51,6 +51,7 @@ $w.dispatchEvent = function(event, bubbles){
     }
     $debug("event target: " + event.target);
     if ( event.type && (this.nodeType             ||
+                        this.window === window    || // compares outer objects under TM (inner == outer, but !== (currently)
                         this === window           ||
                         this.__proto__ === window ||
                         this.$thisWindowsProxyObject === window)) {

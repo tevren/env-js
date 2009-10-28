@@ -1,28 +1,195 @@
-/*
-*	env.johnson.js
-*/
+$env.log = function(msg, level){
+    print(' '+ (level?level:'LOG') + ':\t['+ new Date()+"] {ENVJS} "+msg);
+};
 
-(function($env){
-    
-    whichInterpreter = "Johnson";
-    multiwindow = true;
-
-    $env.sleep = function(t){
-        Ruby.sleep(t/1000000.);
+$env.location = function(path, base){
+    // print("loc",path,base);
+    var protocol = new RegExp('(^file\:|^http\:|^https\:)');
+    var m = protocol.exec(path);
+    if(m&&m.length>1){
+        var url = Ruby.URI.parse(path);
+        var s = url.toString();
+        if ( s.substring(0,6) == "file:/" && s[6] != "/" ) {
+            s = "file://" + s.substring(5,s.length);
+        }
+        // print("YY",s);
+        return s;
+    }else if(base){
+        base = Ruby.URI.parse(base);
+        if ( path[0] == "/" ) {
+            base.path = path;
+            base = base + "";
+        } else {
+            base = base + "";
+            base = base.substring(0, base.lastIndexOf('/'));
+            base = base + '/' + path;
+        }
+        var result = base;
+        // ? This path only used for files?
+        if ( result.substring(0,6) == "file:/" && result[6] != "/" ) {
+            result = "file://" + result.substring(5,result.length);
+        }
+        if ( true && result.substring(0,7) == "file://" ) {
+            result = result.substring(7,result.length);
+        }
+        // print("ZZ",result);
+        return result;
+    }else{
+        //return an absolute url from a url relative to the window location
+        if( ( base = ( ( $master.first_script_window && $master.first_script_window.location ) || window.location) ) &&
+            base.href &&
+            (base.href.length > 0) ) {
+            base = base.href.substring(0, base.href.lastIndexOf('/'));
+            var result = base + '/' + path;
+            if ( result.substring(0,6) == "file:/" && result[6] != "/" ) {
+                result = "file://" + result.substring(5,result.length);
+            }
+            // print("****",result);
+            return result;
+        } else {
+            return "file://"+Ruby.File.expand_path(path);
+        }
     }
+};
 
-    $env.log = function(msg, level){
-         print(' '+ (level?level:'LOG') + ':\t['+ new Date()+"] {ENVJS} "+msg);
-    };
-    
-    var extract_line =
-        Ruby.eval(
+$env.connection = function(xhr, responseHandler, data){
+    var url = Ruby.URI.parse(xhr.url);
+    var connection;
+    var resp;
+    // print("xhr",xhr.url);
+    // print("xhr",url);
+    if ( /^file\:/.test(url) ) {
+        try{
+            if ( xhr.method == "PUT" ) {
+                var text =  data || "" ;
+                $env.writeToFile(text, url);
+            } else if ( xhr.method == "DELETE" ) {
+                $env.deleteFile(url);
+            } else {
+                Ruby.require('envjs/net/file');
+                var request = new Ruby.Envjs.Net.File.Get( url.path );
+                connection = Ruby.Envjs.Net.File.start( url.host, url.port );
+                resp = connection.request( request );
+                //try to add some canned headers that make sense
+                
+                try{
+                    if(xhr.url.match(/html$/)){
+                        xhr.responseHeaders["Content-Type"] = 'text/html';
+                    }else if(xhr.url.match(/.xml$/)){
+                        xhr.responseHeaders["Content-Type"] = 'text/xml';
+                    }else if(xhr.url.match(/.js$/)){
+                        xhr.responseHeaders["Content-Type"] = 'text/javascript';
+                    }else if(xhr.url.match(/.json$/)){
+                        xhr.responseHeaders["Content-Type"] = 'application/json';
+                    }else{
+                        xhr.responseHeaders["Content-Type"] = 'text/plain';
+                    }
+                    //xhr.responseHeaders['Last-Modified'] = connection.getLastModified();
+                    //xhr.responseHeaders['Content-Length'] = headerValue+'';
+                    //xhr.responseHeaders['Date'] = new Date()+'';*/
+                }catch(e){
+                    $env.error('failed to load response headers',e);
+                }
+                
+            }
+        }catch(e){
+            $env.error('failed to open file '+ url, e);
+            connection = null;
+            xhr.readyState = 4;
+            xhr.statusText = "Local File Protocol Error";
+            xhr.responseText = "<html><head/><body><p>"+ e+ "</p></body></html>";
+        }
+    } else { 
+        Ruby.require('net/http');
+
+        var req;
+        if ( xhr.method == "GET" ) {
+            req = new Ruby.Net.HTTP.Get( url.request_uri() );
+        } else if ( xhr.method == "POST" ) {
+            req = new Ruby.Net.HTTP.Post( url.request_uri() );
+        } else if ( xhr.method == "PUT" ) {
+            req = new Ruby.Net.HTTP.Put( url.request_uri() );
+        }
+
+        for (var header in xhr.headers){
+            $master.add_req_field( req, header, xhr.headers[header] );
+        }
+	
+	//write data to output stream if required
+        if(data&&data.length&&data.length>0){
+	    if ( xhr.method == "PUT" || xhr.method == "POST" ) {
+                req.body = data;
+            }
+	}
+	
+        connection = Ruby.Net.HTTP.start( url.host, url.port );
+
+        resp = connection.request(req);
+    }
+    if(connection){
+        try{
+            if (false) {
+            var respheadlength = connection.getHeaderFields().size();
+            // Stick the response headers into responseHeaders
+            for (var i = 0; i < respheadlength; i++) { 
+                var headerName = connection.getHeaderFieldKey(i); 
+                var headerValue = connection.getHeaderField(i); 
+                if (headerName)
+                    xhr.responseHeaders[headerName+''] = headerValue+'';
+            }
+            }
+            resp.each(function(k,v){
+                xhr.responseHeaders[k] = v;
+            });
+        }catch(e){
+            $env.error('failed to load response headers',e);
+        }
+        
+        xhr.readyState = 4;
+        xhr.status = parseInt(connection.responseCode,10) || undefined;
+        xhr.statusText = connection.responseMessage || "";
+        
+        var contentEncoding = resp["Content-Encoding"] || "utf-8",
+        baos = new Ruby.StringIO,
+        length,
+        stream = null,
+        responseXML = null;
+
+        try{
+            var lower = contentEncoding.toLowerCase();
+            stream = ( lower == "gzip" || lower == "decompress" ) ?
+                ( Ruby.raise("java") && new java.util.zip.GZIPInputStream(resp.getInputStream()) ) : resp;
+        }catch(e){
+            if (resp.code == "404")
+                $env.info('failed to open connection stream \n' +
+                          e.toString(), e);
+            else
+                $env.error('failed to open connection stream \n' +
+                           e.toString(), e);
+            stream = resp;
+        }
+        
+        baos.write(resp.body);
+
+        baos.close();
+        connection.finish();
+
+        xhr.responseText = baos.string();
+    }
+    if(responseHandler){
+        $env.debug('calling ajax response handler');
+        responseHandler();
+    }
+};
+
+var extract_line =
+    Ruby.eval(
 "lambda { |e| \
   e.stack.to_s.split(%(\n))[1].match(/:([^:]*)$/)[1]; \
 }");
 
-    var print_exception =
-        Ruby.eval(" \
+var print_exception =
+    Ruby.eval(" \
 lambda { |e| \
   print(%(Exception: ),e,%(\n)); \
   e.stack.to_s.split(%(\n)).each do |line| \
@@ -37,327 +204,131 @@ lambda { |e| \
 } \
 ");
 
-    $env.lineSource = function(e){
-        if(e){
-            print_exception.call(e);
-            return extract_line.call(e);
-        } else {
-            return "";
-        }
-    };
+$env.lineSource = function(e){
+    if(e){
+        print_exception.call(e);
+        return extract_line.call(e);
+    } else {
+        return "";
+    }
+};
     
-    $env.location = function(path, base){
-      var protocol = new RegExp('(^file\:|^http\:|^https\:)');
-        var m = protocol.exec(path);
-        if(m&&m.length>1){
-            return Ruby.URI.parse(path).to_s();
-        }else if(base){
-          Ruby.raise("java");
-          return new java.net.URL(new java.net.URL(base), path).toString()+'';
-        }else{
-            //return an absolute url from a url relative to the window location
-            if(window.location.href.length > 0){
-                base = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
-                return base + '/' + path;
-            }else{
-                return "file:"+Ruby.File.expand_path(path);
+$env.loadInlineScript = function(script){
+    var original_script_window = $master.first_script_window;
+    if ( !$master.first_script_window ) {
+        $master.first_script_window = window;
+    }
+    try {
+        $master.evaluate(script.text,$w);
+    } catch(e) {
+        $env.error("error evaluating script: "+script.text);
+        $env.error(e);
+    }
+    $master.first_script_window = original_script_window;
+};
+    
+$env.writeToTempFile = function(text, suffix){
+    $env.debug("writing text to temp url : " + suffix);
+    // print(text);
+    // Create temp file.
+    Ruby.require('envjs/tempfile');
+    var temp = new Ruby.Envjs.TempFile( "envjs-tmp", suffix );
+    
+    // Write to temp file
+    temp.write(text);
+    temp.close();
+    return temp.getAbsolutePath().toString()+'';
+};
+    
+$env.writeToFile = function(text, url){
+    // print("writing text to url : " + url);
+    $env.debug("writing text to url : " + url);
+    if ( url.substring(0,7) == "file://" ) {
+        url = url.substring(7,url.length);
+    }
+    var file = Ruby.open( url, "w" );
+    // Write to temp file
+    file.write(text);
+    file.close();
+};
+    
+$env.deleteFile = function(url){
+    Ruby.File.unlink(url);
+};
+
+$env.__eval__ = function(script,scope){
+    if (script == "")
+        return;
+    try {
+        var scopes = [];
+        var original = script;
+        if(scope) {
+            script = "(function(){return eval(original)}).call(scopes[0])";
+            while(scope) {
+                scopes.push(scope);
+                scope = scope.parentNode;
+                script = "with(scopes["+(scopes.length-1)+"] ){"+script+"};"
             }
         }
+        script = "function(original,scopes){"+script+"}"
+        var original_script_window = $master.first_script_window;
+        if ( !$master.first_script_window ) {
+            $master.first_script_window = window;
+        }
+        var result = $master.evaluate(script,$w)(original,scopes);
+        $master.first_script_window = original_script_window;
+        return result;
+    }catch(e){
+        $error(e);
+    }
+};
+
+$env.makeNewWindowMaybeLoad = function(openingWindow, parentArg, url, outer){
+// print(location);
+// print("url",url,window.location,openingWindow);
+// print("parent",parentArg);
+    var options = {
+        opener: openingWindow,
+        parent: parentArg,
+        url: $env.location(url)
     };
-    
-    //Used in the XMLHttpRquest implementation to run a
-    // request in a seperate thread
-    $env.onInterrupt = function(){};
-    $env.runAsync = function(fn){
-        $env.debug("running async");
-        var running = true;
+
+    var pair = $env.new_window(outer);
+    var proxy = pair[0];
+    var new_window = pair[1];
+    options.proxy = proxy;
+    new_window.$options = options;
+    $master.load(Ruby.Envjs.ENVJS, new_window);
+    return proxy;
+};
+
+$env.reloadAWindowProxy = function(oldWindowProxy, url){
+    // print("reload",window,oldWindowProxy,url);
+    $env.makeNewWindowMaybeLoad( oldWindowProxy.opener,
+                                 oldWindowProxy.parent,
+                                 url,
+                                 oldWindowProxy );
+};
+
+$env.sleep = function(n){Ruby.sleep(n/1000.);};
+
+$env.loadIntoFnsScope = function(file) {
+    // print("lifs",load);
+    return load(file);
+}
+
+$env.runAsync = function(fn){
+    $env.debug("running async");
         
-        var run = sync(function(){ //while happening only thing in this timer    
-    	    //$env.debug("running timed function");
-            fn();
-        });
+    var run = $env.sync( function(){ fn(); } );
         
-        Ruby.raise("java");
-        var async = (new java.lang.Thread(new java.lang.Runnable({
-            run: run
-        })));
-        
-        try{
-            async.start();
-        }catch(e){
-            $env.error("error while running async", e);
-            async.interrupt();
-            $env.onInterrupt();
-        }
-    };
+    try{
+        $env.spawn(run);
+    }catch(e){
+        $env.error("error while running async", e);
+    }
+};
     
-    //Used to write to a local file
-    $env.writeToFile = function(text, url){
-        $env.debug("writing text to url : " + url);
-        Ruby.raise("java");
-        var out = new java.io.FileWriter( 
-            new java.io.File( 
-                new java.net.URI(url.toString())));	
-        out.write( text, 0, text.length );
-        out.flush();
-        out.close();
-    };
-    
-    //Used to write to a local file
-    $env.writeToTempFile = function(text, suffix){
-        $env.debug("writing text to temp url : " + suffix);
-        // Create temp file.
-        Ruby.require('envjs/tempfile');
-        var temp = new Ruby.Envjs.TempFile( "envjs-tmp", suffix );
-    
-        // Write to temp file
-        temp.write(text);
-        temp.close();
-        return temp.getAbsolutePath().toString()+'';
-    };
-    
-    //Used to delete a local file
-    $env.deleteFile = function(url){
-        Ruby.File.unlink(url);
-    };
-    
-    $env.connection = function(xhr, responseHandler, data){
-      var url = Ruby.URI.parse(xhr.url);
-      var connection;
-        if ( /^file\:/.test(url) ) {
-            try{
-                if ( xhr.method == "PUT" ) {
-                    var text =  data || "" ;
-                    $env.writeToFile(text, url);
-                } else if ( xhr.method == "DELETE" ) {
-                    $env.deleteFile(url);
-                } else {
-                    Ruby.require('envjs/net/file');
-                    var request = new Ruby.Envjs.Net.File.Get( url.path );
-                    var file = Ruby.Envjs.Net.File.start( url.host, url.port );
-                    connection = file.request( request );
-                    //try to add some canned headers that make sense
-                    
-                    try{
-                        if(xhr.url.match(/html$/)){
-                            xhr.responseHeaders["Content-Type"] = 'text/html';
-                        }else if(xhr.url.match(/.xml$/)){
-                            xhr.responseHeaders["Content-Type"] = 'text/xml';
-                        }else if(xhr.url.match(/.js$/)){
-                            xhr.responseHeaders["Content-Type"] = 'text/javascript';
-                        }else if(xhr.url.match(/.json$/)){
-                            xhr.responseHeaders["Content-Type"] = 'application/json';
-                        }else{
-                            xhr.responseHeaders["Content-Type"] = 'text/plain';
-                        }
-                    //xhr.responseHeaders['Last-Modified'] = connection.getLastModified();
-                    //xhr.responseHeaders['Content-Length'] = headerValue+'';
-                    //xhr.responseHeaders['Date'] = new Date()+'';*/
-                    }catch(e){
-                        $env.error('failed to load response headers',e);
-                    }
-                    	
-                }
-            }catch(e){
-                $env.error('failed to open file '+ url, e);
-                throw(e);
-                connection = null;
-                xhr.readyState = 4;
-                xhr.statusText = "Local File Protocol Error";
-                xhr.responseText = "<html><head/><body><p>"+ e+ "</p></body></html>";
-            }
-        } else { 
-            connection = url.openConnection();
-            connection.setRequestMethod( xhr.method );
-			
-            // Add headers to Java connection
-            for (var header in xhr.headers){
-                connection.addRequestProperty(header+'', xhr.headers[header]+'');
-            }
-			
-			//write data to output stream if required
-            if(data&&data.length&&data.length>0){
-				 if ( xhr.method == "PUT" || xhr.method == "POST" ) {
-                	                connection.setDoOutput(true);
-                                        Ruby.raise("java");
-					var outstream = connection.getOutputStream(),
-						outbuffer = new java.lang.String(data).getBytes('UTF-8');
-					
-                    outstream.write(outbuffer, 0, outbuffer.length);
-					outstream.close();
-            	}
-			}else{
-		  		connection.connect();
-			}
-			
-            
-        }
-        if(connection){
-            try{
-                var respheadlength = connection.getHeaderFields().size();
-                // Stick the response headers into responseHeaders
-                for (var i = 0; i < respheadlength; i++) { 
-                    var headerName = connection.getHeaderFieldKey(i); 
-                    var headerValue = connection.getHeaderField(i); 
-                    if (headerName)
-                        xhr.responseHeaders[headerName+''] = headerValue+'';
-                }
-            }catch(e){
-                $env.error('failed to load response headers',e);
-            }
-            
-            xhr.readyState = 4;
-            xhr.status = parseInt(connection.responseCode,10) || undefined;
-            xhr.statusText = connection.responseMessage || "";
-            
-            var contentEncoding = connection.getContentEncoding() || "utf-8",
-                baos = new Ruby.StringIO,
-                length,
-                stream = null,
-                responseXML = null;
-
-            try{
-                var lower = contentEncoding.toLowerCase();
-                stream = ( lower == "gzip" || lower == "decompress" ) ?
-                        ( Ruby.raise("java") && new java.util.zip.GZIPInputStream(connection.getInputStream()) ) :
-                        connection.getInputStream();
-            }catch(e){
-                if (connection.getResponseCode() == 404)
-                    $env.info('failed to open connection stream \n' +
-                              e.toString(), e);
-                else
-                    $env.error('failed to open connection stream \n' +
-                               e.toString(), e);
-                stream = connection.getErrorStream();
-            }
-            
-            var buffer;
-            while ( buffer = stream.read() ) {
-                baos.write(buffer);
-            }
-
-            baos.close();
-            stream.close();
-
-            xhr.responseText = baos.string();
-                
-        }
-        if(responseHandler){
-            $env.debug('calling ajax response handler');
-            responseHandler();
-        }
-    };
-    
-    //var htmlDocBuilder = Packages.javax.xml.parsers.DocumentBuilderFactory.newInstance();
-    // htmlDocBuilder.setNamespaceAware(false);
-    // htmlDocBuilder.setValidating(false);
-    
-    var tidy;
-    $env.tidyHTML = false;
-    $env.tidy = function(htmlString){
-        $env.debug('Cleaning html :\n'+htmlString);
-        Ruby.raise("java");
-        var xmlString,
-		    baos = new java.io.ByteArrayOutputStream(),
-		    bais = new java.io.ByteArrayInputStream(
-			           (new java.lang.String(htmlString)).
-					        getBytes("UTF8"));
-		try{
-	        if(!tidy){
-	            tidy = new org.w3c.tidy.Tidy();
-	        }
-            $env.debug('tidying');
-	        tidy.parse(bais,baos);
-                    Ruby.raise("java");
-			xmlString = java.nio.charset.Charset.forName("UTF-8").
-                decode(java.nio.ByteBuffer.wrap(baos.toByteArray())).toString()+"";
-            $env.debug('finished tidying');
-		}catch(e){
-            $env.error('error in html tidy', e);
-        }finally{
-            try{
-                bais.close();
-                baos.close();
-            }catch(ee){
-                //swallow
-            }
-        }
-        $env.debug('Cleaned html :\n'+xmlString);
-        return xmlString;
-    };
-    
-    // var xmlDocBuilder = Packages.javax.xml.parsers.DocumentBuilderFactory.newInstance();
-    // xmlDocBuilder.setNamespaceAware(true);
-    // xmlDocBuilder.setValidating(false);
-    
-    $env.parseXML = function(xmlstring){
-                    Ruby.raise("java");
-        return xmlDocBuilder.newDocumentBuilder().parse(
-                  new java.io.ByteArrayInputStream(
-                        (new java.lang.String(xmlstring)).getBytes("UTF8")));
-    };
-    
-    
-    $env.xpath = function(expression, doc){
-                    Ruby.raise("java");
-        return Packages.javax.xml.xpath.
-          XPathFactory.newInstance().newXPath().
-            evaluate(expression, doc, javax.xml.xpath.XPathConstants.NODESET);
-    };
-    
-    var jsonmlxslt;
-    $env.jsonml = function(xmlstring){
-        jsonmlxslt = jsonmlxslt||$env.xslt($env.xml2jsonml.toXMLString());
-        var jsonml = $env.transform(jsonmlxslt, xmlstring);
-        //$env.debug('jsonml :\n'+jsonml);
-        return eval(jsonml);
-    };
-    var transformerFactory;
-    $env.xslt = function(xsltstring){
-                    Ruby.raise("java");
-        transformerFactory = transformerFactory||
-            Packages.javax.xml.transform.TransformerFactory.newInstance();
-        return transformerFactory.newTransformer(
-              new javax.xml.transform.dom.DOMSource(
-                  $env.parseXML(xsltstring)
-              )
-          );
-    };
-    $env.transform = function(xslt, xmlstring){
-                    Ruby.raise("java");
-        var baos = new java.io.ByteArrayOutputStream();
-        xslt.transform(
-            new javax.xml.transform.dom.DOMSource($env.parseHTML(xmlstring)),
-            new javax.xml.transform.stream.StreamResult(baos)
-        );
-        return java.nio.charset.Charset.forName("UTF-8").
-            decode(java.nio.ByteBuffer.wrap(baos.toByteArray())).toString()+"";
-    };
-    
-    $env.tmpdir         = Ruby.ENV["TMPDIR"];
-    $env.os_name        = Ruby.eval("%x{uname -s}");
-    $env.os_arch        = Ruby.eval("%x{uname -p}");
-    $env.os_version     = Ruby.eval("%x{uname -r}");
-    $env.lang           = Ruby.eval('l = %x{locale}.match(/LANG="([^."]+)[."]/) and l[1] or ""');
-    $env.platform       = "Johnson";
-
-    $env.scriptTypes = {
-        "text/javascript"   :false,
-        "text/envjs"        :true
-    };
-    
-    
-    $env.loadInlineScript = function(script){
-        var tmpFile = $env.writeToTempFile(script.text, 'js') ;
-        $env.debug("loading " + tmpFile);
-        $env.loadIntoFnsScope(tmpFile);
-        $env.deleteFile(tmpFile);
-    };
-    
-    $env.getFreshScopeObj = getFreshScopeObj;
-
-})(Envjs);
-
 // Local Variables:
 // espresso-indent-level:4
 // c-basic-offset:4

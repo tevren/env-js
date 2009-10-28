@@ -183,7 +183,7 @@ __extend__(HTMLElement.prototype, {
 	    }
 });
 
-var __eval__ = function(script, startingNode){
+var __eval__ = $env.__eval__ || function(script, startingNode){
     if (script == "")
         return;                    // don't assemble environment if no script...
 

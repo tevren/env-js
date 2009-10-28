@@ -1,301 +1,4 @@
 /*
- * Envjs env-js.1.0.rc7 
- * Pure JavaScript Browser Environment
- *   By John Resig <http://ejohn.org/>
- * Copyright 2008-2009 John Resig, under the MIT License
- */
-/**
- * @author thatcher
- */
-var Envjs = function(){
-    if(arguments.length === 2){
-        for ( var i in arguments[1] ) {
-    		var g = arguments[1].__lookupGetter__(i), 
-                s = arguments[1].__lookupSetter__(i);
-    		if ( g || s ) {
-    			if ( g ) Envjs.__defineGetter__(i, g);
-    			if ( s ) Envjs.__defineSetter__(i, s);
-    		} else
-    			Envjs[i] = arguments[1][i];
-    	}
-    }
-
-    if (arguments[0] != null && arguments[0] != "")
-        window.location = arguments[0];
-};
-
-/*
-*	env.rhino.js
-*/
-(function($env){
-    
-    //You can emulate different user agents by overriding these after loading env
-    $env.appCodeName  = "Envjs";//eg "Mozilla"
-    $env.appName      = "Resig/20070309 BirdDog/0.0.0.1";//eg "Gecko/20070309 Firefox/2.0.0.3"
-
-    //set this to true and see profile/profile.js to select which methods
-    //to profile
-    $env.profile = false;
-    
-    $env.log = function(msg, level){};
-	
-    $env.DEBUG  = 4;
-    $env.INFO   = 3;
-    $env.WARN   = 2;
-    $env.ERROR  = 1;
-	$env.NONE   = 0;
-	
-    //set this if you want to get some internal log statements
-    $env.logLevel = $env.INFO;
-    
-    $env.debug  = function(msg){
-		if($env.logLevel >= $env.DEBUG)
-            $env.log(msg,"DEBUG"); 
-    };
-    $env.info = function(msg){
-        if($env.logLevel >= $env.INFO)
-            $env.log(msg,"INFO"); 
-    };
-    $env.warn   = function(msg){
-        if($env.logLevel >= $env.WARN)
-            $env.log(msg,"WARNIING");    
-    };
-    $env.error = function(msg, e){
-        if ($env.logLevel >= $env.ERROR) {
-			$env.log(msg + " Line: " + $env.lineSource(e), 'ERROR');
-			$env.log(e || "", 'ERROR');
-		}
-    };
-    
-    $env.info("Initializing Core Platform Env");
-
-
-    // if we're running in an environment without env.js' custom extensions
-    // for manipulating the JavaScript scope chain, put in trivial emulations
-    $env.debug("performing check for custom Java methods in env-js.jar");
-    var countOfMissing = 0, dontCare;
-    try { dontCare = getFreshScopeObj; }
-    catch (ex){      getFreshScopeObj  = function(){ return {}; };
-                                                       countOfMissing++; }
-    try { dontCare = getProxyFor; }
-    catch (ex){      getProxyFor       = function(obj){ return obj; };
-                                                       countOfMissing++; }
-    try { dontCare = getScope; }
-    catch (ex){      getScope          = function(){}; countOfMissing++; }
-    try { dontCare = setScope; }
-    catch (ex){      setScope          = function(){}; countOfMissing++; }
-    try { dontCare = configureScope; }
-    catch (ex){      configureScope    = function(){}; countOfMissing++; }
-    try { dontCare = restoreScope; }
-    catch (ex){      restoreScope      = function(){}; countOfMissing++; }
-    try { $env.loadIntoFnsScope = loadIntoFnsScope; }
-    catch (ex){      $env.loadIntoFnsScope = load;     countOfMissing++; }
-    if (countOfMissing != 0 && countOfMissing != 7)
-        $env.warn("Some but not all of scope-manipulation functions were " +
-                  "not present in environment.  JavaScript execution may " +
-                  "not occur correctly.");
-
-    $env.lineSource = function(e){};
-    
-    //resolves location relative to base or window location
-    $env.location = function(path, base){};
-  
-    $env.sync = function(fn){
-      var self = this;
-      return function(){ return fn.apply(self,arguments); }
-    }
-  
-    $env.javaEnabled = false;	
-    
-    //Used in the XMLHttpRquest implementation to run a
-    // request in a seperate thread
-    $env.runAsync = function(fn){};
-    
-    //Used to write to a local file
-    $env.writeToFile = function(text, url){};
-    
-    //Used to write to a local file
-    $env.writeToTempFile = function(text, suffix){};
-    
-    //Used to delete a local file
-    $env.deleteFile = function(url){};
-    
-    $env.connection = function(xhr, responseHandler, data){};
-    
-    $env.parseHTML = function(htmlstring){};
-    $env.parseXML = function(xmlstring){};
-    $env.xpath = function(expression, doc){};
-    
-    $env.tmpdir         = ''; 
-    $env.os_name        = ''; 
-    $env.os_arch        = ''; 
-    $env.os_version     = ''; 
-    $env.lang           = ''; 
-    $env.platform       = "Rhino ";//how do we get the version
-    
-    $env.scriptTypes = {
-        "text/javascript"   :false,
-        "text/envjs"        :true
-    };
-    
-    $env.onScriptLoadError = function(){};
-    $env.loadLocalScript = function(script, parser){
-        $env.debug("loading script ");
-        var types, type, src, i, base, 
-            docWrites = [],
-            write = document.write,
-            writeln = document.writeln;
-        //temporarily replace document write becuase the function
-        //has a different meaning during parsing
-        document.write = function(text){
-			docWrites.push(text);
-		};
-        try{
-			if(script.type){
-                types = script.type?script.type.split(";"):[];
-                for(i=0;i<types.length;i++){
-                    if($env.scriptTypes[types[i]]){
-						if(script.src){
-                            $env.info("loading allowed external script :" + script.src);
-                            //lets you register a function to execute 
-                            //before the script is loaded
-                            if($env.beforeScriptLoad){
-                                for(src in $env.beforeScriptLoad){
-                                    if(script.src.match(src)){
-                                        $env.beforeScriptLoad[src]();
-                                    }
-                                }
-                            }
-                            base = "" + window.location;
-							load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
-                            //lets you register a function to execute 
-                            //after the script is loaded
-                            if($env.afterScriptLoad){
-                                for(src in $env.afterScriptLoad){
-                                    if(script.src.match(src)){
-                                        $env.afterScriptLoad[src]();
-                                    }
-                                }
-                            }
-                        }else{
-                            $env.loadInlineScript(script);
-                        }
-                    }else{
-                        if(!script.src && script.type == "text/javascript"){
-                            $env.loadInlineScript(script);
-                        }
-                    }
-                }
-            }else{
-                //anonymous type and anonymous src means inline
-                if(!script.src){
-                    $env.loadInlineScript(script);
-                }
-            }
-        }catch(e){
-            $env.error("Error loading script.", e);
-            $env.onScriptLoadError(script);
-        }finally{
-            if(parser){
-                parser.appendFragment(docWrites.join(''));
-			}
-			//return document.write to it's non-script loading form
-            document.write = write;
-            document.writeln = writeln;
-        }
-    };
-    
-    $env.loadInlineScript = function(script){};
-    
-    
-    $env.getFreshScopeObj = function(){};
-    $env.getProxyFor = function(){};
-    $env.getScope = function(){};
-    $env.setScope = function(){};
-    $env.configureScope = function(){};
-    $env.restoreScope = function(){};
-
-
-    $env.loadFrame = function(frameElement, url){
-        try {
-            if (frameElement._content){
-                $env.$unloadEventsFor(frameElement._content);
-                $env.reloadAWindowProxy(frameElement._content, url);
-            }
-            else
-                frameElement._content = $env.makeNewWindowMaybeLoad(this,
-                    frameElement.ownerDocument.parentWindow, url);
-        } catch(e){
-            $env.error("failed to load frame content: from " + url, e);
-        }
-    };
-
-    $env.reloadAWindowProxy = function(oldWindowProxy, url){
-        var newWindowProxy = $env.makeNewWindowMaybeLoad(
-                                 oldWindowProxy.opener,
-                                 oldWindowProxy.parent,
-                                 url);
-        var newWindow = newWindowProxy.__proto__;
-
-        oldWindowProxy.__proto__ = newWindow;
-        newWindow.$thisWindowsProxyObject = oldWindowProxy;
-        newWindow.document._parentWindow = oldWindowProxy;
-    };
-
-    $env.makeNewWindowMaybeLoad = function(openingWindow, parentArg, url){
-        var newWindow = $env.getFreshScopeObj();
-        var newProxy  = $env.getProxyFor(newWindow);
-        newWindow.$thisWindowsProxyObject = newProxy;
-
-        var local__window__    = $env.window,
-            local_env          = $env,
-            local_opener       = openingWindow,
-            local_parent       = parentArg ? parentArg : newWindow;
-
-        var inNewContext = function(){
-            local__window__(newWindow,        // object to "window-ify"
-                            local_env,        // our scope for globals
-                            local_parent,     // win's "parent"
-                            local_opener,     // win's "opener"
-                            local_parent.top, // win's "top"
-                            false             // this win isn't the original
-                           );
-            if (url)
-                newWindow.__loadAWindowsDocument__(url);
-        };
-
-        var scopes = recordScopesOfKeyObjects(inNewContext);
-        setScopesOfKeyObjects(inNewContext, newWindow);
-        inNewContext(); // invoke local fn to window-ify new scope object
-        restoreScopesOfKeyObjects(inNewContext, scopes);
-        return newProxy;
-    };
-
-    function recordScopesOfKeyObjects(fnToExecInOtherContext){
-        return {                //   getScope()/setScope() from Window.java
-            frame :          $env.getScope(fnToExecInOtherContext),
-            window :         $env.getScope($env.window),
-            global_load :    $env.getScope($env.loadIntoFnsScope),
-            local_load :     $env.getScope($env.loadLocalScript)
-        };
-    }
-
-    function setScopesOfKeyObjects(fnToExecInOtherContext, windowObj){
-        $env.setScope(fnToExecInOtherContext,  windowObj);
-        $env.setScope($env.window,             windowObj);
-        $env.setScope($env.loadIntoFnsScope,   windowObj);
-        $env.setScope($env.loadLocalScript,    windowObj);
-    }
-
-    function restoreScopesOfKeyObjects(fnToExecInOtherContext, scopes){
-        $env.setScope(fnToExecInOtherContext,  scopes.frame);
-        $env.setScope($env.window,             scopes.window);
-        $env.setScope($env.loadIntoFnsScope,   scopes.global_load);
-        $env.setScope($env.loadLocalScript,    scopes.local_load);
-    }
-})(Envjs);
-
-/*
 *	env.rhino.js
 */
 (function($env){
@@ -309,6 +12,9 @@ var Envjs = function(){
     };
     
     $env.sync = sync;
+    $env.sleep = function(t){
+      java.lang.Thread.currentThread().sleep(sleep);
+    }
   
     //For Java the window.location object is a java.net.URL
     $env.location = function(path, base){
@@ -618,32 +324,314 @@ var Envjs = function(){
     $env.configureScope = configureScope;
     $env.restoreScope = restoreScope;
     
-})(Envjs);/*
- * Envjs env-js.1.0.rc7 
- * Pure JavaScript Browser Environment
- *   By John Resig <http://ejohn.org/>
- * Copyright 2008-2009 John Resig, under the MIT License
+})(Envjs);
+/**
+ * @author thatcher
  */
+var Envjs = function(){
+    if(arguments.length === 2){
+        for ( var i in arguments[1] ) {
+    		var g = arguments[1].__lookupGetter__(i), 
+                s = arguments[1].__lookupSetter__(i);
+    		if ( g || s ) {
+    			if ( g ) Envjs.__defineGetter__(i, g);
+    			if ( s ) Envjs.__defineSetter__(i, s);
+    		} else
+    			Envjs[i] = arguments[1][i];
+    	}
+    }
+
+    if (arguments[0] != null && arguments[0] != "")
+        window.location = arguments[0];
+};
+
+(function($env){
+    
+    //You can emulate different user agents by overriding these after loading env
+    $env.appCodeName  = "Envjs";//eg "Mozilla"
+    $env.appName      = "Resig/20070309 BirdDog/0.0.0.1";//eg "Gecko/20070309 Firefox/2.0.0.3"
+
+    //set this to true and see profile/profile.js to select which methods
+    //to profile
+    $env.profile = false;
+    
+    $env.log = $env.log || function(msg, level){};
+	
+    $env.DEBUG  = 4;
+    $env.INFO   = 3;
+    $env.WARN   = 2;
+    $env.ERROR  = 1;
+	$env.NONE   = 0;
+	
+    //set this if you want to get some internal log statements
+    $env.logLevel = $env.DEBUG;
+    $env.logLevel = $env.INFO;
+    
+    $env.debug  = function(msg){
+		if($env.logLevel >= $env.DEBUG)
+            $env.log(msg,"DEBUG"); 
+    };
+    $env.info = function(msg){
+        if($env.logLevel >= $env.INFO)
+            $env.log(msg,"INFO"); 
+    };
+    $env.warn   = function(msg){
+        if($env.logLevel >= $env.WARN)
+            $env.log(msg,"WARNIING");    
+    };
+    $env.error = function(msg, e){
+        if ($env.logLevel >= $env.ERROR) {
+			$env.log(msg + " Line: " + $env.lineSource(e), 'ERROR');
+			$env.log(e || "", 'ERROR');
+		}
+    };
+    
+    $env.info("Initializing Core Platform Env");
 
 
-try {
+  if(false){
+    // if we're running in an environment without env.js' custom extensions
+    // for manipulating the JavaScript scope chain, put in trivial emulations
+    $env.debug("performing check for custom Java methods in env-js.jar");
+    var countOfMissing = 0, dontCare;
+    try { dontCare = getFreshScopeObj; }
+    catch (ex){      getFreshScopeObj  = function(){ return {}; };
+                                                       countOfMissing++; }
+    try { dontCare = getProxyFor; }
+    catch (ex){      getProxyFor       = function(obj){ return obj; };
+                                                       countOfMissing++; }
+    try { dontCare = getScope; }
+    catch (ex){      getScope          = function(){}; countOfMissing++; }
+    try { dontCare = setScope; }
+    catch (ex){      setScope          = function(){}; countOfMissing++; }
+    try { dontCare = configureScope; }
+    catch (ex){      configureScope    = function(){}; countOfMissing++; }
+    try { dontCare = restoreScope; }
+    catch (ex){      restoreScope      = function(){}; countOfMissing++; }
+    try { $env.loadIntoFnsScope = loadIntoFnsScope; }
+    catch (ex){      $env.loadIntoFnsScope = load;     countOfMissing++; }
+    if (countOfMissing != 0 && countOfMissing != 7)
+        $env.warn("Some but not all of scope-manipulation functions were " +
+                  "not present in environment.  JavaScript execution may " +
+                  "not occur correctly.");
+  }
 
-    Envjs.window = function($w,
-                            $env,
-                            $parentWindow,
-                            $openingWindow,
-                            $initTop,
-                            $thisIsTheOriginalWindow){
+    $env.lineSource = $env.lineSource || function(e){};
+    
+    //resolves location relative to base or window location
+    $env.location = $env.location || function(path, base){};
+    
+    $env.sync = $env.sync || function(fn){
+      return function(){ return fn.apply(this,arguments); };
+    };
 
-        // The Window Object
-        var __this__ = $w;
-        $w.__defineGetter__('window', function(){
-            return __this__;
-        });
-        $w.$isOriginalWindow = $thisIsTheOriginalWindow;
-        $w.$haveCalledWindowLocationSetter = false;
+    $env.spawn = $env.spawn || function(fn) {
+      setTimeout(fn,0);
+    };
 
-/*
+    $env.sleep = $env.sleep || function(){};
+
+    //Used in the XMLHttpRquest implementation to run a
+    // request in a seperate thread
+    $env.runAsync = $env.runAsync || function(fn){};
+        
+    //Used to write to a local file
+    $env.writeToFile = $env.writeToFile || function(text, url){};
+        
+    //Used to write to a local file
+    $env.writeToTempFile = $env.writeToTempFile || function(text, suffix){};
+    
+    //Used to delete a local file
+    $env.deleteFile = $env.deleteFile || function(url){};
+    
+    $env.connection = $env.connection || function(xhr, responseHandler, data){};
+    
+    $env.parseHTML = function(htmlstring){};
+    $env.parseHTML = undefined;
+    $env.parseXML = function(xmlstring){};
+    $env.parseXML = undefined;
+    $env.xpath = function(expression, doc){};
+    $env.xpath = undefined;
+    
+    $env.tmpdir         = ''; 
+    $env.os_name        = ''; 
+    $env.os_arch        = ''; 
+    $env.os_version     = ''; 
+    $env.lang           = ''; 
+    $env.platform       = "";
+    
+    $env.scriptTypes = {
+        "text/javascript"   :false,
+        "text/envjs"        :true
+    };
+    
+    $env.onScriptLoadError = $env.onScriptLoadError || function(){};
+    $env.loadLocalScript = function(script, parser){
+        $env.debug("loading script ");
+        var types, type, src, i, base, 
+            docWrites = [],
+            write = document.write,
+            writeln = document.writeln;
+        //temporarily replace document write becuase the function
+        //has a different meaning during parsing
+        document.write = function(text){
+			docWrites.push(text);
+		};
+        try{
+			if(script.type){
+                types = script.type?script.type.split(";"):[];
+                for(i=0;i<types.length;i++){
+                    if($env.scriptTypes[types[i]]){
+						if(script.src){
+                            $env.info("loading allowed external script :" + script.src);
+                            //lets you register a function to execute 
+                            //before the script is loaded
+                            if($env.beforeScriptLoad){
+                                for(src in $env.beforeScriptLoad){
+                                    if(script.src.match(src)){
+                                        $env.beforeScriptLoad[src]();
+                                    }
+                                }
+                            }
+                            base = "" + window.location;
+                            load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
+                            //lets you register a function to execute 
+                            //after the script is loaded
+                            if($env.afterScriptLoad){
+                                for(src in $env.afterScriptLoad){
+                                    if(script.src.match(src)){
+                                        $env.afterScriptLoad[src]();
+                                    }
+                                }
+                            }
+                        }else{
+                            $env.loadInlineScript(script);
+                        }
+                    }else{
+                        if(!script.src && script.type == "text/javascript"){
+                            $env.loadInlineScript(script);
+                        }
+                    }
+                }
+            }else{
+                //anonymous type and anonymous src means inline
+                if(!script.src){
+                    $env.loadInlineScript(script);
+                }
+            }
+        }catch(e){
+            $env.error("Error loading script.", e);
+            $env.onScriptLoadError(script);
+        }finally{
+            if(parser){
+                parser.appendFragment(docWrites.join(''));
+			}
+			//return document.write to it's non-script loading form
+            document.write = write;
+            document.writeln = writeln;
+        }
+    };
+        
+    $env.loadInlineScript = $env.loadInlineScript || function(script){};
+    
+    $env.getFreshScopeObj = function(){};
+    $env.getFreshScopeObj = undefined;
+    $env.getProxyFor = function(){};
+    $env.getProxyFor = undefined;
+    $env.getScope = function(){};
+    $env.getScope = undefined;
+    $env.setScope = function(){};
+    $env.setScope = undefined;
+    $env.configureScope = function(){};
+    $env.configureScope = undefined;
+    $env.restoreScope = function(){};
+    $env.restoreScope = undefined;
+
+
+    $env.loadFrame = function(frameElement, url){
+        try {
+            if (frameElement._content){
+                $env.$unloadEventsFor(frameElement._content);
+                $env.reloadAWindowProxy(frameElement._content, url);
+            }
+            else {
+              var v = $env.makeNewWindowMaybeLoad(this,
+                    frameElement.ownerDocument.parentWindow, url);
+              frameElement._content = v;
+            }
+        } catch(e){
+            $env.error("failed to load frame content: from " + url, e);
+        }
+    };
+    
+    $env.reloadAWindowProxy = $env.reloadAWindowProxy || function(oldWindowProxy, url){
+        var newWindowProxy = $env.makeNewWindowMaybeLoad(
+                                 oldWindowProxy.opener,
+                                 oldWindowProxy.parent,
+                                 url);
+        var newWindow = newWindowProxy.__proto__;
+
+        oldWindowProxy.__proto__ = newWindow;
+        newWindow.$thisWindowsProxyObject = oldWindowProxy;
+        newWindow.document._parentWindow = oldWindowProxy;
+    };
+
+    $env.makeNewWindowMaybeLoad = $env.makeNewWindowMaybeLoad || function(openingWindow, parentArg, url){
+        var newWindow = $env.getFreshScopeObj();
+        var newProxy  = $env.getProxyFor(newWindow);
+        newWindow.$thisWindowsProxyObject = newProxy;
+
+        var local__window__    = $env.window,
+            local_env          = $env,
+            local_opener       = openingWindow,
+            local_parent       = parentArg ? parentArg : newWindow;
+
+        var inNewContext = function(){
+            local__window__(newWindow,        // object to "window-ify"
+                            local_env,        // our scope for globals
+                            local_parent,     // win's "parent"
+                            local_opener,     // win's "opener"
+                            local_parent.top, // win's "top"
+                            false             // this win isn't the original
+                           );
+            if (url)
+                newWindow.__loadAWindowsDocument__(url);
+        };
+
+        var scopes = recordScopesOfKeyObjects(inNewContext);
+        setScopesOfKeyObjects(inNewContext, newWindow);
+        inNewContext(); // invoke local fn to window-ify new scope object
+        restoreScopesOfKeyObjects(inNewContext, scopes);
+        return newProxy;
+    };
+
+    function recordScopesOfKeyObjects(fnToExecInOtherContext){
+        return {                //   getScope()/setScope() from Window.java
+            frame :          $env.getScope(fnToExecInOtherContext),
+            window :         $env.getScope($env.window),
+            global_load :    $env.getScope($env.loadIntoFnsScope),
+            local_load :     $env.getScope($env.loadLocalScript)
+        };
+    }
+    var recordScopesOfKeyObjects = undefined;
+
+    function setScopesOfKeyObjects(fnToExecInOtherContext, windowObj){
+        $env.setScope(fnToExecInOtherContext,  windowObj);
+        $env.setScope($env.window,             windowObj);
+        $env.setScope($env.loadIntoFnsScope,   windowObj);
+        $env.setScope($env.loadLocalScript,    windowObj);
+    }
+    var setScopesOfKeyObjects = undefined;
+
+    function restoreScopesOfKeyObjects(fnToExecInOtherContext, scopes){
+        $env.setScope(fnToExecInOtherContext,  scopes.frame);
+        $env.setScope($env.window,             scopes.window);
+        $env.setScope($env.loadIntoFnsScope,   scopes.global_load);
+        $env.setScope($env.loadLocalScript,    scopes.local_load);
+    }
+    var restoreScopesOfKeyObjects = undefined;
+
+})($env);/*
 *	window.js
 *   - this file will be wrapped in a closure providing the window object as $w
 */
@@ -697,7 +685,8 @@ var $name;
 
 // a read/write reference to the Window object that contained the script that called open() to 
 //open this browser window.  This property is valid only for top-level window objects.
-var $opener = $openingWindow;
+
+var $opener = $openingWindow = options.opener;
 
 // Read-only properties that specify the total height and width, in pixels, of the browser window.
 // These dimensions include the height and width of the menu bar, toolbars, scrollbars, window
@@ -714,7 +703,7 @@ var $pageXOffset = 0, $pageYOffset = 0;
 // or frame.  If the window is a top-level window, parent refers to
 // the window itself.  If this window is a frame, this property refers
 // to the window or frame that conatins it.
-var $parent = $parentWindow;
+var $parent = options.parent || window;
 try {
     if ($parentWindow.$thisWindowsProxyObject)
         $parent = $parentWindow.$thisWindowsProxyObject;
@@ -735,7 +724,7 @@ var $status = '';
 // a read-only reference to the top-level window that contains this window.  If this
 // window is a top-level window it is simply a refernce to itself.  If this window 
 // is a frame, the top property refers to the top-level window that contains the frame.
-var $top = $initTop;
+var $top = $parent && $parent.top || this;
 
 // the window property is identical to the self property and to this obj
 var $window = $w;
@@ -743,7 +732,7 @@ try {
     if ($w.$thisWindowsProxyObject)
         $window = $w.$thisWindowsProxyObject;
 } catch(e){}
-
+options.proxy && ( $window = options.proxy );
 
 $debug("Initializing Window.");
 __extend__($w,{
@@ -3048,7 +3037,6 @@ XMLP.prototype.next = function() {
 };
 
 XMLP.prototype.appendFragment = function(xmlfragment) {
-
     var start = this.m_xml.slice(0,this.m_iP);
     var end = this.m_xml.slice(this.m_iP);
     this.m_xml = start+xmlfragment+end;
@@ -4257,7 +4245,13 @@ var __endHTMLElement__ = function(node, doc, p){
         if (node.src && node.src.length > 0){
             $debug("getting content document for (i)frame from " + node.src);
 
+          // FIX
+          var save = $master.first_script_window;
+          $master.first_script_window = window;
+
             $env.loadFrame(node, $env.location(node.src));
+
+          $master.first_script_window = save;
 
             var event = doc.createEvent();
             event.initEvent("load");
@@ -5494,6 +5488,7 @@ $w.Document = DOMDocument;
 	
 		if ( !doc ) {
 			if ( typeof DOMDocument != "undefined" ){
+print("BB");                          
 				doc = new DOMDocument();
 			}else if ( typeof document != "undefined" && document.implementation && document.implementation.createDocument ){
 				doc = document.implementation.createDocument("", "", null);
@@ -5983,7 +5978,7 @@ __extend__(HTMLElement.prototype, {
 	    }
 });
 
-var __eval__ = function(script, startingNode){
+var __eval__ = $env.__eval__ || function(script, startingNode){
     if (script == "")
         return;                    // don't assemble environment if no script...
 
@@ -7509,6 +7504,7 @@ __extend__(HTMLObjectElement.prototype, {
         this.setAttribute('width',value);
     },
     get contentDocument(){
+print("there");
         return this.ownerDocument;
     }
 });
@@ -8812,21 +8808,13 @@ $debug("Initializing Window Location.");
 var $location = '';
 
 $w.__defineSetter__("location", function(url){
-    if ($w.$isOriginalWindow){
-        if ($w.$haveCalledWindowLocationSetter)
-            throw new Error("Cannot call 'window.location=' multiple times " +
-              "from the context used to load 'env.js'.  Try using " +
-              "'window.open()' to get a new context.");
-        $w.$haveCalledWindowLocationSetter = true;
-        $w.__loadAWindowsDocument__(url);
-    }
-    else {
-        $env.$unloadEventsFor($w);
-        var proxy = $w;
-        if (proxy.$thisWindowsProxyObject)
-            proxy = proxy.$thisWindowsProxyObject;
-        $env.reloadAWindowProxy(proxy, url);
-    }
+  if( !$location || $location == "about:blank" ) {
+    $w.__loadAWindowsDocument__(url);
+  } else {
+    $env.$unloadEventsFor($w);
+    var proxy = $w.window;
+    $env.reloadAWindowProxy(proxy, url);
+  }
 });
 
 $w.__loadAWindowsDocument__ = function(url){
@@ -8916,8 +8904,8 @@ $w.__defineGetter__("location", function(url){
             // ignore 'force': we don't implement a cache
             var thisWindow = $w;
             $env.$unloadEventsFor(thisWindow);
-            try { thisWindow = thisWindow.$thisWindowsProxyObject; }catch (e){}
-            $env.reloadAWindowProxy(thisWindow, thisWindow.location.href);
+            try { thisWindow = thisWindow.$thisWindowsProxyObject || thisWindow; }catch (e){}
+            $env.reloadAWindowProxy($window, thisWindow.location.href);
         },
         replace: function(url){
             $location = url;
@@ -9035,7 +9023,7 @@ $w.__defineGetter__("navigator", function(){
 $debug("Initializing Window Timer.");
 
 //private
-var $timers = $env.timers = $env.timers || [];
+var $timers = $master.timers = $master.timers || [];
 var $event_loop_running = false;
 $timers.lock = $env.sync(function(fn){fn();});
 
@@ -9072,8 +9060,9 @@ window.setTimeout = function(fn, time){
           eval(fn);
         } catch (e) {
           $env.error(e);
+        } finally {
+          window.clearInterval(num);
         }
-        window.clearInterval(num);          
       };
     } else {
       tfn = function() {
@@ -9081,12 +9070,14 @@ window.setTimeout = function(fn, time){
           fn();
         } catch (e) {
           $env.error(e);
+        } finally {
+          window.clearInterval(num);
         }
-        window.clearInterval(num);
       };
     }
     $debug("Creating timer number "+num);
     $timers[num] = new $timer(tfn, time);
+    $timers[num].ofn = fn;
     $timers[num].start();
   });
   return num;
@@ -9108,6 +9099,7 @@ window.setInterval = function(fn, time){
     num = $timers.length+1;
     //$debug("Creating timer number "+num);
     $timers[num] = new $timer(fn, time);
+    $timers[num].ofn = fn;
     $timers[num].start();
   });
   return num;
@@ -9141,6 +9133,13 @@ window.$wait = $env.wait = $env.wait || function(wait) {
     var earliest;
     $timers.lock(function(){
       earliest = undefined;
+      var l = 0;
+      for(var i in $timers){
+        if( isNaN(i*0) ) {
+          continue;
+        }
+        l++;
+      }
       for(var i in $timers){
         if( isNaN(i*0) ) {
           continue;
@@ -9156,8 +9155,9 @@ window.$wait = $env.wait = $env.wait || function(wait) {
       var f = earliest.fn;
       try {
         earliest.running = true;
-        var h = Date.now();
         f();
+      } catch (e) {
+        $env.error(e);
       } finally {
         earliest.running = false;
       }
@@ -9193,7 +9193,7 @@ window.$wait = $env.wait = $env.wait || function(wait) {
     if ( !sleep || sleep > interval ) {
       sleep = interval;
     }
-    java.lang.Thread.currentThread().sleep(sleep);
+    $env.sleep(sleep);
   }
   $event_loop_running = old_loop_running;
 };
@@ -9251,6 +9251,7 @@ $w.dispatchEvent = function(event, bubbles){
     }
     $debug("event target: " + event.target);
     if ( event.type && (this.nodeType             ||
+                        this.window === window    ||
                         this === window           ||
                         this.__proto__ === window ||
                         this.$thisWindowsProxyObject === window)) {
@@ -10292,25 +10293,46 @@ try{
 }catch(e){
 	//TODO - fail gracefully
 }	
-	/*
-*	outro.js
-*/
+	// faux-intro ...
+// (function(){
+//   (function(){
+//     function(){
 
+      if ( options.url ) {
+        $w.__loadAWindowsDocument__(options.url);
+      }
+    };
 
-    };// close function definition begun in 'intro.js'
+    return $env;
 
+  })(); // close function definition begun in 'intro.js'
 
-    // turn "original" JS interpreter global object into the
-    // "root" window object
-    Envjs.window(this,    // object to "window-ify"
-                 Envjs,   // our scope for globals
-                 this,    // a root window's parent is itself
-                 null,    // "opener" for new window
-                 this,    // "top" for new window
-                 true     // identify this as the original (not reloadable) win
-                );
+  // Initial window setup
+  $env.init.call(this);
 
-} catch(e){
-    Envjs.error("ERROR LOADING ENV : " + e + "\nLINE SOURCE:\n" +
-        Envjs.lineSource(e));
-}
+  // User accesible interface ...
+  Envjs = $env.Envjs = function(){
+    if(arguments.length === 2){
+      for ( var i in arguments[1] ) {
+    	var g = arguments[1].__lookupGetter__(i), 
+            s = arguments[1].__lookupSetter__(i);
+    	if ( g || s ) {
+    	  if ( g ) $env.__defineGetter__(i, g);
+    	  if ( s ) $env.__defineSetter__(i, s);
+    	} else
+    	  $env[i] = arguments[1][i];
+      }
+    }
+    if (arguments[0] != null && arguments[0] != "")
+      window.location = arguments[0];
+  };
+  Envjs.$env = $env;
+  Envjs.wait = $env.wait;
+  Envjs.interpreter = window.whichInterpreter;
+  Envjs.evaluate = $env.$master.evaluate;
+  
+})();
+
+// Local Variables:
+// mode:auto-revert
+// End:
