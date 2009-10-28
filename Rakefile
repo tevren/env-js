@@ -64,7 +64,7 @@ task :test => "johnson:test"
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |s|
-    s.name = "envjs"
+    s.name = "smparkes.envjs"
     s.executables = "envjsrb"
     s.summary = "Browser environment for javascript interpreters"
     s.email = "smparkes@smparkes.net" # Just for the ruby part ...
