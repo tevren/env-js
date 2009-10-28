@@ -1,3 +1,6 @@
+require 'rubygems'
+require 'rake'
+
 # task :default => "rhino:test"
 task :default => "johnson:test"
 
@@ -68,6 +71,7 @@ begin
     s.homepage = "http://github.com/thatcher/env-js"
     s.description = "Browser environment for javascript interpreters"
     s.authors = ["John Resig", "Chris Thatcher", "Glen E. Ivey" ]
+    s.add_development_dependency "smparkes.johnson", ">= 1.1.2.2"
     s.files = 
       FileList[ "",
                 "{bin,generators,lib,test}/**/*", 'lib/jeweler/templates/.gitignore']
@@ -75,6 +79,8 @@ begin
 rescue LoadError
   puts "Jeweler, or one of its dependencies, is not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
+
+task :test => :check_dependencies
 
 # Local Variables:
 # mode:ruby
