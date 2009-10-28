@@ -5,7 +5,6 @@
 /rhino/build
 /jshost
 /dist/env.johnson.js
-/vendor
 /lib/envjs/env.js
 /*envjs*.gem
 /*envjs.gemspec
