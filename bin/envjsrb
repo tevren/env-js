@@ -24,7 +24,11 @@ if ARGV.length > 0
 
   begin
     ARGV.each do |file|
-      RUNTIME.load file
+      if file =~ /\.x?html?$/
+        RUNTIME.evaluate("window.location = '#{file}'", file, 1)
+      else
+        RUNTIME.load file
+      end
     end
   rescue Johnson::Error => je
     if je.message.match /<SystemExit: exit>/
