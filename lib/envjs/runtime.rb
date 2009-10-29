@@ -77,6 +77,7 @@ EOJS
 
       ( class << self; self; end ).send :define_method, :wait do
         master["finalize"] && master.finalize.call
+        master.timers && master.timers.wait
       end
 
       scripts = {}
