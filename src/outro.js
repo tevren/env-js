@@ -3,9 +3,7 @@
 //   (function(){
 //     function(){
 
-      if ( options.url ) {
-        $w.__loadAWindowsDocument__(options.url);
-      }
+      $w.__loadAWindowsDocument__(options.url || "about:blank");
     };
 
     return $env;

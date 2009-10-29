@@ -63,7 +63,7 @@ var Envjs = function(){
 		}
     };
     
-    $env.info("Initializing Core Platform Env");
+    $env.debug("Initializing Core Platform Env");
 
 
     // if we're running in an environment without env.js' custom extensions
@@ -135,7 +135,7 @@ var Envjs = function(){
     $env.platform       = "";
     
     $env.scriptTypes = {
-        "text/javascript"   :false,
+        "text/javascript"   :true,
         "text/envjs"        :true
     };
     

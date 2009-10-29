@@ -94,7 +94,19 @@ __extend__(DOMDocument.prototype, {
     load: function(url){
 		$debug("Loading url into DOM Document: "+ url + " - (Asynch? "+$w.document.async+")");
         var scripts, _this = this;
-        var xhr = new XMLHttpRequest();
+        var xhr;
+// print("KK",url,url =="about:blank"); 
+        if (url == "about:blank"){
+            xhr = ({
+                open: function(){},
+                send: function(){
+                    this.responseText = "<html><head><title></title></head><body></body></html>";
+                    this.onreadystatechange();
+                }
+            });
+        } else {
+            xhr = new XMLHttpRequest();
+        }
         xhr.open("GET", url, $w.document.async);
         xhr.onreadystatechange = function(){
             try{
@@ -109,7 +121,9 @@ __extend__(DOMDocument.prototype, {
             }
             _this._url = url;
             
+            if ( url != "about:blank" ) {
         	$info("Sucessfully loaded document at "+url);
+            }
 
                 // first fire body-onload event
             var event = document.createEvent();
@@ -413,3 +427,8 @@ var __isValidNamespace__ = function(doc, namespaceURI, qualifiedName, isAttribut
 };
 
 $w.Document = DOMDocument;
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// End:
