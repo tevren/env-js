@@ -40,6 +40,7 @@ puts = function() {
       s = arguments[i].toString();
     }
     Ruby.print(s);
+    Ruby.eval("$stdout.flush")
   }
 };
 EOJS
