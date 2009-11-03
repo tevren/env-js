@@ -45,11 +45,18 @@
 	// to modify the correct portion of the location object
 	// when we navigate the history
 	var setHistory = function( value, locationPart){
-	    $info("adding value to history: " +value);
+            if ( value == "about:blank" ) {
+                return;
+            }
+	    $debug("adding value to history: " +value);
 		$currentHistoryIndex++;
 		$history.push({
 			location: locationPart||"href",
 			value: value
 		});
 	};
-	
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// End:

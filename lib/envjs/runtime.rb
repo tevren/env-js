@@ -27,8 +27,26 @@ print = function() {
 };
 EOJS
 
+      evaluate <<'EOJS'
+puts = function() {
+  var l = arguments.length
+  for( var i = 0; i < l; i++ ) {
+    var s;
+    if ( arguments[i] === null ) {
+      s = "null";
+    } else if ( arguments[i] === undefined  ) {
+      s = "undefined"      
+    } else {
+      s = arguments[i].toString();
+    }
+    Ruby.print(s);
+    Ruby.eval("$stdout.flush")
+  }
+};
+EOJS
+
       master = global["$master"] = evaluate("new Object")
-      master.symbols = [ "Johnson", "Ruby", "print", "load", "whichInterpreter", "multiwindow" ]
+      master.symbols = [ "Johnson", "Ruby", "print", "puts", "load", "whichInterpreter", "multiwindow" ]
       master.symbols.each { |symbol| master[symbol] = global[symbol] }
 
       master.whichInterpreter = "Johnson"
@@ -77,6 +95,7 @@ EOJS
 
       ( class << self; self; end ).send :define_method, :wait do
         master["finalize"] && master.finalize.call
+        master.timers && master.timers.wait
       end
 
       scripts = {}

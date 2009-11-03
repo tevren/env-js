@@ -102,7 +102,7 @@ window.clearInterval = window.clearTimeout = function(num){
 
 // FIX: make a priority queue ...
 
-window.$wait = $env.wait = $env.wait || function(wait) {
+window.$wait = $timers.wait = $env.wait = $env.wait || function(wait) {
   var start = Date.now();
   var old_loop_running = $event_loop_running;
   $event_loop_running = true; 

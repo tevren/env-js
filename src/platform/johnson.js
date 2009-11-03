@@ -4,6 +4,9 @@ $env.log = function(msg, level){
 
 $env.location = function(path, base){
     // print("loc",path,base);
+    if ( path == "about:blank" ) {
+        return path;
+    }
     var protocol = new RegExp('(^file\:|^http\:|^https\:)');
     var m = protocol.exec(path);
     if(m&&m.length>1){
@@ -29,14 +32,15 @@ $env.location = function(path, base){
         if ( result.substring(0,6) == "file:/" && result[6] != "/" ) {
             result = "file://" + result.substring(5,result.length);
         }
-        if ( true && result.substring(0,7) == "file://" ) {
+        if ( result.substring(0,7) == "file://" ) {
             result = result.substring(7,result.length);
         }
         // print("ZZ",result);
         return result;
     }else{
         //return an absolute url from a url relative to the window location
-        if( ( base = ( ( $master.first_script_window && $master.first_script_window.location ) || window.location) ) &&
+        if( ( base = ( ( $master.first_script_window && $master.first_script_window.location ) || window.location ) ) &&
+            ( base != "about:blank" ) &&
             base.href &&
             (base.href.length > 0) ) {
             base = base.href.substring(0, base.href.lastIndexOf('/'));
@@ -47,6 +51,7 @@ $env.location = function(path, base){
             // print("****",result);
             return result;
         } else {
+            // print("RRR",result);
             return "file://"+Ruby.File.expand_path(path);
         }
     }
@@ -103,12 +108,18 @@ $env.connection = function(xhr, responseHandler, data){
         Ruby.require('net/http');
 
         var req;
+        var path;
+        try {
+            path = url.request_uri();
+        } catch(e) {
+            path = url.path;
+        }
         if ( xhr.method == "GET" ) {
-            req = new Ruby.Net.HTTP.Get( url.request_uri() );
+            req = new Ruby.Net.HTTP.Get( path );
         } else if ( xhr.method == "POST" ) {
-            req = new Ruby.Net.HTTP.Post( url.request_uri() );
+            req = new Ruby.Net.HTTP.Post( path );
         } else if ( xhr.method == "PUT" ) {
-            req = new Ruby.Net.HTTP.Put( url.request_uri() );
+            req = new Ruby.Net.HTTP.Put( path );
         }
 
         for (var header in xhr.headers){
@@ -188,14 +199,17 @@ var extract_line =
   e.stack.to_s.split(%(\n))[1].match(/:([^:]*)$/)[1]; \
 }");
 
-var print_exception =
+var print_exception = window.print_exception =
     Ruby.eval(" \
 lambda { |e| \
-  print(%(Exception: ),e,%(\n)); \
+  estr = e.to_s; \
+  estr.gsub!(/(<br \\/>)+/, %( )); \
+  print(%(Exception: ),estr,%(\n)); \
   e.stack.to_s.split(%(\n)).each do |line| \
     m = line.match(/(.*)@([^@]*)$/); \
     s = m[1]; \
-    limit = 50; \
+    s.gsub!(/(<br \\/>)+/, %( )); \
+    limit = 100; \
     if ( s.length > limit ); \
       s = s[0,limit] + %(...); \
     end; \
@@ -313,7 +327,6 @@ $env.reloadAWindowProxy = function(oldWindowProxy, url){
 $env.sleep = function(n){Ruby.sleep(n/1000.);};
 
 $env.loadIntoFnsScope = function(file) {
-    // print("lifs",load);
     return load(file);
 }
 
