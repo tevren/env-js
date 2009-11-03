@@ -229,6 +229,27 @@ lambda { |e| \
 } \
 ");
 
+var print_exception_trace = window.print_exception_trace =
+    Ruby.eval(" \
+lambda { |e| \
+  estr = e.to_s; \
+  estr.gsub!(/(<br \\/>)+/, %( )); \
+  begin; \
+  e.stack.to_s.split(%(\n)).each do |line| \
+    m = line.match(/(.*)@([^@]*)$/); \
+    m[2] == %(:0) && next; \
+    s = m[1]; \
+    s.gsub!(/(<br \\/>)+/, %( )); \
+    limit = 100; \
+    if ( s.length > limit ); \
+      s = s[0,limit] + %(...); \
+    end; \
+    print(m[2],%( ),s,%(\n)); \
+  end; \
+  rescue; end; \
+} \
+");
+
 $env.lineSource = function(e){
     if(e){
         print_exception.call(e);
