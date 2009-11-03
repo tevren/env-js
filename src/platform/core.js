@@ -41,8 +41,8 @@ var Envjs = function(){
 	$env.NONE   = 0;
 	
     //set this if you want to get some internal log statements
-    $env.logLevel = $env.DEBUG;
     $env.logLevel = $env.INFO;
+    $env.logLevel = $env.DEBUG;
     $env.logLevel = $env.WARN;
     
     $env.debug  = function(msg){
@@ -59,8 +59,12 @@ var Envjs = function(){
     };
     $env.error = function(msg, e){
         if ($env.logLevel >= $env.ERROR) {
-			$env.log(msg + " Line: " + $env.lineSource(e), 'ERROR');
-			$env.log(e || "", 'ERROR');
+          var line = $env.lineSource(e);
+          line != "" && ( line = " Line: "+ line );
+			$env.log(msg + line, 'ERROR');
+                        if(e) {
+  			  $env.log(e || "", 'ERROR');
+                        }
 		}
     };
     
@@ -169,7 +173,13 @@ var Envjs = function(){
                                 }
                             }
                             base = "" + window.location;
-                            load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
+                            try {                      
+                              load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
+                            } catch(e) {
+                              $env.error("could not load script: " +
+                                         $env.location(script.src.match(/([^\?#]*)/)[1], base ) +
+                                         ": " + e + " thrown" );
+                            }
                             //lets you register a function to execute 
                             //after the script is loaded
                             if($env.afterScriptLoad){
