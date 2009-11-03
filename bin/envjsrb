@@ -24,7 +24,7 @@ if ARGV.length > 0
 
   begin
     ARGV.each do |file|
-      if file =~ /\.x?html?$/
+      if file =~ /\.x?html?$/ || file =~ %r(^https?://)
         RUNTIME.evaluate("window.location = '#{file}'", file, 1)
       else
         RUNTIME.load file
