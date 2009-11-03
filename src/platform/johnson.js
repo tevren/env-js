@@ -216,6 +216,7 @@ lambda { |e| \
   begin; \
   e.stack.to_s.split(%(\n)).each do |line| \
     m = line.match(/(.*)@([^@]*)$/); \
+    m[2] == %(:0) && next; \
     s = m[1]; \
     s.gsub!(/(<br \\/>)+/, %( )); \
     limit = 100; \
