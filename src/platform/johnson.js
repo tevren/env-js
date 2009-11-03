@@ -202,7 +202,9 @@ $env.connection = function(xhr, responseHandler, data){
 var extract_line =
     Ruby.eval(
 "lambda { |e| \
-  e.stack.to_s.split(%(\n))[1].match(/:([^:]*)$/)[1]; \
+  begin; \
+    e.stack.to_s.split(%(\n))[1].match(/:([^:]*)$/)[1]; \
+  rescue; %(unknown); end; \
 }");
 
 var print_exception = window.print_exception =
@@ -211,6 +213,7 @@ lambda { |e| \
   estr = e.to_s; \
   estr.gsub!(/(<br \\/>)+/, %( )); \
   print(%(Exception: ),estr,%(\n)); \
+  begin; \
   e.stack.to_s.split(%(\n)).each do |line| \
     m = line.match(/(.*)@([^@]*)$/); \
     s = m[1]; \
@@ -220,7 +223,8 @@ lambda { |e| \
       s = s[0,limit] + %(...); \
     end; \
     print(m[2],%( ),s,%(\n)); \
-  end \
+  end; \
+  rescue; end; \
 } \
 ");
 
