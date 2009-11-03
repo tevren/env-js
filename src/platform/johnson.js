@@ -97,12 +97,18 @@ $env.connection = function(xhr, responseHandler, data){
                 }
                 
             }
-        }catch(e){
-            $env.error('failed to open file '+ url, e);
+        } catch (e) {
             connection = null;
             xhr.readyState = 4;
-            xhr.statusText = "Local File Protocol Error";
-            xhr.responseText = "<html><head/><body><p>"+ e+ "</p></body></html>";
+            if(e.toString().match(/Errno::ENOENT/)) {
+                xhr.status = "404";
+                xhr.statusText = "Not Found";
+                xhr.responseText = undefined;
+            } else {
+                xhr.status = "500";
+                xhr.statusText = "Local File Protocol Error";
+                xhr.responseText = "<html><head/><body><p>"+ e+ "</p></body></html>";
+            }
         }
     } else { 
         Ruby.require('net/http');

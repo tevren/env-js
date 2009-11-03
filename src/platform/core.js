@@ -43,6 +43,7 @@ var Envjs = function(){
     //set this if you want to get some internal log statements
     $env.logLevel = $env.DEBUG;
     $env.logLevel = $env.INFO;
+    $env.logLevel = $env.WARN;
     
     $env.debug  = function(msg){
 		if($env.logLevel >= $env.DEBUG)
