@@ -30,6 +30,7 @@ class Envjs::Net::File < Net::Protocol
       @path = path
       @file = File.new @path
       @body = @file.read
+      @code = @file.nil? ? "404" : "200";
       @file.close
     end
 
@@ -52,15 +53,12 @@ class Envjs::Net::File < Net::Protocol
       @file.nil? ? 404 : 200;
     end
 
-    def code
-      @file.nil? ? "404" : "200";
-    end
 
     def getInputStream
       self
     end
 
-    attr_reader :body
+    attr_reader :body, :code
 
   end
 
