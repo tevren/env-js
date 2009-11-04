@@ -86,6 +86,8 @@ EOJS
       master.first_script_window = window
 
       window["$master"] = master
+      window["$options"] = evaluate("new Object");
+      window["$options"].proxy = outer
 
       window.load = lambda { |*files|
         files.each do |f|
