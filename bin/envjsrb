@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
+require 'pathname'
 
 begin
   require 'johnson/tracemonkey'
@@ -23,9 +24,15 @@ RUNTIME.load Envjs::ENVJS
 if ARGV.length > 0
 
   begin
-    ARGV.each do |file|
+    ARGV.each_with_index do |file,i|
       if file =~ /\.x?html?$/ || file =~ %r(^https?://)
-        RUNTIME.evaluate("window.location = '#{file}'", file, 1)
+        if i > 0
+          RUNTIME.wait
+          RUNTIME.evaluate("window.location = 'about:blank'", "(comand line)", 1)
+          RUNTIME.reset_first_script_window
+        end
+        RUNTIME.wait
+        RUNTIME.evaluate("window.location = 'file://#{Pathname.new(file).realpath}'", file, 1)
       else
         RUNTIME.load file
       end
