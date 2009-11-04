@@ -29,7 +29,6 @@ if ARGV.length > 0
         if i > 0
           RUNTIME.wait
           RUNTIME.evaluate("window.location = 'about:blank'", "(comand line)", 1)
-          RUNTIME.reset_first_script_window
         end
         RUNTIME.wait
         RUNTIME.evaluate("window.location = 'file://#{Pathname.new(file).realpath}'", file, 1)
