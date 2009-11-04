@@ -177,7 +177,7 @@ test("Check that events can be set with addEventListener(), and bubble",
         var elem = document.getElementById('eventsFrame').contentDocument.
           getElementById(id).addEventListener('click', function(event){
             try{
-                ok( event.target === img && this === window,
+                ok( event.target === img && ( ( this === window ) ||  ( this.window === window ) ),
                     "Scope: 'this' refers to the window '" + window + "'");
             }catch(e){print(e);}
         });
