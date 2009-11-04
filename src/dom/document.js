@@ -102,22 +102,31 @@ __extend__(DOMDocument.prototype, {
                 send: function(){
                     this.responseText = "<html><head><title></title></head><body></body></html>";
                     this.onreadystatechange();
-                }
+                },
+                status: 200
             });
         } else {
             xhr = new XMLHttpRequest();
         }
         xhr.open("GET", url, $w.document.async);
         xhr.onreadystatechange = function(){
-            try{
-        	    _this.loadXML(xhr.responseText);
-            }catch(e){
-                $error("Error Parsing XML - ",e);
+            if (xhr.status != 200) {
+                $error("Could not retrieve XHR content from " + url + ": status code " + xhr.status);
                 _this.loadXML(
-                "<html><head></head><body>"+
-                    "<h1>Parse Error</h1>"+
-                    "<p>"+e.toString()+"</p>"+  
-                "</body></html>");
+                    "<html><head></head><body>"+
+                        "<h1>No File</h1>"+
+                        "</body></html>");
+            } else {
+                try{
+        	    _this.loadXML(xhr.responseText);
+                }catch(e){
+                    $error("Error Parsing XML - ",e);
+                    _this.loadXML(
+                        "<html><head></head><body>"+
+                            "<h1>Parse Error</h1>"+
+                            "<p>"+e.toString()+"</p>"+  
+                            "</body></html>");
+                }
             }
             _this._url = url;
             
