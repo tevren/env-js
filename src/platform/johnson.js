@@ -39,6 +39,7 @@ $env.location = function(path, base){
         return result;
     }else{
         //return an absolute url from a url relative to the window location
+        // print("hi",  $master.first_script_window, $master.first_script_window && $master.first_script_window.location );
         if( ( base = ( ( $master.first_script_window && $master.first_script_window.location ) || window.location ) ) &&
             ( base != "about:blank" ) &&
             base.href &&
@@ -163,7 +164,7 @@ $env.connection = function(xhr, responseHandler, data){
         }
         
         xhr.readyState = 4;
-        xhr.status = parseInt(connection.responseCode,10) || undefined;
+        xhr.status = parseInt(resp.code,10) || 0;
         xhr.statusText = connection.responseMessage || "";
         
         var contentEncoding = resp["Content-Encoding"] || "utf-8",
@@ -339,12 +340,16 @@ $env.makeNewWindowMaybeLoad = function(openingWindow, parentArg, url, outer){
         url: $env.location(url)
     };
 
+    // print("$w",$w);
+    // print("$ww",$w.window);
+    // print("$ww",$w === $w.window);
     var pair = $env.new_window(outer);
     var proxy = pair[0];
     var new_window = pair[1];
     options.proxy = proxy;
     new_window.$options = options;
-    $master.load(Ruby.Envjs.ENVJS, new_window);
+    // print("$w",$w);
+    $master.load($master.Ruby.Envjs.ENVJS, new_window);
     return proxy;
 };
 
