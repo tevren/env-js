@@ -3,18 +3,9 @@
 require 'rubygems'
 require 'pathname'
 
-begin
-  require 'johnson/tracemonkey'
-  require 'johnson/cli'
-  require 'envjs/runtime'
-rescue Exception => e
-  # (temporarily) run out of local if gem not installed
-  $: << File.expand_path( File.join( File.dirname(__FILE__), "..", "lib" ) )
-  $: << File.expand_path( File.join( File.dirname(__FILE__), "..", "vendor", "johnson", "lib" ) )
-  require 'johnson/tracemonkey'
-  require 'johnson/cli'
-  require 'envjs/runtime'
-end
+require 'johnson/tracemonkey'
+require 'johnson/cli'
+require 'envjs/runtime'
 
 RUNTIME = js = Johnson::Runtime.new
 RUNTIME.extend Envjs::Runtime
@@ -24,15 +15,24 @@ RUNTIME.load Envjs::ENVJS
 if ARGV.length > 0
 
   begin
-    ARGV.each_with_index do |file,i|
-      if file =~ /\.x?html?$/ || file =~ %r(^https?://)
-        if i > 0
+    about_blank = true
+    ARGV.each do |file|
+      if file == "about:blank"
+        RUNTIME.wait
+        RUNTIME.evaluate("window.location = 'about:blank'", "(comand line)", 1)
+        about_blank = true
+      elsif file =~ /\.x?html?$/ || file =~ %r(^https?://)
+        # this might want to go alway; jazrb does it manually now, which I think was the use case
+        # that wanted this
+        if !about_blank
           RUNTIME.wait
           RUNTIME.evaluate("window.location = 'about:blank'", "(comand line)", 1)
         end
         RUNTIME.wait
         RUNTIME.evaluate("window.location = 'file://#{Pathname.new(file).realpath}'", file, 1)
+        about_blank = false
       else
+        RUNTIME.become_first_script_window
         RUNTIME.load file
       end
     end
