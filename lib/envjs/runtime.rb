@@ -102,6 +102,11 @@ EOJS
 
       scripts = {}
 
+      ( class << self; self; end ).send :define_method, :become_first_script_window do
+        # p "heh", inner, master.first_script_window
+        inner = master.first_script_window
+      end
+
       ( class << self; self; end ).send :define_method, :evaluate do |*args|
         ( script, file, line, global, scope, fn ) = *args
         # print "eval in " + script[0,50].inspect + (scope ? scope.toString() : "nil") + "\n"
