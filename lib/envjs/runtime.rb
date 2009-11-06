@@ -28,6 +28,27 @@ print = function() {
 EOJS
 
       evaluate <<'EOJS'
+debug = function() {
+  var l = arguments.length
+  for( var i = 0; i < l; i++ ) {
+    var s;
+    if ( arguments[i] === null ) {
+      s = "null";
+    } else if ( arguments[i] === undefined  ) {
+      s = "undefined"      
+    } else {
+      s = arguments[i].toString();
+    }
+    Ruby['$stderr'].print(s);
+    if( i < l-1 ) {
+      Ruby['$stderr'].print(" ");
+    }
+  }
+  Ruby['$stderr'].print("\n");
+};
+EOJS
+
+      evaluate <<'EOJS'
 puts = function() {
   var l = arguments.length
   for( var i = 0; i < l; i++ ) {
@@ -46,7 +67,7 @@ puts = function() {
 EOJS
 
       master = global["$master"] = evaluate("new Object")
-      master.symbols = [ "Johnson", "Ruby", "print", "puts", "load", "whichInterpreter", "multiwindow" ]
+      master.symbols = [ "Johnson", "Ruby", "print", "debug", "puts", "load", "whichInterpreter", "multiwindow" ]
       master.symbols.each { |symbol| master[symbol] = global[symbol] }
 
       master.whichInterpreter = "Johnson"

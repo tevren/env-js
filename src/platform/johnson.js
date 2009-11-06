@@ -1,5 +1,5 @@
 $env.log = function(msg, level){
-    print(' '+ (level?level:'LOG') + ':\t['+ new Date()+"] {ENVJS} "+msg);
+    debug(' '+ (level?level:'LOG') + ':\t['+ new Date()+"] {ENVJS} "+msg);
 };
 
 $env.location = function(path, base){
@@ -208,12 +208,13 @@ var extract_line =
   rescue; %(unknown); end; \
 }");
 
-var print_exception = window.print_exception =
+var get_exception = window.get_exception =
     Ruby.eval(" \
 lambda { |e| \
   estr = e.to_s; \
   estr.gsub!(/(<br \\/>)+/, %( )); \
-  print(%(Exception: ),estr,%(\n)); \
+  ss = ''; \
+  ss = ss + %(Exception: ) + estr + %(\n); \
   begin; \
   e.stack.to_s.split(%(\n)).each do |line| \
     m = line.match(/(.*)@([^@]*)$/); \
@@ -224,7 +225,53 @@ lambda { |e| \
     if ( s.length > limit ); \
       s = s[0,limit] + %(...); \
     end; \
-    print(m[2],%( ),s,%(\n)); \
+    ss = ss + m[2] + %( ) + s + %(\n); \
+  end; \
+  rescue; end; \
+  ss; \
+} \
+");
+
+var get_exception_trace = window.get_exception_trace =
+    Ruby.eval(" \
+lambda { |e| \
+  estr = e.to_s; \
+  estr.gsub!(/(<br \\/>)+/, %( )); \
+  begin; \
+  ss = ''; \
+  e.stack.to_s.split(%(\n)).each do |line| \
+    m = line.match(/(.*)@([^@]*)$/); \
+    m[2] == %(:0) && next; \
+    s = m[1]; \
+    s.gsub!(/(<br \\/>)+/, %( )); \
+    limit = 100; \
+    if ( s.length > limit ); \
+      s = s[0,limit] + %(...); \
+    end; \
+    ss = ss + m[2] + %( ) + s +%(\n); \
+  end; \
+  rescue; end; \
+  ss; \
+} \
+");
+
+var print_exception = window.print_exception =
+    Ruby.eval(" \
+lambda { |e| \
+  estr = e.to_s; \
+  estr.gsub!(/(<br \\/>)+/, %( )); \
+  debug(%(Exception: ),estr,%(\n)); \
+  begin; \
+  e.stack.to_s.split(%(\n)).each do |line| \
+    m = line.match(/(.*)@([^@]*)$/); \
+    m[2] == %(:0) && next; \
+    s = m[1]; \
+    s.gsub!(/(<br \\/>)+/, %( )); \
+    limit = 100; \
+    if ( s.length > limit ); \
+      s = s[0,limit] + %(...); \
+    end; \
+    debug(m[2],%( ),s,%(\n)); \
   end; \
   rescue; end; \
 } \
@@ -245,7 +292,7 @@ lambda { |e| \
     if ( s.length > limit ); \
       s = s[0,limit] + %(...); \
     end; \
-    print(m[2],%( ),s,%(\n)); \
+    debug(m[2],%( ),s,%(\n)); \
   end; \
   rescue; end; \
 } \
