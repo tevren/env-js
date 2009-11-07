@@ -24,6 +24,7 @@ print = function() {
     }
   }
   Ruby.print("\n");
+  Ruby['$stdout'].flush();
 };
 EOJS
 
