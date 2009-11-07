@@ -12,61 +12,6 @@ var DOMImplementation = function() {
     this.errorChecking  = true;       // by default, test for exceptions
 };
 
-/*
-var __endHTMLElement__ = function(node, doc, p){
-    if(node.nodeName.toLowerCase() == 'script'){
-        // unless we're parsing in a window context, don't execute scripts
-        if (doc.parentWindow){
-            p.replaceEntities = true;
-            $env.loadLocalScript(node, p);
-
-            // only fire event if we actually had something to load
-            if (node.src && node.src.length > 0){
-                var event = doc.createEvent();
-                event.initEvent("load");
-                node.dispatchEvent( event, false );
-            }
-        }
-    }
-    else if (node.nodeName.toLowerCase() == 'frame' ||
-             node.nodeName.toLowerCase() == 'iframe'   ){
-
-        if (node.src && node.src.length > 0){
-            $debug("getting content document for (i)frame from " + node.src);
-
-            // any JS here is DOM-instigated, so the JS scope is the window, not the first script
-
-            var save = $master.first_script_window;
-            $master.first_script_window = window;
-
-            $env.loadFrame(node, $env.location(node.src));
-
-            $master.first_script_window = save;
-
-            var event = doc.createEvent();
-            event.initEvent("load");
-            node.dispatchEvent( event, false );
-        }
-    }
-    else if (node.nodeName.toLowerCase() == 'link'){
-        if (node.href && node.href.length > 0){
-            // don't actually load anything, so we're "done" immediately:
-            var event = doc.createEvent();
-            event.initEvent("load");
-            node.dispatchEvent( event, false );
-        }
-    }
-    else if (node.nodeName.toLowerCase() == 'img'){
-        if (node.src && node.src.length > 0){
-            // don't actually load anything, so we're "done" immediately:
-            var event = doc.createEvent();
-            event.initEvent("load");
-            node.dispatchEvent( event, false );
-        }
-    }
-}
-*/
-
 __extend__(DOMImplementation.prototype,{
     // @param  feature : string - The package name of the feature to test.
     //      the legal only values are "XML" and "CORE" (case-insensitive).
