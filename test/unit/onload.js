@@ -14,15 +14,13 @@ test("Execution of onload events in top-level document",
   function() {
 
         // top-level window-onload works, or test framework wouldn't run.....
-    expect(7);
+    expect(10);
 
     var mtch = document.getElementById('pCreatedByBodyOnload').innerHTML.
       match(/dynamically-generated paragraph/);
     try{ ok(mtch && mtch.length > 0,
         "Got confirmation that body-onload handler executed");
     }catch(e){print(e);}
-
-print("here",document);
 
 /*
     mtch = document.getElementById('pCreatedByIframeOnload').innerHTML.
@@ -63,23 +61,29 @@ print("here",document);
         "img-onload handler executes when img.src assigned");
     }catch(e){print(e);}
 
-    mtch = document.getElementById('pCreatedByScriptOnloadA').innerHTML.
-      match(/script-onload event handler/);
+    mtch = document.getElementById('pCreatedByScriptA').innerHTML.
+      match(/script event handler/);
     try{ ok(mtch && mtch.length > 0,
-        "Got confirmation that script-onload handler executed, empty tag");
+        "Got confirmation that script-onerror handler executed");
     }catch(e){print(e);}
 
-/*
-    mtch = document.getElementById('pCreatedByScriptOnloadB').innerHTML.
-      match(/script-onload event handler/);
-    try{ ok(mtch && mtch.length > 0,
-        "Script-onload handler executed, with open/close tag pair");
+    try{ ok(!document.getElementById('pCreatedByScriptB'),
+        "Got confirmation that script-onload handler did not execute");
     }catch(e){print(e);}
-*/
+
+    mtch = document.getElementById('pCreatedByScriptD').innerHTML.
+      match(/script event handler/);
+    try{ ok(mtch && mtch.length > 0,
+        "Got confirmation that script-onload handler executed");
+    }catch(e){print(e);}
+
+    try{ ok(!document.getElementById('pCreatedByScriptC'),
+        "Got confirmation that script-onerror handler did not execute");
+    }catch(e){print(e);}
 
     mtch = document.getElementById('pShouldntBeCreated');
     try{ ok(!(mtch),
-"Confirmed that script-onload handler that shouldn't execute actually didn't");
+      "Confirmed that script-onload handler that shouldn't execute actually didn't");
     }catch(e){print(e);}
 });
 

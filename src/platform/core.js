@@ -150,15 +150,12 @@ var Envjs = function(){
         var types, type, src, i, base, 
             docWrites = [],
             write = document.write,
-            writeln = document.writeln;
-        //temporarily replace document write becuase the function
-        //has a different meaning during parsing
-        /*document.write = function(text){
-			docWrites.push(text);
-		};*/
+            writeln = document.writeln,
+            okay = true;
+        var script_type = script.type === null ? "text/javascript" : script.type;
         try{
-	  if(script.type){
-                types = script.type?script.type.split(";"):[];
+	  if(script_type){
+                types = script_type?script_type.split(";"):[];
                 for(i=0;i<types.length;i++){
                     if($env.scriptTypes[types[i]]){
 						if(script.src){
@@ -176,6 +173,7 @@ var Envjs = function(){
                             try {                      
                               load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
                             } catch(e) {
+                              okay = false;
                               $env.error("could not load script: " +
                                          $env.location(script.src.match(/([^\?#]*)/)[1], base ) +
                                          ": " + e + " thrown" );
@@ -193,7 +191,7 @@ var Envjs = function(){
                             $env.loadInlineScript(script);
                         }
                     }else{
-                        if(!script.src && script.type == "text/javascript"){
+                        if(!script.src && script_type == "text/javascript"){
                             $env.loadInlineScript(script);
                         }
                     }
@@ -205,6 +203,7 @@ var Envjs = function(){
                 }
             }
         }catch(e){
+            okay = false;
             $env.error("Error loading script.", e);
             $env.onScriptLoadError(script);
         }finally{
@@ -215,6 +214,7 @@ var Envjs = function(){
             document.write = write;
             document.writeln = writeln;*/
         }
+        return okay;
     };
         
     $env.loadInlineScript = $env.loadInlineScript || function(script){};

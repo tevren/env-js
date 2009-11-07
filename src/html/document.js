@@ -234,22 +234,22 @@ __extend__(HTMLDocument.prototype, {
 });
 
 var __elementPopped__ = function(ns, name, node){
-    //print('Element Popped: '+ns+" "+name+ " " );
+    // print('Element Popped: '+ns+" "+name+ " "+ node+" " +node.type+" "+node.nodeName);
     var doc = __ownerDocument__(node);
+    var type = ( node.type === null ) ? "text/javascript" : node.type;
     try{
-        if(node.nodeName.toLowerCase() == 'script' && node.type !== undefined){
+        if(node.nodeName.toLowerCase() == 'script' && type == "text/javascript"){
             //$env.debug("element popped: script\n"+node.xml);
             // unless we're parsing in a window context, don't execute scripts
             if (doc.parentWindow){
                 //p.replaceEntities = true;
-                $env.loadLocalScript(node, null);
-    
+                var okay = $env.loadLocalScript(node, null);
                 // only fire event if we actually had something to load
                 if (node.src && node.src.length > 0){
                     var event = doc.createEvent();
-                    event.initEvent("load");
+                    event.initEvent( okay ? "load" : "error" );
                     node.dispatchEvent( event, false );
-                }
+                  }
             }
         }
         else if (node.nodeName.toLowerCase() == 'frame' ||
