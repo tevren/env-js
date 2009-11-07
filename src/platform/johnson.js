@@ -260,7 +260,7 @@ var print_exception = window.print_exception =
 lambda { |e| \
   estr = e.to_s; \
   estr.gsub!(/(<br \\/>)+/, %( )); \
-  debug(%(Exception: ),estr,%(\n)); \
+  $stderr.print(%(Exception: ),estr,%(\n)); \
   begin; \
   e.stack.to_s.split(%(\n)).each do |line| \
     m = line.match(/(.*)@([^@]*)$/); \
@@ -271,7 +271,7 @@ lambda { |e| \
     if ( s.length > limit ); \
       s = s[0,limit] + %(...); \
     end; \
-    debug(m[2],%( ),s,%(\n)); \
+    $stderr.print(m[2],%( ),s,%(\n)); \
   end; \
   rescue; end; \
 } \
@@ -292,7 +292,7 @@ lambda { |e| \
     if ( s.length > limit ); \
       s = s[0,limit] + %(...); \
     end; \
-    debug(m[2],%( ),s,%(\n)); \
+    $stderr.print(m[2],%( ),s,%(\n)); \
   end; \
   rescue; end; \
 } \
