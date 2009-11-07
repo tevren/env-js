@@ -20,6 +20,7 @@ var HTMLDocument = function(implementation, docParentWindow, docReferrer) {
 HTMLDocument.prototype = new DOMDocument;
 __extend__(HTMLDocument.prototype, {
     createElement: function(tagName){
+          //print('createElement :'+tagName);
           // throw Exception if the tagName string contains an illegal character
           if (__ownerDocument__(this).implementation.errorChecking && 
                 (!__isValidName__(tagName))) {
@@ -81,6 +82,36 @@ __extend__(HTMLDocument.prototype, {
           // assign values to properties (and aliases)
           node.tagName  = tagName;
           return node;
+    },
+    createElementNS : function (uri, local) {
+        //print('createElementNS :'+uri+" "+local);
+        if(!uri){
+            return this.createElement(local);
+        }else if ("http://www.w3.org/1999/xhtml" == uri) {
+             return this.createElement(local);
+        } else if ("http://www.w3.org/1998/Math/MathML" == uri) {
+          if (!this.mathplayerinitialized) {
+              var obj = this.createElement("object");
+              obj.setAttribute("id", "mathplayer");
+              obj.setAttribute("classid", "clsid:32F66A20-7614-11D4-BD11-00104BD3F987");
+              this.getElementsByTagName("head")[0].appendChild(obj);
+              this.namespaces.add("m", "http://www.w3.org/1998/Math/MathML", "#mathplayer");  
+              this.mathplayerinitialized = true;
+          }
+          return this.createElement("m:" + local);
+        } else if ("http://www.w3.org/2000/svg" == uri) {
+          if (!this.renesisinitialized) {
+              var obj = this.createElement("object");
+              obj.setAttribute("id", "renesis");
+              obj.setAttribute("classid", "clsid:AC159093-1683-4BA2-9DCF-0C350141D7F2");
+              this.getElementsByTagName("head")[0].appendChild(obj);
+              this.namespaces.add("s", "http://www.w3.org/2000/svg", "#renesis");  
+              this.renesisinitialized = true;
+          }
+          return this.createElement("s:" + local);
+        } else {
+            return DOMDocument.prototype.createElementNS.apply(this,[uri, local]);
+        }
     },
     get anchors(){
         return new HTMLCollection(this.getElementsByTagName('a'), 'Anchor');
@@ -201,5 +232,68 @@ __extend__(HTMLDocument.prototype, {
     get URL(){ return $w.location.href;  },
     set URL(url){ $w.location.href = url;  }
 });
+
+var __elementPopped__ = function(ns, name, node){
+    //print('Element Popped: '+ns+" "+name+ " " );
+    var doc = __ownerDocument__(node);
+    try{
+        if(node.nodeName.toLowerCase() == 'script' && node.type !== undefined){
+            //$env.debug("element popped: script\n"+node.xml);
+            // unless we're parsing in a window context, don't execute scripts
+            if (doc.parentWindow){
+                //p.replaceEntities = true;
+                $env.loadLocalScript(node, null);
+    
+                // only fire event if we actually had something to load
+                if (node.src && node.src.length > 0){
+                    var event = doc.createEvent();
+                    event.initEvent("load");
+                    node.dispatchEvent( event, false );
+                }
+            }
+        }
+        else if (node.nodeName.toLowerCase() == 'frame' ||
+                 node.nodeName.toLowerCase() == 'iframe'   ){
+            
+            //$env.debug("element popped: iframe\n"+node.xml);
+            if (node.src && node.src.length > 0){
+                $debug("getting content document for (i)frame from " + node.src);
+    
+                // any JS here is DOM-instigated, so the JS scope is the window, not the first script
+              
+                var save = $master.first_script_window;
+                $master.first_script_window = window;
+
+                $env.loadFrame(node, $env.location(node.src));
+    
+                $master.first_script_window = save;
+
+                var event = doc.createEvent();
+                event.initEvent("load");
+                node.dispatchEvent( event, false );
+            }
+        }
+        else if (node.nodeName.toLowerCase() == 'link'){
+            //$env.debug("element popped: link\n"+node.xml);
+            if (node.href && node.href.length > 0){
+                // don't actually load anything, so we're "done" immediately:
+                var event = doc.createEvent();
+                event.initEvent("load");
+                node.dispatchEvent( event, false );
+            }
+        }
+        else if (node.nodeName.toLowerCase() == 'img'){
+            //$env.debug("element popped: img \n"+node.xml);
+            if (node.src && node.src.length > 0){
+                // don't actually load anything, so we're "done" immediately:
+                var event = doc.createEvent();
+                event.initEvent("load");
+                node.dispatchEvent( event, false );
+            }
+        }
+    }catch(e){
+        $env.error('error loading html element', e);
+    }
+};
 
 $w.HTMLDocument = HTMLDocument;

@@ -58,7 +58,7 @@ __extend__(HTMLTableElement.prototype, {
         }
     },
  
-    appendChild : function (child) {
+    /*appendChild : function (child) {
         
         var tagName;
         if(child.tagName){
@@ -83,7 +83,7 @@ __extend__(HTMLTableElement.prototype, {
         }else{
             $error('HTMLTableElement.appendChild => child.tagName should not be undefined here... Fix ME!');
         }
-    },
+    },*/
      
     get tBodies() {
         return new HTMLCollection(this.getElementsByTagName("tbody"));

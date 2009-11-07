@@ -64,7 +64,7 @@ __extend__(HTMLScriptElement.prototype, {
         this.setAttribute('type',value);
     },
     onload: function(event){
-        __eval__(this.getAttribute('onload')||'', this)
+        __eval__(this.getAttribute('onload')||'', this);
     }
 });
 

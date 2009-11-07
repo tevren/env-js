@@ -245,6 +245,7 @@ __extend__(DOMNode.prototype, {
             newChild.previousSibling = oldChild.previousSibling;
             newChild.nextSibling = oldChild.nextSibling;
         }
+        
         return ret;
     },
     removeChild : function(oldChild) {
@@ -349,7 +350,6 @@ __extend__(DOMNode.prototype, {
           this.firstChild = newChild;
         }
       }
-      
       return newChild;
     },
     hasChildNodes : function() {
@@ -527,6 +527,8 @@ __extend__(DOMNode.prototype, {
     } 
 
 });
+
+
 
 /**
  * @method DOMNode._getElementsByTagNameRecursive - implements getElementsByTagName()

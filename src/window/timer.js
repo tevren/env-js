@@ -14,6 +14,13 @@ var $timer = function(fn, interval){
   this.interval = interval;
   this.at = Date.now() + interval;
   this.running = false; // allows for calling wait() from callbacks
+  if ( false ) {
+    try {
+      throw new Error;
+    } catch(e) {
+      print(get_exception_trace(e));
+    }
+  }
 };
   
 $timer.prototype.start = function(){};
@@ -24,8 +31,11 @@ var convert_time = function(time) {
   if ( isNaN(time) || time < 0 ) {
     time = 0;
   }
-  if ( $event_loop_running && time < 4 ) {
-    time = 4;
+  // html5 says this should be at least 4, but the parser is using a setTimeout for the SAX stuff
+  // which messes up the world
+  var min = /* 4 */ 0;
+  if ( $event_loop_running && time < min ) {
+    time = min;
   }
   return time;
 }
@@ -99,10 +109,16 @@ window.clearInterval = window.clearTimeout = function(num){
 // wait(n) (n > 0): execute any timers as they fire until there are none left waiting at least n ms
 // but no more, even if there are future events/current threads
 // wait(0): execute any immediately runnable timers and return
+// wait(-n): keep sleeping until the next event is more than n ms in the future
 
 // FIX: make a priority queue ...
 
 window.$wait = $timers.wait = $env.wait = $env.wait || function(wait) {
+  var delta_wait;
+  if (wait < 0) {
+    delta_wait = -wait;
+    wait = 0;
+  }
   var start = Date.now();
   var old_loop_running = $event_loop_running;
   $event_loop_running = true; 
@@ -154,14 +170,16 @@ window.$wait = $timers.wait = $env.wait = $env.wait || function(wait) {
       // no events, but a wait requested: fall through to sleep
     } else {
       // there are events in the queue, but they aren't firable now
-      if ( wait === 0 || ( wait > 0 && wait < Date.now () ) ) {
+      if ( delta_wait && sleep <= delta_wait ) {
+        // if they will happen within the next delta, fall through to sleep
+      } else if ( wait === 0 || ( wait > 0 && wait < Date.now () ) ) {
         // loop ends even if there are events but the user specifcally asked not to wait too long
         break;
       }
       // there are events and the user wants to wait: fall through to sleep
     }
 
-    // Releated to ajax threads ... hopefully can go away ..
+    // Related to ajax threads ... hopefully can go away ..
     var interval =  $wait.interval || 100;
     if ( !sleep || sleep > interval ) {
       sleep = interval;

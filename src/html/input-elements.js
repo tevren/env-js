@@ -213,6 +213,12 @@ __extend__(HTMLTypeValueInputs.prototype, inputElements_size);
 __extend__(HTMLTypeValueInputs.prototype, inputElements_status);
 __extend__(HTMLTypeValueInputs.prototype, inputElements_dataProperties);
 __extend__(HTMLTypeValueInputs.prototype, {
+    get defaultValue(){
+        return this.getAttribute('defaultValue');
+    },
+    set defaultValue(value){
+        this.setAttribute('defaultValue', value);
+    },
     get name(){
         return this.getAttribute('name')||'';
     },
@@ -222,11 +228,20 @@ __extend__(HTMLTypeValueInputs.prototype, {
     get type(){
         return this.getAttribute('type');
     },
+    set type(type){
+        return this.setAttribute('type', type);
+    },
     get value(){
         return this.getAttribute('value')||'';
     },
     set value(newValue){
         this.setAttribute('value',newValue);
+    },
+    setAttribute: function(name, value){
+        if(name == 'value' && !this.defaultValue){
+            this.defaultValue = value;
+        }
+        HTMLElement.prototype.setAttribute.apply(this, [name, value]);
     }
 });
 
@@ -247,12 +262,6 @@ HTMLInputAreaCommon.prototype = new HTMLTypeValueInputs;
 __extend__(HTMLInputAreaCommon.prototype, inputElements_focusEvents);
 __extend__(HTMLInputAreaCommon.prototype, inputElements_onchange);
 __extend__(HTMLInputAreaCommon.prototype, {
-    get defaultValue(){
-        return this.getAttribute('defaultValue');
-    },
-    set defaultValue(value){
-        this.setAttribute('defaultValue', value);
-    },
     get readOnly(){
         return (this.getAttribute('readonly')=='readonly');
     },

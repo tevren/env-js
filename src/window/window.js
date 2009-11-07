@@ -145,17 +145,17 @@ $w.open = function(url, name, features, replace){
   if (replace)
     $env.warn("'replace' argument for 'window.open()' not yet implemented");
 
-  var newWindow = $env.makeNewWindowMaybeLoad(this, null, url);
+  var newWindow = $env.newwindow(this, null, url);
   newWindow.$name = name;
   return newWindow;
 };
 
 $w.close = function(){
-  $env.$unloadEventsFor($w);
+  $env.unload($w);
   $closed = true;
 };     
 
-$env.$unloadEventsFor = function(windowToUnload){
+$env.unload = function(windowToUnload){
   try {
     var event = windowToUnload.document.createEvent();
     event.initEvent("unload");
@@ -169,6 +169,14 @@ $env.$unloadEventsFor = function(windowToUnload){
   windowToUnload.dispatchEvent(event, false);
 };
   
+  
+$env.load = function(url){
+    $location = $env.location(url);
+    __setHistory__($location);
+    $w.document.load($location);
+};
+
+
 /* Time related functions - see timer.js
 *   - clearTimeout
 *   - clearInterval

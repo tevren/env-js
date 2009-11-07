@@ -1,4 +1,3 @@
-
 /**
  * @class  DOMNamedNodeMap - used to represent collections of nodes that can be accessed by name
  *  typically a set of Element attributes
@@ -17,6 +16,9 @@ var DOMNamedNodeMap = function(ownerDocument, parentNode) {
 };
 DOMNamedNodeMap.prototype = new DOMNodeList;
 __extend__(DOMNamedNodeMap.prototype, {
+    add: function(name){
+        this[this.length] = name;
+    },
     getNamedItem : function(name) {
         var ret = null;
         

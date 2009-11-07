@@ -1,140 +1,14 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr" id="html">
+<!DOCTYPE html >
+<html lang="en" dir="ltr" id="html">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
 	<title>jQuery Test Suite</title>
-    
-    <script>
-        function testLinkOnload(){
-            var t = document.createTextNode(
-              '#styleCreatedByLinkOnloadEvent { color: red; }');
-            var s = document.createElement('style');
-            s.setAttribute('id', 'sCreatedByLinkOnload');
-            s.appendChild(t);
-            document.getElementsByTagName('head')[0].appendChild(s);
-        }
-    </script>
-    <script>
-        function testXMLSpecialCharacters(){
-            if(true && true && 0>-1){
-                var f = 0&1;
-				f&=1;    
-			}
-        }
-    </script>
-    <link rel="Stylesheet" media="screen" href="data/testsuite.css"
-              onload="try{testLinkOnload();}catch(e){;}" />
-
-	<script>var jQuery = "jQuery", $ = "$"; // For testing .noConflict()</script>
-	<script type="text/javascript" src="../dist/jquery.js"></script>
-	<script type="text/javascript" src="data/testrunner.js"></script>
-	<script type="text/javascript" src="unit/core.js"></script>
-	<script type="text/javascript" src="unit/dimensions.js"></script>
-	<script type="text/javascript" src="unit/selector.js"></script>
-	<script type="text/javascript" src="unit/event.js"></script>
-	<script type="text/javascript" src="unit/ajax.js"></script>
-	<script type="text/javascript" src="unit/fx.js"></script>
-    
 </head>
 
 <body id="body">
-	<h1 id="header">jQuery Test Suite</h1>
-	<h2 id="banner"></h2>
-	<h2 id="userAgent"></h2>
+	<h1 id="header">jQuery Test Suite<h1>
 	
-	<!-- Test HTML -->
-	<div id="nothiddendiv" style="height:1px;background:white;">
-		<div id="nothiddendivchild"></div>
-	</div>
-
-	<!-- this iframe is outside the #main so it won't reload constantly wasting time, but it means the tests must be "safe" and clean up after themselves -->
-    <iframe id="loadediframe" name="loadediframe" style="display:none;"
-            src="html/iframe1.html">
-
-        <script>
-            // kind of a cheat--env.js isn't smart enough to choose between
-            //   either loading from 'src' or parsing its content, so it
-            //   does both, which is exploited here to ensure that the
-            //   onload handler is installed before env.js "finishes
-            //   loading" (which happens when the /iframe tag is parsed
-print("XXXXXXXXXXXXX");
-            var iframeElem = document.getElementById('loadediframe');
-            iframeElem.onload = function(){
-                var t = document.createTextNode(
-'Paragraph created by execution of iframe-onload event handler.');
-                var p = document.createElement('p');
-                p.setAttribute('id', 'pCreatedByIframeOnload');
-                p.appendChild(t);
-                iframeElem.appendChild(p);
-            }
-        </script>
-    </iframe>
-    <iframe id="emptyiframe" name="emtpyiframe" style="display:none;"></iframe>
-
-    <script>
-        var usingEnvjsSpecificJar = false;
-        try {
-          usingEnvjsSpecificJar = (( this.whichJarFile == "envjs" ) || this.multiwindow);
-        } catch (e){;}
-        if (usingEnvjsSpecificJar){
-          eventFrameLoaded = eventFrameClicked = 0;
-          function eventOnloadHandler(){  eventFrameLoaded  += 1;}
-          function eventOnclickHandler(){ eventFrameClicked += 1;}
-
-            document.write('                                                  \
-            \x3ciframe id="eventsFrame" name="eventsFrame"                    \
-                           src="html/events.html"                             \
-                     onload="eventOnloadHandler();"                           \
-                     onclick="eventOnclickHandler();"                         \
-            \x3e\x3c/iframe\x3e                                               \
-            \x3ciframe id="scopeFrame" name="scopeFrame"                      \
-                     src="html/scope.html"                                    \
-            \x3e\x3c/iframe\x3e                                               \
-            ');
-        }
-    </script>
-
-    <script>
-        function imgOnloadEventHandler(){
-            var t = document.createTextNode(
-'Paragraph created by execution of img-onload event handler.');
-            var p = document.createElement('p');
-            p.setAttribute('id', 'pCreatedByImgOnload');
-            p.appendChild(t);
-            document.getElementsByTagName('body')[0].appendChild(p);
-        }
-    </script>
-    <img id="anImg" src="html/img1.png"
-         onload="try{imgOnloadEventHandler();}catch(e){;}" />
-
-    <script>
-        function onloadHandlerThatShouldntExecute(){
-            var t = document.createTextNode(
-'Paragraph created by execution of script-onload *BAD* event handler.');
-            var p = document.createElement('p');
-            p.setAttribute('id', 'pShouldntBeCreated');
-            p.appendChild(t);
-            document.getElementsByTagName('body')[0].appendChild(p);
-        }
-    </script>
-    <script onload="onloadHandlerThatShouldntExecute();">
-        function scriptOnloadEventHandler(tag){
-            var t = document.createTextNode(
-'Paragraph created by execution of script-onload event handler.');
-            var p = document.createElement('p');
-            p.setAttribute('id', 'pCreatedByScriptOnload'+tag);
-            p.appendChild(t);
-            document.getElementsByTagName('body')[0].appendChild(p);
-        }
-    </script>
-    <script src="html/missingScript.js"
-            onload="try{scriptOnloadEventHandler('A');}catch(e){;}" />
-    <script src="html/missingScript.js"
-            onload="try{scriptOnloadEventHandler('B');}catch(e){;}"></script>
-
-
-	<dl id="dl" style="display:none;">
-	<div id="main" style="display: none;">
+	
 		<p id="firstp">See <a id="simon1" href="http://simon.incutio.com/archive/2003/03/25/#getElementsBySelector" rel="bookmark">this blog entry</a> for more information.</p>
 		<p id="ap">
 			Here are some links in a normal paragraph: <a id="google" href="http://www.google.com/" title="Google!">Google</a>, 
@@ -172,7 +46,7 @@ print("XXXXXXXXXXXXX");
 			
 			<select name="select1" id="select1">
 				<option id="option1a" class="emptyopt" value="">Nothing</option>
-				<option id="option1b" value="1">1</option>
+				<option id="option1b" value="1">1
 				<option id="option1c" value="2">2</option>
 				<option id="option1d" value="3">3</option>
 			</select>
@@ -204,10 +78,9 @@ print("XXXXXXXXXXXXX");
 			<foo_bar id="foobar">test element</foo_bar>
 		</form>
 		<b id="floatTest">Float test.</b>
-		<iframe id="iframe" name="iframe"></iframe>
 		<form id="lengthtest">
-			<input type="text" id="length" name="test"/>
-			<input type="text" id="idTest" name="id"/>
+			<input type="text" id="length" name="test">
+			<input type="text" id="idTest" name="id">
 		</form>
 		<table id="table"></table>
 		

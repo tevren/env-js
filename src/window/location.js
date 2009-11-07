@@ -8,19 +8,14 @@ var $location = '';
 
 $w.__defineSetter__("location", function(url){
   if( !$location || $location == "about:blank" ) {
-    $w.__loadAWindowsDocument__(url);
+    // $w.__loadAWindowsDocument__(url);
+    $env.load(url);
   } else {
-    $env.$unloadEventsFor($w);
+    $env.unload($w);
     var proxy = $w.window;
-    $env.reloadAWindowProxy(proxy, url);
+    $env.reload(proxy, url);
   }
 });
-
-$w.__loadAWindowsDocument__ = function(url){
-    $location = $env.location(url);
-    setHistory($location);
-    $w.document.load($location);
-};
 
 $w.__defineGetter__("location", function(url){
 	var hash 	 = new RegExp('(\\#.*)'),
@@ -102,9 +97,9 @@ $w.__defineGetter__("location", function(url){
         reload: function(force){
             // ignore 'force': we don't implement a cache
             var thisWindow = $w;
-            $env.$unloadEventsFor(thisWindow);
+            $env.unload(thisWindow);
             try { thisWindow = thisWindow.$thisWindowsProxyObject || thisWindow; }catch (e){}
-            $env.reloadAWindowProxy($window, thisWindow.location.href);
+            $env.reload($window, thisWindow.location.href);
         },
         replace: function(url){
             $location = url;

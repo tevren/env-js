@@ -8,7 +8,7 @@ test("attributes common to all HTML elements", function() {
 
     // tests for .innerText
     var mtch = document.getElementById('dl').innerText.match(
-        /^See this blog entry for more information.\s+Here are/);
+        /^\s+See this blog entry for more information.\s+Here are/);
     try{ ok(mtch && mtch.length > 0,
         "dl.innerText returns the correct content");
     }catch(e){print(e);}

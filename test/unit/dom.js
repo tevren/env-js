@@ -6,7 +6,7 @@ this.options = this.options || {}
 
 load("src/window/window.js", "src/dom/node.js");
 
-
+debugger;
 module("dom");
 
 test("Basic requirements", function() {
@@ -17,6 +17,7 @@ test("Basic requirements", function() {
 	ok( document.getElementsByTagName, "getElementsByTagName" );
 	ok( RegExp, "RegExp" );
 });
+
 
 test("document.getElementById", function() {
 	expect(14);

@@ -44,7 +44,7 @@
 	// of the location object that was modified.  This allows us
 	// to modify the correct portion of the location object
 	// when we navigate the history
-	var setHistory = function( value, locationPart){
+	var __setHistory__ = function( value, locationPart){
             if ( value == "about:blank" ) {
                 return;
             }

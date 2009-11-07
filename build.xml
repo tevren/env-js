@@ -60,10 +60,6 @@
             <fileset dir="${SRC_DIR}" includes="intro.js" />
             -->
             <fileset dir="${SRC_DIR}" includes="window/window.js" />
-            <!--
-            <fileset dir="${SRC_DIR}" includes="platform/xmlsax.js" />
-            <fileset dir="${SRC_DIR}" includes="platform/xmlw3cdom.js" />
-            -->
             <fileset dir="${SRC_DIR}" includes="dom/nodelist.js" />
             <fileset dir="${SRC_DIR}" includes="dom/namednodemap.js" />
             <fileset dir="${SRC_DIR}" includes="dom/node.js" />
@@ -149,6 +145,7 @@
             <fileset dir="${SRC_DIR}" includes="profile/profile.js" />
             <fileset dir="${SRC_DIR}" includes="window/document.js" />
             <fileset dir="${SRC_DIR}" includes="html/cookie.js" />
+            <fileset dir="${SRC_DIR}" includes="parser/html5.js" />
         </concat>
         <echo message="${ENV_DIST} built." />
         <copy tofile="${ENV_LATEST_DIST}" file="${ENV_DIST}"/>
@@ -174,28 +171,46 @@
     
     <target name="test" description="Run the tests">
       <java fork="true" jar="${DIST_DIR}/env-js.jar" failonerror="true">
+        <arg value="-opt"/>
+        <arg value="-1"/>
         <arg value="test/test-with-envs-jar.js"/>
         <jvmarg value="-Dfile.encoding=utf-8"/>
+        <jvmarg value="-Xmx256m"/>
       </java>
       <java fork="true" jar="${DIST_DIR}/env-js.jar" failonerror="true">
+        <arg value="-opt"/>
+        <arg value="-1"/>
         <arg value="test/envjs-call-load-test.js"/>
         <jvmarg value="-Dfile.encoding=utf-8"/>
+        <jvmarg value="-Xmx256m"/>
       </java>
       <java fork="true" jar="${DIST_DIR}/env-js.jar" failonerror="true">
+        <arg value="-opt"/>
+        <arg value="-1"/>
         <arg value="test/envjs-prototype.js"/>
         <jvmarg value="-Dfile.encoding=utf-8"/>
+        <jvmarg value="-Xmx256m"/>
       </java>
       <java fork="true" jar="${RHINO_JAR}" failonerror="true">
+        <arg value="-opt"/>
+        <arg value="-1"/>
         <arg value="test/test-with-rhino-jar.js"/>
         <jvmarg value="-Dfile.encoding=utf-8"/>
+        <jvmarg value="-Xmx256m"/>
       </java>
       <java fork="true" jar="${RHINO_JAR}" failonerror="true">
-        <arg value="test/call-load-test.js"/>
+        <arg value="-opt"/>
+        <arg value="-1"/>
+        <arg value="test/rhino-call-load-test.js"/>
         <jvmarg value="-Dfile.encoding=utf-8"/>
+        <jvmarg value="-Xmx256m"/>
       </java>
       <java fork="true" jar="${RHINO_JAR}" failonerror="true">
-        <arg value="test/prototype.js"/>
+        <arg value="-opt"/>
+        <arg value="-1"/>
+        <arg value="test/rhino-prototype.js"/>
         <jvmarg value="-Dfile.encoding=utf-8"/>
+        <jvmarg value="-Xmx256m"/>
       </java>
     </target>
     

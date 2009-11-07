@@ -12,6 +12,7 @@ var DOMImplementation = function() {
     this.errorChecking  = true;       // by default, test for exceptions
 };
 
+/*
 var __endHTMLElement__ = function(node, doc, p){
     if(node.nodeName.toLowerCase() == 'script'){
         // unless we're parsing in a window context, don't execute scripts
@@ -64,6 +65,7 @@ var __endHTMLElement__ = function(node, doc, p){
         }
     }
 }
+*/
 
 __extend__(DOMImplementation.prototype,{
     // @param  feature : string - The package name of the feature to test.
@@ -534,7 +536,7 @@ function __isNamespaceDeclaration__(attributeName) {
  */
 function __isIdDeclaration__(attributeName) {
   // test if attributeName is 'id' (case insensitive)
-  return (attributeName.toLowerCase() == 'id');
+  return attributeName?(attributeName.toLowerCase() == 'id'):false;
 };
 
 /**

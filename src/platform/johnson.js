@@ -377,7 +377,7 @@ $env.__eval__ = function(script,scope){
     }
 };
 
-$env.makeNewWindowMaybeLoad = function(openingWindow, parentArg, url, outer){
+$env.newwindow = function(openingWindow, parentArg, url, outer){
 // print(location);
 // print("url",url,window.location,openingWindow);
 // print("parent",parentArg);
@@ -400,9 +400,9 @@ $env.makeNewWindowMaybeLoad = function(openingWindow, parentArg, url, outer){
     return proxy;
 };
 
-$env.reloadAWindowProxy = function(oldWindowProxy, url){
+$env.reload = function(oldWindowProxy, url){
     // print("reload",window,oldWindowProxy,url);
-    $env.makeNewWindowMaybeLoad( oldWindowProxy.opener,
+    $env.newwindow( oldWindowProxy.opener,
                                  oldWindowProxy.parent,
                                  url,
                                  oldWindowProxy );

@@ -10,19 +10,6 @@ var HTMLElement = function(ownerDocument) {
 };
 HTMLElement.prototype = new DOMElement;
 __extend__(HTMLElement.prototype, {
-    $recursivelyGatherTextFromNodeTree: function(aNode) {
-        var accumulateText = "";
-        var idx; var n;
-        for (idx=0;idx < aNode.childNodes.length;idx++){
-            n = aNode.childNodes.item(idx);
-        if      (n.nodeType == DOMNode.TEXT_NODE)
-                accumulateText += n.data;
-            else
-                accumulateText += this.$recursivelyGatherTextFromNodeTree(n);
-        }
-
-        return accumulateText;
-    },
 
 		get className() { 
 		    return this.getAttribute("class")||''; 
@@ -55,8 +42,8 @@ __extend__(HTMLElement.prototype, {
 		    //Should be replaced with HTMLPARSER usage
             //$debug('SETTING INNER HTML ('+this+'+'+html.substring(0,64));
 		    var doc = new DOMParser().
-			  parseFromString('<div>'+html+'</div>');
-            var parent = doc.documentElement;
+			  parseFromString(html);
+            var parent = doc.body;
 			while(this.firstChild != null){
 			    this.removeChild( this.firstChild );
 			}
@@ -70,7 +57,7 @@ __extend__(HTMLElement.prototype, {
 		    doc = null;
 		},
         get innerText(){
-            return this.$recursivelyGatherTextFromNodeTree(this);
+            return __recursivelyGatherText__(this);
         },
         set innerText(newText){
             this.innerHTML = newText;  // a paranoid would HTML-escape, but...
@@ -183,6 +170,20 @@ __extend__(HTMLElement.prototype, {
 	    }
 });
 
+var __recursivelyGatherText__ = function(aNode) {
+    var accumulateText = "";
+    var idx; var n;
+    for (idx=0;idx < aNode.childNodes.length;idx++){
+        n = aNode.childNodes.item(idx);
+        if(n.nodeType == DOMNode.TEXT_NODE)
+            accumulateText += n.data;
+        else
+            accumulateText += __recursivelyGatherText__(n);
+    }
+
+    return accumulateText;
+};
+    
 var __eval__ = $env.__eval__ || function(script, startingNode){
     if (script == "")
         return;                    // don't assemble environment if no script...
@@ -190,7 +191,7 @@ var __eval__ = $env.__eval__ || function(script, startingNode){
     try{
         var doEval = function(scriptText){
             eval(scriptText);
-        }
+        };
 
         var listOfScopes = [];
         for (var node = startingNode; node != null; node = node.parentNode)

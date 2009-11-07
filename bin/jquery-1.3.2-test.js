@@ -45,11 +45,12 @@ load("build/runtest/env.js");
                         isStopped = true;
                         unsafeStop.call(this);
                         timeout = ( timeout && timeout > 0 ) ? timeout : 10000;
-	                if (timeout)
-		          config_timeout = setTimeout(function() {
-			    QUnit.ok( false, "Test timed out" );
-			    start();
-		          }, timeout);
+	                /*if (timeout)
+	                  config_timeout = setTimeout(function() {
+        			    QUnit.ok( false, "Test timed out" );
+        			    start();
+        		      }, timeout);*/
+                      $env.wait()
                     }
                 };
                 start = function(){
@@ -60,7 +61,7 @@ load("build/runtest/env.js");
                           clearTimeout(config_timeout);
                           config_timeout = undefined;
                         }
-                      unsafeStart.call(this);
+                        unsafeStart.call(this);
                     }
                 };
                 //we know some ajax calls will fail becuase

@@ -93,7 +93,7 @@ test("IFRAMEs reload with accessible content", function() {
 // this test relies on iframe3.html, iframe2.html, and iframeN.html
 test("IFRAMEs can be nested, created dynamically", function() {
     var startingDepth = 3;
-    var endingDepth   = 7
+    var endingDepth   = 7;
     expect(5 + (10*((endingDepth - startingDepth)+1)));
 
     // manually load iframe3.html
