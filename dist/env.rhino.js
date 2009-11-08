@@ -146,15 +146,12 @@ var Envjs = function(){
         var types, type, src, i, base, 
             docWrites = [],
             write = document.write,
-            writeln = document.writeln;
-        //temporarily replace document write becuase the function
-        //has a different meaning during parsing
-        /*document.write = function(text){
-			docWrites.push(text);
-		};*/
+            writeln = document.writeln,
+            okay = true;
+        var script_type = script.type === null ? "text/javascript" : script.type;
         try{
-            if(script.type){
-                types = script.type?script.type.split(";"):[];
+            if(script_type){
+                types = script_type?script_type.split(";"):[];
                 for(i=0;i<types.length;i++){
                     if($env.scriptTypes[types[i]]){
 						if(script.src){
@@ -169,7 +166,11 @@ var Envjs = function(){
                                 }
                             }
                             base = "" + window.location;
-							load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
+                            try {                      
+                              load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
+                            } catch(e) {
+                              okay = false;
+                            }
                             //lets you register a function to execute 
                             //after the script is loaded
                             if($env.afterScriptLoad){
@@ -183,18 +184,23 @@ var Envjs = function(){
                             $env.loadInlineScript(script);
                         }
                     }else{
-                        if(!script.src && script.type == "text/javascript"){
+                        if(!script.src && script_type == "text/javascript"){
                             $env.loadInlineScript(script);
+                        } else {
+                          // load prohbited ...
+                          okay = false;
                         }
                     }
                 }
             }else{
+                // SMP this branch is probably dead ...
                 //anonymous type and anonymous src means inline
                 if(!script.src){
                     $env.loadInlineScript(script);
                 }
             }
         }catch(e){
+            okay = false;
             $env.error("Error loading script.", e);
             $env.onScriptLoadError(script);
         }finally{
@@ -205,6 +211,7 @@ var Envjs = function(){
             document.write = write;
             document.writeln = writeln;*/
         }
+        return okay;
     };
     
     $env.loadInlineScript = function(script){};
@@ -6151,22 +6158,22 @@ __extend__(HTMLDocument.prototype, {
 });
 
 var __elementPopped__ = function(ns, name, node){
-    //print('Element Popped: '+ns+" "+name+ " " );
+    // print('Element Popped: '+ns+" "+name+ " "+ node+" " +node.type+" "+node.nodeName);
     var doc = __ownerDocument__(node);
+    var type = ( node.type === null ) ? "text/javascript" : node.type;
     try{
-        if(node.nodeName.toLowerCase() == 'script' && node.type !== undefined){
+        if(node.nodeName.toLowerCase() == 'script' && type == "text/javascript"){
             //$env.debug("element popped: script\n"+node.xml);
             // unless we're parsing in a window context, don't execute scripts
             if (doc.parentWindow){
                 //p.replaceEntities = true;
-                $env.loadLocalScript(node, null);
-    
+                var okay = $env.loadLocalScript(node, null);
                 // only fire event if we actually had something to load
                 if (node.src && node.src.length > 0){
                     var event = doc.createEvent();
-                    event.initEvent("load");
+                    event.initEvent( okay ? "load" : "error" );
                     node.dispatchEvent( event, false );
-                }
+                  }
             }
         }
         else if (node.nodeName.toLowerCase() == 'frame' ||
@@ -8121,6 +8128,9 @@ __extend__(HTMLScriptElement.prototype, {
     },
     onload: function(event){
         __eval__(this.getAttribute('onload')||'', this);
+    },
+    onerror: function(event){
+        __eval__(this.getAttribute('onerror')||'', this);
     }
 });
 

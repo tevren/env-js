@@ -154,7 +154,7 @@ var Envjs = function(){
             okay = true;
         var script_type = script.type === null ? "text/javascript" : script.type;
         try{
-	  if(script_type){
+            if(script_type){
                 types = script_type?script_type.split(";"):[];
                 for(i=0;i<types.length;i++){
                     if($env.scriptTypes[types[i]]){
@@ -174,9 +174,6 @@ var Envjs = function(){
                               load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
                             } catch(e) {
                               okay = false;
-                              $env.error("could not load script: " +
-                                         $env.location(script.src.match(/([^\?#]*)/)[1], base ) +
-                                         ": " + e + " thrown" );
                             }
                             //lets you register a function to execute 
                             //after the script is loaded
@@ -193,10 +190,14 @@ var Envjs = function(){
                     }else{
                         if(!script.src && script_type == "text/javascript"){
                             $env.loadInlineScript(script);
+                        } else {
+                          // load prohbited ...
+                          okay = false;
                         }
                     }
                 }
             }else{
+                // SMP this branch is probably dead ...
                 //anonymous type and anonymous src means inline
                 if(!script.src){
                     $env.loadInlineScript(script);

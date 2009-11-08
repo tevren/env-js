@@ -64,12 +64,12 @@ test("Execution of onload events in top-level document",
     mtch = document.getElementById('pCreatedByScriptA').innerHTML.
       match(/script event handler/);
     try{ ok(mtch && mtch.length > 0,
-        "Got confirmation that script-onerror handler executed");
-    }catch(e){print(e);}
+            "Got confirmation that script-onerror handler executed");
+       }catch(e){print(e);}
 
     try{ ok(!document.getElementById('pCreatedByScriptB'),
-        "Got confirmation that script-onload handler did not execute");
-    }catch(e){print(e);}
+            "Got confirmation that script-onload handler did not execute");
+       }catch(e){print(e);}
 
     mtch = document.getElementById('pCreatedByScriptD').innerHTML.
       match(/script event handler/);

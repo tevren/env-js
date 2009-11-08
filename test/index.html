@@ -72,9 +72,10 @@ print("XXXXXXXXXXXXX");
     <iframe id="emptyiframe" name="emtpyiframe" style="display:none;"></iframe>
 
     <script>
-        var usingEnvjsSpecificJar = false;
+        var usingEnvjsSpecificJar = false, rhino = false;
         try {
           usingEnvjsSpecificJar = (( this.whichJarFile == "envjs" ) || this.multiwindow);
+          rhino = true;
         } catch (e){;}
         if (usingEnvjsSpecificJar){
           eventFrameLoaded = eventFrameClicked = 0;
@@ -127,12 +128,29 @@ print("XXXXXXXXXXXXX");
             document.getElementsByTagName('body')[0].appendChild(p);
         }
     </script>
+    <script>
+      // Generic case: allow scripts (not on rhino, which can't detect failures)
+      if (!rhino && Envjs.scriptTypes) {
+        js_enabled = Envjs.scriptTypes["text/javascript"];
+        Envjs.scriptTypes["text/javascript"] = true;
+      }
+    </script>
     <script src="html/missingScript.js"
              onerror="try{scriptEventHandler('A');}catch(e){;}"
              onload="try{scriptEventHandler('B');}catch(e){;}"></script>
+    <script>
+      // Rhino case: these will succeed anyway
+      if (rhino && Envjs.scriptTypes) {
+        js_enabled = Envjs.scriptTypes["text/javascript"];
+        Envjs.scriptTypes["text/javascript"] = true;
+      }
+    </script>
     <script src="html/script.js"
              onerror="try{scriptEventHandler('C');}catch(e){;}"
              onload="try{scriptEventHandler('D');}catch(e){;}"></script>
+    <script>
+      Envjs.scriptTypes && (Envjs.scriptTypes["text/javascript"] = js_enabled);
+    </script>
 
 	<dl id="dl" style="display:none;">
 	<div id="main" style="display: none;">
