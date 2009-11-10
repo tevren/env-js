@@ -71,7 +71,7 @@ puts = function() {
 EOJS
 
       master = global["$master"] = evaluate("new Object")
-      master.symbols = [ "Johnson", "Ruby", "print", "debug", "puts", "load", "whichInterpreter", "multiwindow" ]
+      master.symbols = [ "Johnson", "Ruby", "print", "debug", "puts", "load", "reload", "whichInterpreter", "multiwindow" ]
       master.symbols.each { |symbol| master[symbol] = global[symbol] }
 
       master.whichInterpreter = "Johnson"
@@ -150,6 +150,19 @@ EOJS
         end
       }
 
+      master.reload = lambda { |*files|
+        if files.length == 2 && !(String === files[1])
+          f = files[0]
+          w = files[1]
+          v = open(f).read.gsub(/\A#!.*$/, '')
+          loc = nil
+          add_dep.call w, f
+          reevaluate(v, f, 1, w, w, f)
+        else
+          reload *files
+        end
+      }
+
       master.evaluate = lambda { |v,w|
         evaluate(v,"inline",1,w,w);
       }
@@ -178,6 +191,12 @@ EOJS
         end
       }
 
+      window.reload = lambda { |*files|
+        files.each do |f|
+          master.reload.call f, window
+        end
+      }
+
       ( class << self; self; end ).send :define_method, :wait do
         master["finalize"] && master.finalize.call
         master.timers && master.timers.wait
@@ -201,6 +220,18 @@ EOJS
         # compiled_script = compile(script, file, line, global)
         compiled_script ||= compile(script, file, line, global)
         if fn && !scripts[fn]
+          scripts[fn] = compiled_script
+        end
+        evaluate_compiled_script(compiled_script,scope)
+      end
+
+      ( class << self; self; end ).send :define_method, :reevaluate do |*args|
+        ( script, file, line, global, scope, fn ) = *args
+        # print "eval in " + script[0,50].inspect + (scope ? scope.toString() : "nil") + "\n"
+        global = nil
+        scope ||= inner
+        compiled_script = compile(script, file, line, global)
+        if fn
           scripts[fn] = compiled_script
         end
         evaluate_compiled_script(compiled_script,scope)
