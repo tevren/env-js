@@ -362,6 +362,7 @@ __extend__(DOMNode.prototype, {
             return __ownerDocument__(this).importNode(this, deep);
         } catch (e) {
             //there shouldn't be any exceptions, but if there are, return null
+            // may want to warn: $debug("could not clone node: "+e.code);
             return null;
         }
     },
@@ -421,7 +422,9 @@ __extend__(DOMNode.prototype, {
     importNode : function(importedNode, deep) {
         
         var importNode;
-        //$debug("importing node " + importedNode.nodeName + "(?deep = "+deep+")");
+
+        // debug("importing node " + importedNode.nodeName + "(" + importedNode.nodeType + ")" + "(?deep = "+deep+")");
+
         //there is no need to perform namespace checks since everything has already gone through them
         //in order to have gotten into the DOM in the first place. The following line
         //turns namespace checking off in ._isValidNamespace
@@ -470,7 +473,7 @@ __extend__(DOMNode.prototype, {
                 // set the value of the local Attribute to match that of the importedAttribute
                 importNode.value = importedNode.value;
                 
-            } else if (importedNode.nodeType == DOMNode.DOCUMENT_FRAGMENT) {
+            } else if (importedNode.nodeType == DOMNode.DOCUMENT_FRAGMENT_NODE) {
                 // create a local DocumentFragment
                 importNode = __ownerDocument__(this).createDocumentFragment();
             } else if (importedNode.nodeType == DOMNode.NAMESPACE_NODE) {
