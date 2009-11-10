@@ -99,16 +99,6 @@ __extend__(HTMLDocument.prototype, {
               this.mathplayerinitialized = true;
           }
           return this.createElement("m:" + local);
-        } else if ("http://www.w3.org/2000/svg" == uri) {
-          if (!this.renesisinitialized) {
-              var obj = this.createElement("object");
-              obj.setAttribute("id", "renesis");
-              obj.setAttribute("classid", "clsid:AC159093-1683-4BA2-9DCF-0C350141D7F2");
-              this.getElementsByTagName("head")[0].appendChild(obj);
-              this.namespaces.add("s", "http://www.w3.org/2000/svg", "#renesis");  
-              this.renesisinitialized = true;
-          }
-          return this.createElement("s:" + local);
         } else {
             return DOMDocument.prototype.createElementNS.apply(this,[uri, local]);
         }

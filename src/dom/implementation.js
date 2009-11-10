@@ -26,6 +26,9 @@ __extend__(DOMImplementation.prototype,{
         else if (feature.toLowerCase() == "core") {
             ret = (!version || (version == "2.0"));
         }
+        else if (feature == "http://www.w3.org/TR/SVG11/feature#BasicStructure") {
+            ret = (version == "1.1");
+        }
         return ret;
     },
     createDocumentType : function(qname, publicid, systemid){
