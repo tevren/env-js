@@ -3,6 +3,8 @@
 require 'rubygems'
 require 'pathname'
 
+require 'envjs/options'
+
 require 'johnson/tracemonkey'
 require 'johnson/cli'
 require 'envjs/runtime'

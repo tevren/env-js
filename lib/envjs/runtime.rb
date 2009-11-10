@@ -1,5 +1,8 @@
 require 'envjs'
 require "open-uri"
+require 'rubygems'
+require 'fsdb'
+require 'envjs/net/file'
 
 module Envjs::Runtime
 
@@ -78,11 +81,69 @@ EOJS
       # calling this from JS is hosed; the ruby side is confused, maybe because HTTPHeaders is mixed in?
       master.add_req_field = lambda { |r,k,v| r.add_field(k,v) }
 
+      db = lambda do
+        $envjsrb_deps && ( @db ||= FSDB::Database.new $envjsrb_deps )
+      end
+
+      clear_deps = lambda do |w|
+        begin
+        if db.call
+          loc = w
+          begin loc = w.location; rescue; end
+          loc && ( loc = loc.to_s )
+          if ( loc !~ %r((http?s|file|about):) )
+            loc = "file://" + Pathname(loc).realpath.to_s
+          end
+          # $stderr.puts "clear", loc
+          if loc and loc != "about:blank"
+            paths = db.call[loc+".on.yml"] || []
+            paths.each do |path|
+              # $stderr.print "#{path} not by #{loc}\n";
+              db.call[path+".by.yml"].delete loc
+            end
+            # $stderr.print "#{loc} not on anything\n";
+            db.call.delete loc+".on.yml"
+          end
+        end
+        rescue Exception => e; $stderr.puts e; end
+      end
+
+      if $envjsrb_deps
+        Envjs::Net::File.on_open = clear_deps
+      end
+
+      add_dep = lambda do |w, f|
+        if db.call
+          loc = nil
+          begin loc = w.location; rescue; end
+          loc && ( loc = loc.to_s )
+          if ( loc && loc !~ %r((http?s|file|about):) )
+            loc = "file://" + Pathname(loc).realpath.to_s
+          end
+          path = f
+          if ( path !~ %r((http?s|file|about):) )
+            path = "file://" + Pathname(path).realpath.to_s
+          end
+          if loc and loc != "about:blank"
+            on = db.call[loc+".on.yml"] || []
+            on << path
+            db.call[loc+".on.yml"] = on
+            by = db.call[path+".by.yml"] = []
+            by << loc
+            db.call[path+".by.yml"] = by
+            # $stderr.print "#{loc} on #{path}: #{db.call[loc+'.on.yml']}\n"
+            # $stderr.print "#{path} by #{loc}: #{db.call[path+'.by.yml']}\n"
+          end
+        end
+      end
+
       master.load = lambda { |*files|
         if files.length == 2 && !(String === files[1])
           f = files[0]
           w = files[1]
           v = open(f).read.gsub(/\A#!.*$/, '')
+          loc = nil
+          add_dep.call w, f
           evaluate(v, f, 1, w, w, f)
         else
           load *files
