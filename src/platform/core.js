@@ -170,9 +170,11 @@ var Envjs = function(){
                                 }
                             }
                             base = "" + window.location;
+                            var filename = $env.location(script.src.match(/([^\?#]*)/)[1], base );
                             try {                      
-                              load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
+                              load(filename);
                             } catch(e) {
+                              $env.warn("could not load script "+ filename +": "+e );
                               okay = false;
                             }
                             //lets you register a function to execute 
