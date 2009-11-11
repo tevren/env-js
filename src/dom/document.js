@@ -107,7 +107,7 @@ __extend__(DOMDocument.prototype, {
         xhr.open("GET", url, $w.document.async);
         xhr.onreadystatechange = function(){
             if (xhr.status != 200) {
-                $error("Could not retrieve XHR content from " + url + ": status code " + xhr.status);
+                $warn("Could not retrieve XHR content from " + url + ": status code " + xhr.status);
                 _this.loadXML(
                     "<html><head></head><body>"+
                         "<h1>No File</h1>"+
@@ -437,4 +437,5 @@ $w.Document = DOMDocument;
 // Local Variables:
 // espresso-indent-level:4
 // c-basic-offset:4
+// tab-width:4
 // End:
