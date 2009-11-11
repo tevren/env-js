@@ -35,6 +35,7 @@ if ARGV.length > 0
         about_blank = false
       else
         RUNTIME.become_first_script_window
+        RUNTIME.top_level_load file
         RUNTIME.load file
       end
     end

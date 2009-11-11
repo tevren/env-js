@@ -85,44 +85,61 @@ EOJS
         $envjsrb_deps && ( @db ||= FSDB::Database.new $envjsrb_deps )
       end
 
+      top_level_js = nil
+
+      add_dep = nil
+
       clear_deps = lambda do |w|
         begin
-        if db.call
-          loc = w
-          begin loc = w.location; rescue; end
-          loc && ( loc = loc.to_s )
-          if ( loc !~ %r((http?s|file|about):) )
-            loc = "file://" + Pathname(loc).realpath.to_s
-          end
-          # $stderr.puts "clear", loc
-          if loc and loc != "about:blank"
-            paths = db.call[loc+".on.yml"] || []
-            paths.each do |path|
-              # $stderr.print "#{path} not by #{loc}\n";
-              db.call[path+".by.yml"].delete loc
+          if db.call
+            loc = w
+            begin loc = w.location; rescue; end
+            loc && ( loc = loc.to_s )
+            if ( loc !~ %r((http?s|file|about):) )
+              begin
+                loc = "file://" + Pathname(loc).realpath.to_s
+              rescue Errno::ENOENT; end
             end
-            # $stderr.print "#{loc} not on anything\n";
-            db.call.delete loc+".on.yml"
+            # $stderr.puts "clear", loc
+            if loc and loc != "about:blank"
+              paths = db.call[loc+".on.yml"] || []
+              paths.each do |path|
+                # $stderr.print "#{path} not by #{loc}\n";
+                db.call[path+".by.yml"].delete loc
+              end
+              # $stderr.print "#{loc} not on anything\n";
+              db.call.delete loc+".on.yml"
+            end
           end
-        end
-        rescue Exception => e; $stderr.puts e; end
+          add_dep.call( nil, loc )
+        rescue Exception => e; $stderr.puts e, e.class; $stderr.puts e.backtrace; end
       end
 
       if $envjsrb_deps
         Envjs::Net::File.on_open = clear_deps
       end
-
+      
       add_dep = lambda do |w, f|
         if db.call
           loc = nil
-          begin loc = w.location; rescue; end
+          begin loc = w.location; rescue Exception; end
           loc && ( loc = loc.to_s )
           if ( loc && loc !~ %r((http?s|file|about):) )
             loc = "file://" + Pathname(loc).realpath.to_s
           end
           path = f
           if ( path !~ %r((http?s|file|about):) )
-            path = "file://" + Pathname(path).realpath.to_s
+            begin
+              path = "file://" + Pathname(path).realpath.to_s
+            rescue Errno::ENOENT
+              return
+            end
+          end
+          if !loc || loc == "about:blank"
+            tll = "file://" + Pathname(top_level_js).realpath.to_s
+            if ( tll != path ) 
+              loc = tll
+            end
           end
           if loc and loc != "about:blank"
             on = db.call[loc+".on.yml"] || []
@@ -135,6 +152,12 @@ EOJS
             # $stderr.print "#{path} by #{loc}: #{db.call[path+'.by.yml']}\n"
           end
         end
+      end
+
+      (class << self; self; end).send :define_method, :top_level_load do |path|
+        # $stderr.print "tll #{path}\n"
+        top_level_js = path
+        clear_deps.call( path )
       end
 
       master.load = lambda { |*files|
