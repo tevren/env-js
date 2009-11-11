@@ -81,7 +81,7 @@ mode = nil
         mode = :js
         input = stream.next("js> ")
         input and input.chomp!
-        throw "Breakout" if handle_exit(input)
+        begin stream.exit(input); throw "Breakout" end if handle_exit(input)
         
         if input =~ /^rb\s+(.+)$/
           eval_in_ruby($1, local_binding, stream)
@@ -96,7 +96,7 @@ mode = nil
             mode = :rb
             # input = Readline.readline("rb> ", true)
             input = stream.next("rb> ")
-            throw "Breakout" if handle_exit(input)
+            begin stream.exit(input); throw "Breakout" end if handle_exit(input)
 
             break if input == "js"
 
@@ -167,6 +167,7 @@ else
       end
       def result &block
       end
+      def exit v; end
     end.new files[0]
 
     do_loop file
@@ -200,6 +201,7 @@ else
     def result
       puts yield
     end
+    def exit v; puts if v.nil?; end
   end.new
 
   begin
