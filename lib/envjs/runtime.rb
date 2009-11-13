@@ -145,7 +145,7 @@ EOJS
             on = db.call[loc+".on.yml"] || []
             on << path
             db.call[loc+".on.yml"] = on
-            by = db.call[path+".by.yml"] = []
+            by = db.call[path+".by.yml"] || []
             by << loc
             db.call[path+".by.yml"] = by
             # $stderr.print "#{loc} on #{path}: #{db.call[loc+'.on.yml']}\n"
