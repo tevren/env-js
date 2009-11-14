@@ -60,9 +60,9 @@ window.setTimeout = function(fn, time){
       tfn = function() {
         try {
           fn();
-        } catch (e) {
+        } /* catch (e) {
           $env.error(e);
-        } finally {
+        } */ finally {
           window.clearInterval(num);
         }
       };
@@ -145,9 +145,9 @@ window.$wait = $timers.wait = $env.wait = $env.wait || function(wait) {
       try {
         earliest.running = true;
         f();
-      } catch (e) {
+      } /* catch (e) {
         $env.error(e);
-      } finally {
+      } */ finally {
         earliest.running = false;
       }
       var goal = earliest.at + earliest.interval;
