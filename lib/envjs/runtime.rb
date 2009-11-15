@@ -144,12 +144,14 @@ EOJS
           if loc and loc != "about:blank"
             on = db.call[loc+".on.yml"] || []
             on << path
+            on.uniq!
             db.call[loc+".on.yml"] = on
             by = db.call[path+".by.yml"] || []
             by << loc
+            by.uniq!
             db.call[path+".by.yml"] = by
-            # $stderr.print "#{loc} on #{path}: #{db.call[loc+'.on.yml']}\n"
-            # $stderr.print "#{path} by #{loc}: #{db.call[path+'.by.yml']}\n"
+            # $stderr.print "#{loc} on #{path}: #{db.call[loc+'.on.yml'].join(' ')}\n"
+            # $stderr.print "#{path} by #{loc}: #{db.call[path+'.by.yml'].join(' ')}\n"
           end
         end
       end
