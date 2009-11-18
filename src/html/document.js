@@ -26,6 +26,7 @@ __extend__(HTMLDocument.prototype, {
                 (!__isValidName__(tagName))) {
               throw(new DOMException(DOMException.INVALID_CHARACTER_ERR));
           }
+          var originalName = tagName;
           tagName = tagName.toUpperCase();
           // create DOMElement specifying 'this' as ownerDocument
           //This is an html document so we need to use explicit interfaces per the 
@@ -80,7 +81,7 @@ __extend__(HTMLDocument.prototype, {
           }
         
           // assign values to properties (and aliases)
-          node.tagName  = tagName;
+          node.tagName  = tagName; // originalName;
           return node;
     },
     createElementNS : function (uri, local) {
