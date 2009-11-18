@@ -14,7 +14,7 @@ test("Execution of onload events in top-level document",
   function() {
 
         // top-level window-onload works, or test framework wouldn't run.....
-    expect(10);
+    expect(11);
 
     var mtch = document.getElementById('pCreatedByBodyOnload').innerHTML.
       match(/dynamically-generated paragraph/);
@@ -22,13 +22,11 @@ test("Execution of onload events in top-level document",
         "Got confirmation that body-onload handler executed");
     }catch(e){print(e);}
 
-/*
     mtch = document.getElementById('pCreatedByIframeOnload').innerHTML.
       match(/iframe-onload event handler/);
     try{ ok(mtch && mtch.length > 0,
         "Got confirmation that iframe-onload handler executed");
     }catch(e){print(e);}
-*/
 
     var iframe = document.getElementById('loadediframe');
     var aCounter = 0;

@@ -196,7 +196,7 @@ var __eval__ = $env.__eval__ || function(script, startingNode){
         var listOfScopes = [];
         for (var node = startingNode; node != null; node = node.parentNode)
             listOfScopes.push(node);
-        listOfScopes.push(window);
+        listOfScopes.push($w);
 
 
         var oldScopesArray = $env.configureScope(

@@ -32,12 +32,13 @@ document.__defineSetter__("cookie", function(cookie){
 	//(which succeeds 'expires') 
 	cookie = {};//keyword properties of the cookie
 	for(i=0;i<attrs.length;i++){
-		attr = attrs[i].split("=");
-		if(attr.length > 0){
-			name = trim(attr[0]);
-			value = trim(attr[1]);
-			if(name=='max-age'){ 
-				//we'll have to set a timer to check these 
+		var index = attrs[i].indexOf("=");
+        if(index > -1){
+            name = trim(attrs[i].slice(0,index));
+            value = trim(attrs[i].slice(index+1));
+            cookie['domain'] = "";
+            if(name=='max-age'){
+               //we'll have to set a timer to check these
 				//and garbage collect expired cookies
 				cookie[name] = parseInt(value, 10);
 			} else if(name=='domain'){
@@ -55,8 +56,8 @@ document.__defineSetter__("cookie", function(cookie){
 				properties[name] = value;
 			}
 		}else{
-			if(attr[0] == 'secure'){
-				cookie[attr[0]] = true;
+			if(attrs[i] == 'secure'){
+                cookie[attrs[i]] = true;
 			}
 		}
 	}
@@ -81,9 +82,26 @@ document.__defineGetter__("cookie", function(c){
 	//case we must check our current location.protocol to make sure it's
 	//https:
 	var allcookies = [], i;
-	//TODO 	
+	return cookieString($cookies.temporary) + cookieString($cookies.persistent); 	
 });
 
+var cookieString = function(cookies) {
+    var cookieString = "";
+    for (var i in cookies) {
+        // check if the cookie is in the current domain (if domain is set)
+        if (i == "" || i == $w.location.domain) {
+            for (var j in cookies[i]) {
+                // make sure path is at or below the window location path
+                if (j == "/" || $w.location.pathname.indexOf(j) === 0) {
+                    for (var k in cookies[i][j]) {
+                        cookieString += k + "=" + cookies[i][j][k].value+";";
+                    }
+                }
+            }
+        }
+    }
+    return cookieString;
+}
 
 
 var domainValid = function(domain){

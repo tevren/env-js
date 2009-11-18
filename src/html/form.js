@@ -71,6 +71,16 @@ __extend__(HTMLFormElement.prototype,{
 	reset:function(){
 	    __reset__(this);
 	    
+    },
+    onsubmit:function(){
+        if (__eval__(this.getAttribute('onsubmit')||'', this)) {
+            this.submit();
+        }
+    },
+    onreset:function(){
+        if (__eval__(this.getAttribute('onreset')||'', this)) {
+            this.reset();
+        }
     }
 });
 

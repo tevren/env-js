@@ -30,9 +30,16 @@ __extend__(HTMLSelectElement.prototype, {
             this.selectedIndex = index;
         }
     },
-    get value(){    // if we only over-ride one, then getter becomes undefined
-        return this.getAttribute('value')||'';
+    get value() {
+        var value = this.getAttribute('value');
+        if (value === undefined || value === null) {
+            var index = this.selectedIndex;
+            return (index != -1) ? this.options[index].value : "";
+        } else {
+            return value;
+        }
     },
+
 
     get length(){
         return this.options.length;
@@ -55,14 +62,16 @@ __extend__(HTMLSelectElement.prototype, {
         };
         return -1;
     },
-    set selectedIndex(value){
-        if (this.selectedIndex != -1) {
-            this.options[this.selectedIndex].selected = '';
+    
+    set selectedIndex(value) {
+        var i;
+        for (i=0; i<this.options.length; i++) {
+            this.options[i].selected = (i == Number(value));
         }
-        var option = this.options[Number(value)];
-        if (option) {
-            option.selected = 'selected';
-        }
+    },
+    get type(){
+        var type = this.getAttribute('type');
+        return type?type:'select-one';
     },
 
     add : function(){

@@ -5,7 +5,7 @@ window.addEventListener("load",function(){
   print("Handling onload for test.js");
   print("Loading tests.");
 
-  load( "test/unit/dom.js");
+  load("test/unit/dom.js");
   load("test/unit/window.js");
   load("test/unit/elementmembers.js");
   if (multiwindow) {
@@ -23,4 +23,4 @@ window.addEventListener("load",function(){
 
 window.location = "test/index.html";
 
-this.Envjs && this.Envjs.wait();
+Envjs.wait();

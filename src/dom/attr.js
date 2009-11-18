@@ -43,7 +43,7 @@ __extend__(DOMAttr.prototype, {
     },
     get xml(){
         if(this.nodeValue)
-            return this.nodeName + '="' + __escapeXML__(this.nodeValue+"") + '" ';
+            return ' '+this.nodeName + '="' + __escapeXML__(this.nodeValue+"") + '"';
         else
             return '';
     },

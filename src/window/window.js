@@ -136,7 +136,10 @@ __extend__($w,{
   get status(){return $status;},
   set status(_status){$status = _status;},
   get top(){return $top || $window;},
-  get window(){return $window;}
+  get window(){return $window;},
+  toString : function(){
+      return '[object Window]';
+  }
 });
 
 $w.open = function(url, name, features, replace){

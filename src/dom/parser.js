@@ -62,7 +62,7 @@ var whitespace = "\n\r\t ";
 **/
 
 
-var XMLP = function(strXML) {
+/*var XMLP = function(strXML) {
     // Normalize line breaks
     strXML = SAXStrings.replace(strXML, null, null, "\r\n", "\n");
     strXML = SAXStrings.replace(strXML, null, null, "\r", "\n");
@@ -458,14 +458,7 @@ XMLP.prototype._parseDTD = function(iB) {
     strClose = ((iInt != -1) && (iInt < iE)) ? "]>" : ">";
 
     while(true) {
-        // DEBUG: Remove
-        /*if(iE == iLast) {
-            return this._setErr(XMLP.ERR_INFINITELOOP);
-        }
-
-        iLast = iE;*/
-        // DEBUG: Remove End
-
+       
         iE = this.m_xml.indexOf(strClose, iB);
         if(iE == -1) {
             return this._setErr(XMLP.ERR_CLOSE_DTD);
@@ -513,17 +506,18 @@ XMLP.prototype._parseElement = function(iB) {
     //djohack
     //hack to allow for elements with single character names to be recognized
 
-    /*if (iE - iB != 1 ) {
-        if(SAXStrings.indexOfNonWhitespace(this.m_xml, iB, iDE) != iB) {
-            return this._setErr(XMLP.ERR_ELM_NAME);
-        }
-    }*/
+    ///if (iE - iB != 1 ) {
+    ///    if(SAXStrings.indexOfNonWhitespace(this.m_xml, iB, iDE) != iB) {
+    ///        return this._setErr(XMLP.ERR_ELM_NAME);
+    ///    }
+    ///}
+    
     // end hack -- original code below
 
-    /*
-    if(SAXStrings.indexOfNonWhitespace(this.m_xml, iB, iDE) != iB)
-        return this._setErr(XMLP.ERR_ELM_NAME);
-    */
+    
+    ///if(SAXStrings.indexOfNonWhitespace(this.m_xml, iB, iDE) != iB)
+    ///    return this._setErr(XMLP.ERR_ELM_NAME);
+    ///
     this._clearAttributes();
 
     iNE = SAXStrings.indexOfWhitespace(this.m_xml, iB, iDE);
@@ -546,9 +540,9 @@ XMLP.prototype._parseElement = function(iB) {
 
     strN = this.m_xml.substring(iB, iNE);
 
-    /*if(strN.indexOf("<") != -1) {
-        return this._setErr(XMLP.ERR_ELM_LT_NAME);
-    }*/
+    ///if(strN.indexOf("<") != -1) {
+    ///    return this._setErr(XMLP.ERR_ELM_LT_NAME);
+    ///}s
 
     this.m_name = strN;
     this.m_iP = iE + 1;
@@ -725,7 +719,7 @@ XMLP.prototype._setErr = function(iErr) {
     return XMLP._ERROR;
 
 }
-
+*/
 
 /**
 * function:   SAXDriver
@@ -735,7 +729,7 @@ XMLP.prototype._setErr = function(iErr) {
 *   event-based interface for parsing. This is the object users interact with when coding
 *   with XML for <SCRIPT>
 **/
-
+/*
 var SAXDriver = function() {
     this.m_hndDoc = null;
     this.m_hndErr = null;
@@ -803,9 +797,9 @@ SAXDriver.prototype.setLexicalHandler = function(hnd) {
 }
 
 
-    /**
-    * LOCATOR/PARSE EXCEPTION INTERFACE
-    ***/
+    
+    /// LOCATOR/PARSE EXCEPTION INTERFACE
+    
 
 SAXDriver.prototype.getColumnNumber = function() {
 
@@ -842,10 +836,10 @@ SAXDriver.prototype.getSystemId = function() {
 }
 
 
-    /***
-    * Attribute List Interface
-    **/
 
+    /// Attribute List Interface
+    
+    
 SAXDriver.prototype.getLength = function() {
 
     return this.m_parser.getAttributeCount();
@@ -874,9 +868,7 @@ SAXDriver.prototype.getValueByName = function(name) {
 }
 
 
-    /***
-    *    Private functions
-    **/
+    ///    Private functions
 
 SAXDriver.prototype._fireError = function(strMsg) {
     this.m_strErrMsg = strMsg;
@@ -986,11 +978,11 @@ SAXDriver.prototype._parseLoop = function(parser) {
 
 }  // end function _parseLoop
 
-/**
-*   function:   SAXStrings
-*   Author:   Scott Severtson
-*   Description: a useful object containing string manipulation functions
-**/
+///
+///   function:   SAXStrings
+///   Author:   Scott Severtson
+///   Description: a useful object containing string manipulation functions
+///
 
 var _SAXStrings = function() {};
 
@@ -1038,12 +1030,12 @@ _SAXStrings.prototype.indexOfNonWhitespace = function(strD, iB, iE) {
 
     while( strD.charCodeAt(iB++) < 33 );
     return (iB > iE)?-1:iB-1;
-    /*for(var i = iB; i < iE; i++){
-        if(_SAXStrings.WHITESPACE.indexOf(strD.charAt(i)) == -1) {
-            return i;
-        }
-    }
-    return -1;*/
+    ///for(var i = iB; i < iE; i++){
+    ///    if(_SAXStrings.WHITESPACE.indexOf(strD.charAt(i)) == -1) {
+    ///        return i;
+    ///    }
+    ///}
+    ///return -1;
 
 }  // end function indexOfNonWhitespace
 
@@ -1059,12 +1051,12 @@ _SAXStrings.prototype.indexOfWhitespace = function(strD, iB, iE) {
     while( strD.charCodeAt(iB++) >= 33 );
     return (iB > iE)?-1:iB-1;
 
-    /*for(var i = iB; i < iE; i++) {
-        if(_SAXStrings.WHITESPACE.indexOf(strD.charAt(i)) != -1) {
-            return i;
-        }
-    }
-    return -1;*/
+    ///for(var i = iB; i < iE; i++) {
+    ///    if(_SAXStrings.WHITESPACE.indexOf(strD.charAt(i)) != -1) {
+    ///        return i;
+    ///    }
+    ///}
+    ///return -1;
 }  // end function indexOfWhitespace
 
 
@@ -1085,12 +1077,12 @@ _SAXStrings.prototype.lastIndexOfNonWhitespace = function(strD, iB, iE) {
     while( (iE >= iB) && strD.charCodeAt(--iE) < 33 );
     return (iE < iB)?-1:iE;
 
-    /*for(var i = iE - 1; i >= iB; i--){
-        if(_SAXStrings.WHITESPACE.indexOf(strD.charAt(i)) == -1){
-            return i;
-        }
-    }
-    return -1;*/
+    ///for(var i = iE - 1; i >= iB; i--){
+    ///    if(_SAXStrings.WHITESPACE.indexOf(strD.charAt(i)) == -1){
+    ///         return i;
+    ///    }
+    ///}
+    ///return -1;
 }
 
 
@@ -1114,7 +1106,7 @@ Stack: A simple stack class, used for verifying document structure.
 
     Author:   Scott Severtson
 *****************************************************************************************************************/
-
+/*
 var Stack = function() {
     this.m_arr = new Array();
 };
@@ -1148,15 +1140,15 @@ __extend__(Stack.prototype, {
 });
 
 
-/**
-* function: isEmpty
-* Author: mike@idle.org
-* Description:  convenience function to identify an empty string
-**/
+///
+/// function: isEmpty
+/// Author: mike@idle.org
+/// Description:  convenience function to identify an empty string
+///
 function isEmpty(str) {
     return (str==null) || (str.length==0);
 };
-
+*/
 
 /**
  * function __escapeXML__
@@ -1178,7 +1170,22 @@ function __escapeXML__(str) {
 
     return str;
 };
+function __escapeHTML5__(str) {
+    str = str.replace(escAmpRegEx, "&amp;").
+            replace(escLtRegEx, "&lt;").
+            replace(escGtRegEx, "&gt;");
 
+    return str;
+};
+function __escapeHTML5Atribute__(str) {
+    str = str.replace(escAmpRegEx, "&amp;").
+            replace(escLtRegEx, "&lt;").
+            replace(escGtRegEx, "&gt;").
+            replace(quotRegEx, "&quot;").
+            replace(aposRegEx, "&apos;");
+
+    return str;
+};
 /**
  * function __unescapeXML__
  * author: David Joham djoham@yahoo.com

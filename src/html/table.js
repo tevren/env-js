@@ -58,10 +58,10 @@ __extend__(HTMLTableElement.prototype, {
         }
     },
  
-    /*appendChild : function (child) {
+    appendChild : function (child) {
         
         var tagName;
-        if(child.tagName){
+        if(child&&child.nodeType==DOMNode.ELEMENT_NODE){
             tagName = child.tagName.toLowerCase();
             if (tagName === "tr") {
                 // need an implcit <tbody> to contain this...
@@ -81,9 +81,10 @@ __extend__(HTMLTableElement.prototype, {
                 return DOMNode.prototype.appendChild.apply(this, arguments);
             }
         }else{
-            $error('HTMLTableElement.appendChild => child.tagName should not be undefined here... Fix ME!');
+            //tables can still have text node from white space
+            return DOMNode.prototype.appendChild.apply(this, arguments);
         }
-    },*/
+    },
      
     get tBodies() {
         return new HTMLCollection(this.getElementsByTagName("tbody"));
@@ -114,8 +115,7 @@ __extend__(HTMLTableElement.prototype, {
         // the row is appended as the last row. If index is omitted 
         // or greater than the number of rows, an error will result
         if (idx === -1 || idx === numRows) {
-            lastRow = rows[rows.length-1];
-            lastRow.parentNode.appendChild(inserted);
+            this.appendChild(inserted);
         } else {
             rows[idx].parentNode.insertBefore(inserted, rows[idx]);
         }

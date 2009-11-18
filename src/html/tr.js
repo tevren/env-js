@@ -11,6 +11,13 @@ var HTMLTableRowElement = function(ownerDocument) {
 HTMLTableRowElement.prototype = new HTMLElement;
 __extend__(HTMLTableRowElement.prototype, {
     
+    appendChild : function (child) {
+    
+       var retVal = DOMNode.prototype.appendChild.apply(this, arguments);
+       retVal.cellIndex = this.cells.length -1;
+             
+       return retVal;
+    },
     // align gets or sets the horizontal alignment of data within cells of the row.
     get align() {
         return this.getAttribute("align");
@@ -91,9 +98,11 @@ __extend__(HTMLTableRowElement.prototype, {
         }
             
         this.insertBefore(cell, node);
-        
+        cell.cellIndex = idx;
+          
         return cell;
     },
+
     
     deleteCell : function (idx) {
         var elem = this.cells[idx];

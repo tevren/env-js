@@ -13,5 +13,3 @@ test("window.location= following Envjs() initialization flagged as error",
      function(){
     expect(0);
 });
-
-//Envjs.wait();

@@ -48,26 +48,18 @@
 	</div>
 
 	<!-- this iframe is outside the #main so it won't reload constantly wasting time, but it means the tests must be "safe" and clean up after themselves -->
-    <iframe id="loadediframe" name="loadediframe" style="display:none;"
-            src="html/iframe1.html">
-
-        <script>
-            // kind of a cheat--env.js isn't smart enough to choose between
-            //   either loading from 'src' or parsing its content, so it
-            //   does both, which is exploited here to ensure that the
-            //   onload handler is installed before env.js "finishes
-            //   loading" (which happens when the /iframe tag is parsed
-print("XXXXXXXXXXXXX");
-            var iframeElem = document.getElementById('loadediframe');
-            iframeElem.onload = function(){
-                var t = document.createTextNode(
+    <script>
+        function iframeOnloadHandler(targetIframe){
+			var t = document.createTextNode(
 'Paragraph created by execution of iframe-onload event handler.');
-                var p = document.createElement('p');
-                p.setAttribute('id', 'pCreatedByIframeOnload');
-                p.appendChild(t);
-                iframeElem.appendChild(p);
-            }
-        </script>
+			var p = document.createElement('p');
+			p.setAttribute('id', 'pCreatedByIframeOnload');
+			p.appendChild(t);
+			targetIframe.appendChild(p);
+        }
+    </script>
+    <iframe id="loadediframe" name="loadediframe" style="display:none;"
+            src="html/iframe1.html" onload="iframeOnloadHandler(this)">
     </iframe>
     <iframe id="emptyiframe" name="emtpyiframe" style="display:none;"></iframe>
 
@@ -208,6 +200,16 @@ print("XXXXXXXXXXXXX");
 				<option id="option3d" value="3">3</option>
 			</select>
 			
+            <select id="test_value">
+                <option value="optionvalue" selected="selected">optiontext</option>
+            </select>
+        
+            <select id="test_selecting">
+                <option value="0">option0</option>
+                <option value="1" selected="selected">option1</option>
+                <option value="2">option2</option>
+            </select>
+
 			<object id="object1" codebase="stupid">
 				<param name="p1" value="x1" />
 				<param name="p2" value="x2" />

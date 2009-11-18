@@ -131,7 +131,7 @@ __extend__(DOMImplementation.prototype,{
  * @return : DOMDocument
  */
 
-function __parseLoop__(impl, doc, p, isWindowDocument) {
+/*function __parseLoop__(impl, doc, p, isWindowDocument) {
     var iEvt, iNode, iAttr, strName;
     var iNodeParent = doc;
 
@@ -408,12 +408,12 @@ function __parseLoop__(impl, doc, p, isWindowDocument) {
     else if(iEvt == XMLP._NONE) {                   // no more events
       //steven woods notes that unclosed tags are rejected elsewhere and this check
 	  //breaks a table patching routine
-	  /*if (iNodeParent == doc) {                     // confirm that we have recursed back up to root
-        break;
-      }
-      else {
-        throw(new DOMException(DOMException.SYNTAX_ERR));  // one or more Tags were not closed properly
-      }*/
+	  //if (iNodeParent == doc) {                     // confirm that we have recursed back up to root
+      //  break;
+      //}
+      //else {
+      //  throw(new DOMException(DOMException.SYNTAX_ERR));  // one or more Tags were not closed properly
+      //}
         break;
 
     }
@@ -462,7 +462,7 @@ function __parseLoop__(impl, doc, p, isWindowDocument) {
     }
 
   }
-};
+};*/
 
 
 /**

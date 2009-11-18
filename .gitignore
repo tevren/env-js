@@ -2,9 +2,12 @@
 /dist/env.rhino.*.*.*.js
 /dist/env-js.*.jar
 *~
-/rhino/build
-/jshost
 /dist/env.johnson.js
 /lib/envjs/env.js
 /*envjs*.gem
 /*envjs.gemspec
+/rhino/build
+/jshost
+/htmlparser/gwt*
+/htmlparser/html5
+/htmlparser/build

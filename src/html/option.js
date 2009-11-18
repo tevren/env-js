@@ -32,9 +32,34 @@ __extend__(HTMLOptionElement.prototype, {
         return (this.getAttribute('selected')=='selected');
     },
     set selected(value){
-        if(this.defaultSelected===null&&this.selected!==null)
+        if(this.defaultSelected===null && this.selected!==null){
             this.defaultSelected = this.selected;
-        this.setAttribute('selected', (value ? 'selected' :''));
+        }
+        var selectedValue = (value ? 'selected' : '');
+        if (this.getAttribute('selected') == selectedValue) {
+            // prevent inifinite loops (option's selected modifies 
+            // select's value which modifies option's selected)
+            return;
+        }
+        this.setAttribute('selected', selectedValue);
+        if (value) {
+            // set select's value to this option's value (this also 
+            // unselects previously selected value)
+            this.parentNode.value = this.value;
+        } else {
+            // if no other option is selected, select the first option in the select
+            var i, anythingSelected;
+            for (i=0; i<this.parentNode.options.length; i++) {
+                if (this.parentNode.options[i].selected) {
+                    anythingSelected = true;
+                    break;
+                }
+            }
+            if (!anythingSelected) {
+                this.parentNode.value = this.parentNode.options[0].value;
+            }
+        }
+
     },
     get text(){
          return ((this.nodeValue === null) ||  (this.nodeValue ===undefined)) ?

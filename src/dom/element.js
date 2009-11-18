@@ -20,9 +20,9 @@ __extend__(DOMElement.prototype, {
     set tagName(name){
         this.nodeName = name;  
     },
-    addEventListener        : function(){ window.addEventListener.apply(this, arguments) },
-	removeEventListener     : function(){ window.removeEventListener.apply(this, arguments) },
-	dispatchEvent           : function(){ window.dispatchEvent.apply(this, arguments) },
+    addEventListener        : function(){ $w.addEventListener.apply(this, arguments); },
+	removeEventListener     : function(){ $w.removeEventListener.apply(this, arguments); },
+	dispatchEvent           : function(){ $w.dispatchEvent.apply(this, arguments); },
     getAttribute: function(name) {
         var ret = null;
         // if attribute exists, use it
@@ -63,7 +63,7 @@ __extend__(DOMElement.prototype, {
             }*/
             
             // assign values to properties (and aliases)
-            attr.value     = value;
+            attr.value     = value + '';
             
             // add/replace Attribute in NamedNodeMap
             this.attributes.setNamedItem(attr);
@@ -190,12 +190,11 @@ __extend__(DOMElement.prototype, {
         
         // serialize Attribute declarations
         var attrs = this.attributes.xml;
-        if (attrs.length > 0) attrs = " "+ attrs;
         
         // serialize this Element
         ret += "<" + this.nodeName.toLowerCase() + ns + attrs +">";
         ret += this.childNodes.xml;
-        ret += "</" + this.nodeName.toLowerCase()+">";
+        ret += "</" + this.nodeName.toLowerCase() + ">";
         
         return ret;
     },

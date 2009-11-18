@@ -153,6 +153,7 @@ var Envjs = function(){
             write = document.write,
             writeln = document.writeln,
             okay = true;
+        // SMP: see also the note in html/document.js about script.type
         var script_type = script.type === null ? "text/javascript" : script.type;
         try{
             if(script_type){
@@ -223,14 +224,6 @@ var Envjs = function(){
         
     $env.loadInlineScript = $env.loadInlineScript || function(script){};
     
-    $env.getFreshScopeObj = function(){};
-    $env.getProxyFor = function(){};
-    $env.getScope = function(){};
-    $env.setScope = function(){};
-    $env.configureScope = function(){};
-    $env.restoreScope = function(){};
-
-
     $env.loadFrame = function(frameElement, url){
         try {
             if (frameElement._content){
@@ -294,25 +287,25 @@ print("TT");
 
     function recordScopesOfKeyObjects(fnToExecInOtherContext){
         return {                //   getScope()/setScope() from Window.java
-            frame :          $env.getScope(fnToExecInOtherContext),
-            window :         $env.getScope($env.window),
-            global_load :    $env.getScope($env.loadIntoFnsScope),
-            local_load :     $env.getScope($env.loadLocalScript)
+            frame :          getScope(fnToExecInOtherContext),
+            window :         getScope($env.window),
+            global_load :    getScope($env.loadIntoFnsScope),
+            local_load :     getScope($env.loadLocalScript)
         };
     }
 
     function setScopesOfKeyObjects(fnToExecInOtherContext, windowObj){
-        $env.setScope(fnToExecInOtherContext,  windowObj);
-        $env.setScope($env.window,             windowObj);
-        $env.setScope($env.loadIntoFnsScope,   windowObj);
-        $env.setScope($env.loadLocalScript,    windowObj);
+        setScope(fnToExecInOtherContext,  windowObj);
+        setScope($env.window,             windowObj);
+        setScope($env.loadIntoFnsScope,   windowObj);
+        setScope($env.loadLocalScript,    windowObj);
     }
 
     function restoreScopesOfKeyObjects(fnToExecInOtherContext, scopes){
-        $env.setScope(fnToExecInOtherContext,  scopes.frame);
-        $env.setScope($env.window,             scopes.window);
-        $env.setScope($env.loadIntoFnsScope,   scopes.global_load);
-        $env.setScope($env.loadLocalScript,    scopes.local_load);
+        setScope(fnToExecInOtherContext,  scopes.frame);
+        setScope($env.window,             scopes.window);
+        setScope($env.loadIntoFnsScope,   scopes.global_load);
+        setScope($env.loadLocalScript,    scopes.local_load);
     }
 
 })($env);

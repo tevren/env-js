@@ -1,6 +1,4 @@
 /*
-<<<<<<< HEAD
-=======
  * Envjs env-js.1.1.rc1 
  * Pure JavaScript Browser Environment
  *   By John Resig <http://ejohn.org/>
@@ -26,7 +24,6 @@ try {
 
         
         /*
->>>>>>> thatcher
 *	window.js
 *   - this file will be wrapped in a closure providing the window object as $w
 */
@@ -80,8 +77,7 @@ var $name;
 
 // a read/write reference to the Window object that contained the script that called open() to 
 //open this browser window.  This property is valid only for top-level window objects.
-
-var $opener = $openingWindow = options.opener;
+var $opener = $openingWindow;
 
 // Read-only properties that specify the total height and width, in pixels, of the browser window.
 // These dimensions include the height and width of the menu bar, toolbars, scrollbars, window
@@ -98,7 +94,7 @@ var $pageXOffset = 0, $pageYOffset = 0;
 // or frame.  If the window is a top-level window, parent refers to
 // the window itself.  If this window is a frame, this property refers
 // to the window or frame that conatins it.
-var $parent = options.parent || window;
+var $parent = $parentWindow;
 try {
     if ($parentWindow.$thisWindowsProxyObject)
         $parent = $parentWindow.$thisWindowsProxyObject;
@@ -119,7 +115,7 @@ var $status = '';
 // a read-only reference to the top-level window that contains this window.  If this
 // window is a top-level window it is simply a refernce to itself.  If this window 
 // is a frame, the top property refers to the top-level window that contains the frame.
-var $top = $parent && $parent.top || this;
+var $top = $initTop;
 
 // the window property is identical to the self property and to this obj
 var $window = $w;
@@ -127,7 +123,7 @@ try {
     if ($w.$thisWindowsProxyObject)
         $window = $w.$thisWindowsProxyObject;
 } catch(e){}
-options.proxy && ( $window = options.proxy );
+
 
 $debug("Initializing Window.");
 __extend__($w,{
@@ -2444,6 +2440,7 @@ XMLP.prototype.next = function() {
 };
 
 XMLP.prototype.appendFragment = function(xmlfragment) {
+
     var start = this.m_xml.slice(0,this.m_iP);
     var end = this.m_xml.slice(this.m_iP);
     this.m_xml = start+xmlfragment+end;
@@ -3631,61 +3628,6 @@ var DOMImplementation = function() {
     this.errorChecking  = true;       // by default, test for exceptions
 };
 
-<<<<<<< HEAD
-var __endHTMLElement__ = function(node, doc, p){
-    if(node.nodeName.toLowerCase() == 'script'){
-        // unless we're parsing in a window context, don't execute scripts
-        if (doc.parentWindow){
-            p.replaceEntities = true;
-            $env.loadLocalScript(node, p);
-
-            // only fire event if we actually had something to load
-            if (node.src && node.src.length > 0){
-                var event = doc.createEvent();
-                event.initEvent("load");
-                node.dispatchEvent( event, false );
-            }
-        }
-    }
-    else if (node.nodeName.toLowerCase() == 'frame' ||
-             node.nodeName.toLowerCase() == 'iframe'   ){
-
-        if (node.src && node.src.length > 0){
-            $debug("getting content document for (i)frame from " + node.src);
-
-          // FIX
-          var save = $master.first_script_window;
-          $master.first_script_window = window;
-
-            $env.loadFrame(node, $env.location(node.src));
-
-          $master.first_script_window = save;
-
-            var event = doc.createEvent();
-            event.initEvent("load");
-            node.dispatchEvent( event, false );
-        }
-    }
-    else if (node.nodeName.toLowerCase() == 'link'){
-        if (node.href && node.href.length > 0){
-            // don't actually load anything, so we're "done" immediately:
-            var event = doc.createEvent();
-            event.initEvent("load");
-            node.dispatchEvent( event, false );
-        }
-    }
-    else if (node.nodeName.toLowerCase() == 'img'){
-        if (node.src && node.src.length > 0){
-            // don't actually load anything, so we're "done" immediately:
-            var event = doc.createEvent();
-            event.initEvent("load");
-            node.dispatchEvent( event, false );
-        }
-    }
-}
-
-=======
->>>>>>> thatcher
 __extend__(DOMImplementation.prototype,{
     // @param  feature : string - The package name of the feature to test.
     //      the legal only values are "XML" and "CORE" (case-insensitive).
@@ -4321,7 +4263,7 @@ __extend__(DOMDocument.prototype, {
 
             parseHtmlDocument(xmlString, this, null, null);
             
-            $env.wait();
+            $env.wait(-1);
         } catch (e) {
             $error(e);
         }
@@ -4894,7 +4836,6 @@ $w.Document = DOMDocument;
 	
 		if ( !doc ) {
 			if ( typeof DOMDocument != "undefined" ){
-print("BB");                          
 				doc = new DOMDocument();
 			}else if ( typeof document != "undefined" && document.implementation && document.implementation.createDocument ){
 				doc = document.implementation.createDocument("", "", null);
@@ -5458,9 +5399,6 @@ __extend__(HTMLElement.prototype, {
 	    }
 });
 
-<<<<<<< HEAD
-var __eval__ = $env.__eval__ || function(script, startingNode){
-=======
 
 var __recursivelyGatherText__ = function(aNode) {
     var accumulateText = "";
@@ -5477,7 +5415,6 @@ var __recursivelyGatherText__ = function(aNode) {
 };
     
 var __eval__ = function(script, startingNode){
->>>>>>> thatcher
     if (script == "")
         return;                    // don't assemble environment if no script...
 
@@ -7012,7 +6949,6 @@ __extend__(HTMLObjectElement.prototype, {
         this.setAttribute('width',value);
     },
     get contentDocument(){
-print("there");
         return this.ownerDocument;
     }
 });
@@ -8319,15 +8255,6 @@ $debug("Initializing Window Location.");
 var $location = '';
 
 $w.__defineSetter__("location", function(url){
-<<<<<<< HEAD
-  if( !$location || $location == "about:blank" ) {
-    $w.__loadAWindowsDocument__(url);
-  } else {
-    $env.$unloadEventsFor($w);
-    var proxy = $w.window;
-    $env.reloadAWindowProxy(proxy, url);
-  }
-=======
     if ($w.$isOriginalWindow){
         if ($w.$haveCalledWindowLocationSetter)
             throw new Error("Cannot call 'window.location=' multiple times " +
@@ -8343,7 +8270,6 @@ $w.__defineSetter__("location", function(url){
             proxy = proxy.$thisWindowsProxyObject;
         $env.reload(proxy, url);
     }
->>>>>>> thatcher
 });
 
 
@@ -8427,15 +8353,9 @@ $w.__defineGetter__("location", function(url){
         reload: function(force){
             // ignore 'force': we don't implement a cache
             var thisWindow = $w;
-<<<<<<< HEAD
-            $env.$unloadEventsFor(thisWindow);
-            try { thisWindow = thisWindow.$thisWindowsProxyObject || thisWindow; }catch (e){}
-            $env.reloadAWindowProxy($window, thisWindow.location.href);
-=======
             $env.unload(thisWindow);
             try { thisWindow = thisWindow.$thisWindowsProxyObject; }catch (e){}
             $env.reload(thisWindow, thisWindow.location.href);
->>>>>>> thatcher
         },
         replace: function(url){
             $location = url;
@@ -8553,7 +8473,7 @@ $w.__defineGetter__("navigator", function(){
 $debug("Initializing Window Timer.");
 
 //private
-var $timers = $master.timers = $master.timers || [];
+var $timers = $env.timers = $env.timers || [];
 var $event_loop_running = false;
 $timers.lock = $env.sync(function(fn){fn();});
 
@@ -8572,8 +8492,11 @@ var convert_time = function(time) {
   if ( isNaN(time) || time < 0 ) {
     time = 0;
   }
-  if ( $event_loop_running && time < 4 ) {
-    time = 4;
+  // html5 says this should be at least 4, but the parser is using a setTimeout for the SAX stuff
+  // which messes up the world
+  var min = /* 4 */ 0;
+  if ( $event_loop_running && time < min ) {
+    time = min;
   }
   return time;
 }
@@ -8607,7 +8530,6 @@ window.setTimeout = function(fn, time){
     }
     $debug("Creating timer number "+num);
     $timers[num] = new $timer(tfn, time);
-    $timers[num].ofn = fn;
     $timers[num].start();
   });
   return num;
@@ -8629,7 +8551,6 @@ window.setInterval = function(fn, time){
     num = $timers.length+1;
     //$debug("Creating timer number "+num);
     $timers[num] = new $timer(fn, time);
-    $timers[num].ofn = fn;
     $timers[num].start();
   });
   return num;
@@ -8649,10 +8570,16 @@ window.clearInterval = window.clearTimeout = function(num){
 // wait(n) (n > 0): execute any timers as they fire until there are none left waiting at least n ms
 // but no more, even if there are future events/current threads
 // wait(0): execute any immediately runnable timers and return
+// wait(-n): keep sleeping until the next event is more than n ms in the future
 
 // FIX: make a priority queue ...
 
 window.$wait = $env.wait = $env.wait || function(wait) {
+  var delta_wait;
+  if (wait < 0) {
+    delta_wait = -wait;
+    wait = 0;
+  }
   var start = Date.now();
   var old_loop_running = $event_loop_running;
   $event_loop_running = true; 
@@ -8663,13 +8590,6 @@ window.$wait = $env.wait = $env.wait || function(wait) {
     var earliest;
     $timers.lock(function(){
       earliest = undefined;
-      var l = 0;
-      for(var i in $timers){
-        if( isNaN(i*0) ) {
-          continue;
-        }
-        l++;
-      }
       for(var i in $timers){
         if( isNaN(i*0) ) {
           continue;
@@ -8711,19 +8631,21 @@ window.$wait = $env.wait = $env.wait || function(wait) {
       // no events, but a wait requested: fall through to sleep
     } else {
       // there are events in the queue, but they aren't firable now
-      if ( wait === 0 || ( wait > 0 && wait < Date.now () ) ) {
+      if ( delta_wait && sleep <= delta_wait ) {
+        // if they will happen within the next delta, fall through to sleep
+      } else if ( wait === 0 || ( wait > 0 && wait < Date.now () ) ) {
         // loop ends even if there are events but the user specifcally asked not to wait too long
         break;
       }
       // there are events and the user wants to wait: fall through to sleep
     }
 
-    // Releated to ajax threads ... hopefully can go away ..
+    // Related to ajax threads ... hopefully can go away ..
     var interval =  $wait.interval || 100;
     if ( !sleep || sleep > interval ) {
       sleep = interval;
     }
-    $env.sleep(sleep);
+    java.lang.Thread.currentThread().sleep(sleep);
   }
   $event_loop_running = old_loop_running;
 };
@@ -8781,7 +8703,6 @@ $w.dispatchEvent = function(event, bubbles){
     }
     $debug("event target: " + event.target);
     if ( event.type && (this.nodeType             ||
-                        this.window === window    ||
                         this === window           ||
                         this.__proto__ === window ||
                         this.$thisWindowsProxyObject === window)) {
@@ -9823,10 +9744,8 @@ try{
 }catch(e){
 	//TODO - fail gracefully
 }	
-<<<<<<< HEAD
-	
-=======
-	var Html5Parser;
+	(function(window,document){
+var Html5Parser;
 (function () {window.nu_validator_htmlparser_HtmlParser = function(){
   var $intern_0 = '', $intern_19 = '" for "gwt:onLoadErrorFn"', $intern_17 = '" for "gwt:onPropertyErrorFn"', $intern_4 = '#', $intern_6 = '/', $intern_2 = '<script id="__gwt_marker_nu.validator.htmlparser.HtmlParser"><\/script>', $intern_14 = '=', $intern_5 = '?', $intern_16 = 'Bad handler "', $intern_20 = 'DOMContentLoaded', $intern_3 = '__gwt_marker_nu.validator.htmlparser.HtmlParser', $intern_7 = 'base', $intern_9 = 'clear.cache.gif', $intern_13 = 'content', $intern_18 = 'gwt:onLoadErrorFn', $intern_15 = 'gwt:onPropertyErrorFn', $intern_12 = 'gwt:property', $intern_8 = 'img', $intern_10 = 'meta', $intern_11 = 'name', $intern_1 = 'nu.validator.htmlparser.HtmlParser';
   var $wnd = window, $doc = document, gwtOnLoad, bodyDone, base = $intern_0, metaProps = {}, values = [], providers = [], answers = [], onLoadErrorFunc, propertyErrorFunc;
@@ -20594,6 +20513,8 @@ var com_google_gwt_lang_ClassLiteralHolder_Ljava_1lang_1Object_12_1classLit = ja
 if (nu_validator_htmlparser_HtmlParser) {  var __gwt_initHandlers = nu_validator_htmlparser_HtmlParser.__gwt_initHandlers;  nu_validator_htmlparser_HtmlParser.onScriptLoad(gwtOnLoad);}})();
 
 Html5Parser();
+
+})($w,$document);
 /*
 *	outro.js
 */
@@ -20617,4 +20538,3 @@ Html5Parser();
     Envjs.error("ERROR LOADING ENV : " + e + "\nLINE SOURCE:\n" +
         Envjs.lineSource(e));
 }
->>>>>>> thatcher
