@@ -65,6 +65,11 @@ $env.connection = function(xhr, responseHandler, data){
     // print("xhr",xhr.url);
     // print("xhr",url);
     if ( /^file\:/.test(url) ) {
+        // experimental hack
+        try {
+            Ruby.require('envjs/net/cgi');
+            resp = connection = new Ruby.Envjs.Net.CGI( xhr, data );
+        } catch(e) {
         try{
             if ( xhr.method == "PUT" ) {
                 var text =  data || "" ;
@@ -110,6 +115,7 @@ $env.connection = function(xhr, responseHandler, data){
                 xhr.statusText = "Local File Protocol Error";
                 xhr.responseText = "<html><head/><body><p>"+ e+ "</p></body></html>";
             }
+        }
         }
     } else { 
         Ruby.require('net/http');

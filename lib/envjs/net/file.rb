@@ -29,6 +29,10 @@ class Envjs::Net::File < Net::Protocol
   def finish
   end
 
+  def request request
+    Response.new request.path
+  end
+
   class Response
     def initialize path
       @path = path
@@ -66,10 +70,6 @@ class Envjs::Net::File < Net::Protocol
 
     attr_reader :body, :code
 
-  end
-
-  def request request
-    Response.new request.path
   end
 
 end

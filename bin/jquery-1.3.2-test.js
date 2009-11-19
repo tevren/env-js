@@ -45,12 +45,12 @@ load("build/runtest/env.js");
                         isStopped = true;
                         unsafeStop.call(this);
                         timeout = ( timeout && timeout > 0 ) ? timeout : 10000;
-	                /*if (timeout)
+	                if (timeout)
 	                  config_timeout = setTimeout(function() {
         			    QUnit.ok( false, "Test timed out" );
         			    start();
-        		      }, timeout);*/
-                      $env.wait()
+        		      }, timeout);
+                      /* $env.wait() */
                     }
                 };
                 start = function(){
@@ -97,3 +97,10 @@ load("build/runtest/env.js");
 })(Envjs);
 
 Envjs.wait();
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// mode:auto-revert
+// End:
