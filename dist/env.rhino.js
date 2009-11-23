@@ -94,6 +94,283 @@
         file["delete"]();
     };
     
+<<<<<<< HEAD
+    $env.connection = function(xhr, responseHandler, data){
+        var url = java.net.URL(xhr.url);//, $w.location);
+      var connection;
+        if ( /^file\:/.test(url) ) {
+            try{
+                if ( xhr.method == "PUT" ) {
+                    var text =  data || "" ;
+                    $env.writeToFile(text, url);
+                } else if ( xhr.method == "DELETE" ) {
+                    $env.deleteFile(url);
+                } else {
+                    connection = url.openConnection();
+                    connection.connect();
+                    //try to add some canned headers that make sense
+                    
+                    try{
+                        if(xhr.url.match(/html$/)){
+                            xhr.responseHeaders["Content-Type"] = 'text/html';
+                        }else if(xhr.url.match(/.xml$/)){
+                            xhr.responseHeaders["Content-Type"] = 'text/xml';
+                        }else if(xhr.url.match(/.js$/)){
+                            xhr.responseHeaders["Content-Type"] = 'text/javascript';
+                        }else if(xhr.url.match(/.json$/)){
+                            xhr.responseHeaders["Content-Type"] = 'application/json';
+=======
+    $env.onScriptLoadError = function(){};
+    $env.loadLocalScript = function(script, parser){
+        $env.debug("loading script ");
+        var types, type, src, i, base, 
+            docWrites = [],
+            write = document.write,
+            writeln = document.writeln,
+            okay = true;
+        // SMP: see also the note in html/document.js about script.type
+        var script_type = script.type === null ? "text/javascript" : script.type;
+        try{
+            if(script_type){
+                types = script_type?script_type.split(";"):[];
+                for(i=0;i<types.length;i++){
+                    if($env.scriptTypes[types[i]]){
+						if(script.src){
+                            $env.info("loading allowed external script :" + script.src);
+                            //lets you register a function to execute 
+                            //before the script is loaded
+                            if($env.beforeScriptLoad){
+                                for(src in $env.beforeScriptLoad){
+                                    if(script.src.match(src)){
+                                        $env.beforeScriptLoad[src]();
+                                    }
+                                }
+                            }
+                            base = "" + window.location;
+                            var filename = $env.location(script.src.match(/([^\?#]*)/)[1], base );
+                            try {                      
+                              load(filename);
+                            } catch(e) {
+                              $env.warn("could not load script "+ filename +": "+e );
+                              okay = false;
+                            }
+                            //lets you register a function to execute 
+                            //after the script is loaded
+                            if($env.afterScriptLoad){
+                                for(src in $env.afterScriptLoad){
+                                    if(script.src.match(src)){
+                                        $env.afterScriptLoad[src]();
+                                    }
+                                }
+                            }
+>>>>>>> thatcher
+                        }else{
+                            xhr.responseHeaders["Content-Type"] = 'text/plain';
+                        }
+                    //xhr.responseHeaders['Last-Modified'] = connection.getLastModified();
+                    //xhr.responseHeaders['Content-Length'] = headerValue+'';
+                    //xhr.responseHeaders['Date'] = new Date()+'';*/
+                    }catch(e){
+                        $env.error('failed to load response headers',e);
+                    }
+<<<<<<< HEAD
+=======
+                }
+            }else{
+                // SMP this branch is probably dead ...
+                //anonymous type and anonymous src means inline
+                if(!script.src){
+                    $env.loadInlineScript(script);
+                }
+            }
+        }catch(e){
+            okay = false;
+            $env.error("Error loading script.", e);
+            $env.onScriptLoadError(script);
+        }finally{
+            /*if(parser){
+                parser.appendFragment(docWrites.join(''));
+			}
+			//return document.write to it's non-script loading form
+            document.write = write;
+            document.writeln = writeln;*/
+        }
+        return okay;
+    };
+    
+    $env.loadInlineScript = function(script){};
+    $env.loadFrame = function(frameElement, url){
+        try {
+            if (frameElement._content){
+                $env.unload(frameElement._content);
+                $env.reload(frameElement._content, url);
+            }
+            else
+                frameElement._content = $env.newwindow(this,
+                    frameElement.ownerDocument.parentWindow, url);
+        } catch(e){
+            $env.error("failed to load frame content: from " + url, e);
+        }
+    };
+
+    $env.reload = function(oldWindowProxy, url){
+        var newWindowProxy = $env.newwindow(
+                                 oldWindowProxy.opener,
+                                 oldWindowProxy.parent,
+                                 url);
+        var newWindow = newWindowProxy.__proto__;
+        
+        oldWindowProxy.__proto__ = newWindow;
+        newWindow.$thisWindowsProxyObject = oldWindowProxy;
+        newWindow.document._parentWindow = oldWindowProxy;
+    };
+
+    $env.newwindow = function(openingWindow, parentArg, url){
+        var newWindow = $env.getFreshScopeObj();
+        var newProxy  = $env.getProxyFor(newWindow);
+        newWindow.$thisWindowsProxyObject = newProxy;
+
+        var local__window__    = $env.window,
+            local_env          = $env,
+            local_opener       = openingWindow,
+            local_parent       = parentArg ? parentArg : newWindow;
+
+        var inNewContext = function(){
+            local__window__(newWindow,        // object to "window-ify"
+                            local_env,        // our scope for globals
+                            local_parent,     // win's "parent"
+                            local_opener,     // win's "opener"
+                            local_parent.top, // win's "top"
+                            false             // this win isn't the original
+                           );
+            if (url)
+                $env.load(url);
+        };
+
+        var scopes = recordScopesOfKeyObjects(inNewContext);
+        setScopesOfKeyObjects(inNewContext, newWindow);
+        inNewContext(); // invoke local fn to window-ify new scope object
+        restoreScopesOfKeyObjects(inNewContext, scopes);
+        return newProxy;
+    };
+
+    function recordScopesOfKeyObjects(fnToExecInOtherContext){
+        return {                //   getScope()/setScope() from Window.java
+            frame :          getScope(fnToExecInOtherContext),
+            window :         getScope($env.window),
+            global_load :    getScope($env.loadIntoFnsScope),
+            local_load :     getScope($env.loadLocalScript)
+        };
+    }
+
+    function setScopesOfKeyObjects(fnToExecInOtherContext, windowObj){
+        setScope(fnToExecInOtherContext,  windowObj);
+        setScope($env.window,             windowObj);
+        setScope($env.loadIntoFnsScope,   windowObj);
+        setScope($env.loadLocalScript,    windowObj);
+    }
+
+    function restoreScopesOfKeyObjects(fnToExecInOtherContext, scopes){
+        setScope(fnToExecInOtherContext,  scopes.frame);
+        setScope($env.window,             scopes.window);
+        setScope($env.loadIntoFnsScope,   scopes.global_load);
+        setScope($env.loadLocalScript,    scopes.local_load);
+    }
+})(Envjs);
+
+/*
+*	env.rhino.js
+*/
+(function($env){
+    
+    $env.log = function(msg, level){
+         print(' '+ (level?level:'LOG') + ':\t['+ new Date()+"] {ENVJS} "+msg);
+    };
+    
+    $env.lineSource = function(e){
+        return e&&e.rhinoException?e.rhinoException.lineSource():"(line ?)";
+    };
+    
+    $env.sync = sync;
+  
+    //For Java the window.location object is a java.net.URL
+    $env.location = function(path, base){
+      var protocol = new RegExp('(^file\:|^http\:|^https\:)');
+        var m = protocol.exec(path);
+        if(m&&m.length>1){
+            return new java.net.URL(path).toString()+'';
+        }else if(base){
+          return new java.net.URL(new java.net.URL(base), path).toString()+'';
+        }else{
+            //return an absolute url from a url relative to the window location
+                base = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+            if(window.location.href.length > 0){
+                return base + '/' + path;
+            }else{
+                return new java.io.File(  path ).toURL().toString()+'';
+            }
+        }
+    };
+    
+    //Since we're running in rhino I guess we can safely assume
+    //java is 'enabled'.  I'm sure this requires more thought
+    //than I've given it here
+    $env.javaEnabled = true;	
+    
+    
+    //Used in the XMLHttpRquest implementation to run a
+    // request in a seperate thread
+    $env.onInterrupt = function(){};
+    $env.runAsync = function(fn){
+        $env.debug("running async");
+        var running = true;
+        
+        var run = sync(function(){ //while happening only thing in this timer    
+    	    //$env.debug("running timed function");
+            fn();
+        });
+        
+        try{
+            spawn(run);
+        }catch(e){
+            $env.error("error while running async", e);
+            $env.onInterrupt();
+        }
+    };
+    
+    //Used to write to a local file
+    $env.writeToFile = function(text, url){
+        $env.debug("writing text to url : " + url);
+        var out = new java.io.FileWriter( 
+            new java.io.File( 
+                new java.net.URI(url.toString())));	
+        out.write( text, 0, text.length );
+        out.flush();
+        out.close();
+    };
+    
+    //Used to write to a local file
+    $env.writeToTempFile = function(text, suffix){
+        $env.debug("writing text to temp url : " + suffix);
+        // Create temp file.
+        var temp = java.io.File.createTempFile("envjs-tmp", suffix);
+    
+        // Delete temp file when program exits.
+        temp.deleteOnExit();
+    
+        // Write to temp file
+        var out = new java.io.FileWriter(temp);
+        out.write(text, 0, text.length);
+        out.close();
+        return temp.getAbsolutePath().toString()+'';
+    };
+    
+    //Used to delete a local file
+    $env.deleteFile = function(url){
+        var file = new java.io.File( new java.net.URI( url ) );
+        file["delete"]();
+    };
+    
     $env.connection = function(xhr, responseHandler, data){
         var url = java.net.URL(xhr.url);//, $w.location);
       var connection;
@@ -127,6 +404,7 @@
                     }catch(e){
                         $env.error('failed to load response headers',e);
                     }
+>>>>>>> thatcher
                     	
                 }
             }catch(e){
@@ -9297,7 +9575,11 @@ $w.clearInterval = $w.clearTimeout = function(num){
 
 // FIX: make a priority queue ...
 
+<<<<<<< HEAD
 $w.$wait = $timers.wait = $env.wait = $env.wait || function(wait) {
+=======
+$w.$wait = $env.wait = $env.wait || function(wait) {
+>>>>>>> thatcher
   var delta_wait;
   if (wait < 0) {
     delta_wait = -wait;

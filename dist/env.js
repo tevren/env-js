@@ -8661,7 +8661,11 @@ $w.clearInterval = $w.clearTimeout = function(num){
 
 // FIX: make a priority queue ...
 
+<<<<<<< HEAD
 $w.$wait = $timers.wait = $env.wait = $env.wait || function(wait) {
+=======
+$w.$wait = $env.wait = $env.wait || function(wait) {
+>>>>>>> thatcher
   var delta_wait;
   if (wait < 0) {
     delta_wait = -wait;

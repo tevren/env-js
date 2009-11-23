@@ -221,7 +221,6 @@ var Envjs = function(){
         }
         return okay;
     };
-        
     $env.loadInlineScript = $env.loadInlineScript || function(script){};
     
     $env.loadFrame = function(frameElement, url){
