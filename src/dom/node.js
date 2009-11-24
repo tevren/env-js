@@ -524,8 +524,8 @@ __extend__(DOMNode.prototype, {
             if(all[i] == b) node_location = i;
             if(my_location && node_location) break;
         }
-        number += (my_location < node_location && 4)
-        number += (my_location > node_location && 2)
+        number += (my_location < node_location && 4);
+        number += (my_location > node_location && 2);
         return number;
     } 
 
@@ -542,7 +542,7 @@ __extend__(DOMNode.prototype, {
  * @return : DOMNodeList
  */
 var __getElementsByTagNameRecursive__ = function (elem, tagname, nodeList) {
-    
+
     if (elem.nodeType == DOMNode.ELEMENT_NODE || elem.nodeType == DOMNode.DOCUMENT_NODE) {
     
         if(elem.nodeType !== DOMNode.DOCUMENT_NODE && 
@@ -603,3 +603,10 @@ var __ownerDocument__ = function(node){
 };
 
 $w.Node = DOMNode;
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// mode:auto-revert
+// End:

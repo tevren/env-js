@@ -41,9 +41,10 @@ __extend__(HTMLElement.prototype, {
 		set innerHTML(html){
 		    //Should be replaced with HTMLPARSER usage
             //$debug('SETTING INNER HTML ('+this+'+'+html.substring(0,64));
-            var tmp = new HTMLDocument($implementation,null,"");
-            $w.parseHtmlDocument(html,tmp,null,null);
-            var parent = tmp.body;
+            var doc = new HTMLDocument($implementation,null,"");
+            $w.parseHtmlDocument(html,doc,null,null);
+            $env.wait(-1);
+            var parent = doc.body;
 			while(this.firstChild != null){
 			    this.removeChild( this.firstChild );
 			}
@@ -54,7 +55,7 @@ __extend__(HTMLElement.prototype, {
 			    this.appendChild( importedNode );   
 		    }
 		    //Mark for garbage collection
-		    tmp = null;
+		    doc = null;
 		},
         get innerText(){
             return __recursivelyGatherText__(this);

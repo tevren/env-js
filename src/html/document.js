@@ -210,7 +210,7 @@ __extend__(HTMLDocument.prototype, {
 	    this.write(htmlstring+'\n'); 
     },
 	toString: function(){ 
-	    return "Document" +  (typeof this._url == "string" ? ": " + this._url : ""); 
+	    return "HTMLDocument" +  (typeof this._url == "string" ? ": " + this._url : ""); 
     },
 	get innerHTML(){ 
 	    return this.documentElement.outerHTML; 

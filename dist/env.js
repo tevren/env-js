@@ -136,10 +136,10 @@ __extend__($w,{
   get status(){return $status;},
   set status(_status){$status = _status;},
   get top(){return $top || $window;},
-  get window(){return $window;},
+  get window(){return $window;} /*,
   toString : function(){
       return '[object Window]';
-  }
+  } FIX SMP */
 });
 
 $w.open = function(url, name, features, replace){
@@ -176,6 +176,8 @@ $env.unload = function(windowToUnload){
 $env.load = function(url){
     $location = $env.location(url);
     __setHistory__($location);
+print("WW",$w);
+print("WW",$w.document);
     $w.document.load($location);
 };
 
@@ -265,8 +267,6 @@ function __setArray__( target, array ) {
 	target.length = 0;
 	Array.prototype.push.apply( target, array );
 };
-
-
 $debug("Defining NodeList");
 /*
 * NodeList - DOM Level 2
@@ -1236,13 +1236,20 @@ __extend__(DOMNode.prototype, {
         return __ownerDocument__(this).implementation.hasFeature(feature, version);
     },
     getElementsByTagName : function(tagname) {
+// print("gEBTGN",tagname,this.tagName);
+try {
         // delegate to _getElementsByTagNameRecursive
         // recurse childNodes
         var nodelist = new DOMNodeList(__ownerDocument__(this));
         for(var i = 0; i < this.childNodes.length; i++) {
+// print("tagname",tagname,this.childNodes.item(i),i,this.childNodes.length);
             nodeList = __getElementsByTagNameRecursive__(this.childNodes.item(i), tagname, nodelist);
         }
         return nodelist;
+} catch(e) {
+    print("!!!!!!!!!!!oops",e);
+    throw(e);
+}
     },
     getElementsByTagNameNS : function(namespaceURI, localName) {
         // delegate to _getElementsByTagNameNSRecursive
@@ -1341,10 +1348,12 @@ __extend__(DOMNode.prototype, {
             while(node && node != this ){
                 node = node.parentNode;
             }
+// print("contains",!!node);
             return !!node;
     },
     compareDocumentPosition : function(b){
         var a = this;
+// print("cDP",a,b);
         var number = (a != b && a.contains(b) && 16) + (a != b && b.contains(a) && 8);
         //find position of both
         var all = document.getElementsByTagName("*");
@@ -1354,8 +1363,9 @@ __extend__(DOMNode.prototype, {
             if(all[i] == b) node_location = i;
             if(my_location && node_location) break;
         }
-        number += (my_location < node_location && 4)
-        number += (my_location > node_location && 2)
+        number += (my_location < node_location && 4);
+        number += (my_location > node_location && 2);
+// print("cDP",number);
         return number;
     } 
 
@@ -1372,17 +1382,20 @@ __extend__(DOMNode.prototype, {
  * @return : DOMNodeList
  */
 var __getElementsByTagNameRecursive__ = function (elem, tagname, nodeList) {
-    
+
+// print("_g", elem,elem.nodeType);
     if (elem.nodeType == DOMNode.ELEMENT_NODE || elem.nodeType == DOMNode.DOCUMENT_NODE) {
     
         if(elem.nodeType !== DOMNode.DOCUMENT_NODE && 
             ((elem.nodeName.toUpperCase() == tagname.toUpperCase()) || 
                 (tagname == "*")) ){
+// print("add");
             __appendChild__(nodeList, elem);               // add matching node to nodeList
         }
     
         // recurse childNodes
         for(var i = 0; i < elem.childNodes.length; i++) {
+// print("r",elem,elem.childNodes.item(i),i,elem.childNodes.length);
             nodeList = __getElementsByTagNameRecursive__(elem.childNodes.item(i), tagname, nodeList);
         }
     }
@@ -1433,6 +1446,13 @@ var __ownerDocument__ = function(node){
 };
 
 $w.Node = DOMNode;
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// mode:auto-revert
+// End:
 
 /**
  * @class  DOMNamespace - The Namespace interface represents an namespace in an Element object
@@ -3638,9 +3658,20 @@ __extend__(DOMImplementation.prototype,{
         return new DOMDocumentType();
     },
     createDocument : function(nsuri, qname, doctype){
-      //TODO - this currently returns an empty doc
-      //but needs to handle the args
-        return new HTMLDocument($implementation, null, "");
+        //TODO - this currently returns an empty doc
+        //but needs to handle the args
+        return new Document($implementation, null);
+    },
+    createHTMLDocument : function(title){
+        var doc = new HTMLDocument($implementation, null, "");
+        var html = doc.createElement("html"); doc.appendChild(html);
+        var head = doc.createElement("head"); html.appendChild(head);
+        var body = doc.createElement("body"); html.appendChild(body);
+        var t = doc.createElement("title"); head.appendChild(t);
+        if( title) {
+            t.appendChild(doc.createTextNode(title));
+        }
+        return doc;
     },
     translateErrCode : function(code) {
         //convert DOMException Code to human readable error message;
@@ -4174,7 +4205,14 @@ function __parseQName__(qualifiedName) {
 $debug("Initializing document.implementation");
 var $implementation =  new DOMImplementation();
 $implementation.namespaceAware = false;
-$implementation.errorChecking = false;$debug("Defining Document");
+$implementation.errorChecking = false;
+    
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// End:
+$debug("Defining Document");
 /**
  * @class  DOMDocument - The Document interface represents the entire HTML 
  *      or XML document. Conceptually, it is the root of the document tree, 
@@ -4212,7 +4250,7 @@ var DOMDocument = function(implementation, docParentWindow) {
 DOMDocument.prototype = new DOMNode;
 __extend__(DOMDocument.prototype, {	
     toString : function(){
-        return '[object HTMLDocument]';
+        return '[object DOMDocument]';
     },
     addEventListener        : function(){ $w.addEventListener.apply(this, arguments); },
 	removeEventListener     : function(){ $w.removeEventListener.apply(this, arguments); },
@@ -4254,11 +4292,19 @@ __extend__(DOMDocument.prototype, {
             this._namespaces     = new DOMNamespaceNodeMap(this, this);
             this._readonly = false;
 
+try{
+    debug("xml",this,xmlString);
             $w.parseHtmlDocument(xmlString, this, null, null);
+    debug("xml after");
+} catch(e){print("opsla " + e); throw e; }
+debug("xml>",this,this.innerHTML);
             
             $env.wait(-1);
+debug("xml<",this,this.innerHTML);
+debug("xml<",this,this.body.innerHTML);
 
         } catch (e) {
+print("UUUUUUUUU",e);
             $error(e);
         }
 
@@ -4267,7 +4313,7 @@ __extend__(DOMDocument.prototype, {
         return this;
     },
     load: function(url){
-		$debug("Loading url into DOM Document: "+ url + " - (Asynch? "+$w.document.async+")");
+		debug("Loading url into DOM Document: "+ url + " - (Asynch? "+$w.document.async+")");
         var scripts, _this = this;
         var xhr;
 // print("KK",url,url =="about:blank"); 
@@ -4552,7 +4598,7 @@ __extend__(DOMDocument.prototype, {
         return this.documentElement.xml;
     },
 	toString: function(){ 
-	    return "Document" +  (typeof this._url == "string" ? ": " + this._url : ""); 
+	    return "DOMDocument" +  (typeof this._url == "string" ? ": " + this._url : ""); 
     },
 	get defaultView(){ 
 		return { getComputedStyle: function(elem){
@@ -5170,7 +5216,7 @@ __extend__(HTMLDocument.prototype, {
 	    this.write(htmlstring+'\n'); 
     },
 	toString: function(){ 
-	    return "Document" +  (typeof this._url == "string" ? ": " + this._url : ""); 
+	    return "HTMLDocument" +  (typeof this._url == "string" ? ": " + this._url : ""); 
     },
 	get innerHTML(){ 
 	    return this.documentElement.outerHTML; 
@@ -5298,8 +5344,9 @@ __extend__(HTMLElement.prototype, {
 		set innerHTML(html){
 		    //Should be replaced with HTMLPARSER usage
             //$debug('SETTING INNER HTML ('+this+'+'+html.substring(0,64));
-		    var doc = new DOMParser().
-			  parseFromString(html);
+            var doc = new HTMLDocument($implementation,null,"");
+            $w.parseHtmlDocument(html,doc,null,null);
+            $env.wait(-1);
             var parent = doc.body;
 			while(this.firstChild != null){
 			    this.removeChild( this.firstChild );
@@ -5317,7 +5364,11 @@ __extend__(HTMLElement.prototype, {
             return __recursivelyGatherText__(this);
         },
         set innerText(newText){
-            this.innerHTML = newText;  // a paranoid would HTML-escape, but...
+			while(this.firstChild != null){
+			    this.removeChild( this.firstChild );
+			}
+            var text = this.ownerDocument.createTextNode(newText);
+            this.appendChild(text);
         },
 		get lang() { 
 		    return this.getAttribute("lang"); 
@@ -5545,6 +5596,12 @@ var __blur__ = function(element){
 };
 
 $w.HTMLElement = HTMLElement;
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// End:
 $debug("Defining HTMLCollection");
 /*
 * HTMLCollection - DOM Level 2

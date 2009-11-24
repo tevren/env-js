@@ -36,7 +36,7 @@ var DOMDocument = function(implementation, docParentWindow) {
 DOMDocument.prototype = new DOMNode;
 __extend__(DOMDocument.prototype, {	
     toString : function(){
-        return '[object HTMLDocument]';
+        return '[object DOMDocument]';
     },
     addEventListener        : function(){ $w.addEventListener.apply(this, arguments); },
 	removeEventListener     : function(){ $w.removeEventListener.apply(this, arguments); },
@@ -376,7 +376,7 @@ __extend__(DOMDocument.prototype, {
         return this.documentElement.xml;
     },
 	toString: function(){ 
-	    return "Document" +  (typeof this._url == "string" ? ": " + this._url : ""); 
+	    return "DOMDocument" +  (typeof this._url == "string" ? ": " + this._url : ""); 
     },
 	get defaultView(){ 
 		return { getComputedStyle: function(elem){
