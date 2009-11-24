@@ -176,8 +176,6 @@ $env.unload = function(windowToUnload){
 $env.load = function(url){
     $location = $env.location(url);
     __setHistory__($location);
-print("WW",$w);
-print("WW",$w.document);
     $w.document.load($location);
 };
 
@@ -1236,20 +1234,13 @@ __extend__(DOMNode.prototype, {
         return __ownerDocument__(this).implementation.hasFeature(feature, version);
     },
     getElementsByTagName : function(tagname) {
-// print("gEBTGN",tagname,this.tagName);
-try {
         // delegate to _getElementsByTagNameRecursive
         // recurse childNodes
         var nodelist = new DOMNodeList(__ownerDocument__(this));
         for(var i = 0; i < this.childNodes.length; i++) {
-// print("tagname",tagname,this.childNodes.item(i),i,this.childNodes.length);
             nodeList = __getElementsByTagNameRecursive__(this.childNodes.item(i), tagname, nodelist);
         }
         return nodelist;
-} catch(e) {
-    print("!!!!!!!!!!!oops",e);
-    throw(e);
-}
     },
     getElementsByTagNameNS : function(namespaceURI, localName) {
         // delegate to _getElementsByTagNameNSRecursive
@@ -1348,12 +1339,10 @@ try {
             while(node && node != this ){
                 node = node.parentNode;
             }
-// print("contains",!!node);
             return !!node;
     },
     compareDocumentPosition : function(b){
         var a = this;
-// print("cDP",a,b);
         var number = (a != b && a.contains(b) && 16) + (a != b && b.contains(a) && 8);
         //find position of both
         var all = document.getElementsByTagName("*");
@@ -1365,7 +1354,6 @@ try {
         }
         number += (my_location < node_location && 4);
         number += (my_location > node_location && 2);
-// print("cDP",number);
         return number;
     } 
 
@@ -1383,19 +1371,16 @@ try {
  */
 var __getElementsByTagNameRecursive__ = function (elem, tagname, nodeList) {
 
-// print("_g", elem,elem.nodeType);
     if (elem.nodeType == DOMNode.ELEMENT_NODE || elem.nodeType == DOMNode.DOCUMENT_NODE) {
     
         if(elem.nodeType !== DOMNode.DOCUMENT_NODE && 
             ((elem.nodeName.toUpperCase() == tagname.toUpperCase()) || 
                 (tagname == "*")) ){
-// print("add");
             __appendChild__(nodeList, elem);               // add matching node to nodeList
         }
     
         // recurse childNodes
         for(var i = 0; i < elem.childNodes.length; i++) {
-// print("r",elem,elem.childNodes.item(i),i,elem.childNodes.length);
             nodeList = __getElementsByTagNameRecursive__(elem.childNodes.item(i), tagname, nodeList);
         }
     }
@@ -4292,19 +4277,11 @@ __extend__(DOMDocument.prototype, {
             this._namespaces     = new DOMNamespaceNodeMap(this, this);
             this._readonly = false;
 
-try{
-    debug("xml",this,xmlString);
             $w.parseHtmlDocument(xmlString, this, null, null);
-    debug("xml after");
-} catch(e){print("opsla " + e); throw e; }
-debug("xml>",this,this.innerHTML);
             
             $env.wait(-1);
-debug("xml<",this,this.innerHTML);
-debug("xml<",this,this.body.innerHTML);
 
         } catch (e) {
-print("UUUUUUUUU",e);
             $error(e);
         }
 
@@ -4313,7 +4290,7 @@ print("UUUUUUUUU",e);
         return this;
     },
     load: function(url){
-		debug("Loading url into DOM Document: "+ url + " - (Asynch? "+$w.document.async+")");
+		$debug("Loading url into DOM Document: "+ url + " - (Asynch? "+$w.document.async+")");
         var scripts, _this = this;
         var xhr;
 // print("KK",url,url =="about:blank"); 
