@@ -136,10 +136,10 @@ __extend__($w,{
   get status(){return $status;},
   set status(_status){$status = _status;},
   get top(){return $top || $window;},
-  get window(){return $window;},
+  get window(){return $window;} /*,
   toString : function(){
       return '[object Window]';
-  }
+  } FIX SMP */
 });
 
 $w.open = function(url, name, features, replace){
@@ -265,5 +265,3 @@ function __setArray__( target, array ) {
 	target.length = 0;
 	Array.prototype.push.apply( target, array );
 };
-
-

@@ -60,7 +60,6 @@ __extend__(HTMLElement.prototype, {
             return __recursivelyGatherText__(this);
         },
         set innerText(newText){
-            this.innerHTML = "<div>"+newText+"</div>";
 			while(this.firstChild != null){
 			    this.removeChild( this.firstChild );
 			}
