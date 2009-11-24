@@ -35,9 +35,20 @@ __extend__(DOMImplementation.prototype,{
         return new DOMDocumentType();
     },
     createDocument : function(nsuri, qname, doctype){
-      //TODO - this currently returns an empty doc
-      //but needs to handle the args
-        return new HTMLDocument($implementation, null, "");
+        //TODO - this currently returns an empty doc
+        //but needs to handle the args
+        return new Document($implementation, null);
+    },
+    createHTMLDocument : function(title){
+        var doc = new HTMLDocument($implementation, null, "");
+        var html = doc.createElement("html"); doc.appendChild(html);
+        var head = doc.createElement("head"); html.appendChild(head);
+        var body = doc.createElement("body"); html.appendChild(body);
+        var t = doc.createElement("title"); head.appendChild(t);
+        if( title) {
+            t.appendChild(doc.createTextNode(title));
+        }
+        return doc;
     },
     translateErrCode : function(code) {
         //convert DOMException Code to human readable error message;
@@ -572,3 +583,9 @@ $debug("Initializing document.implementation");
 var $implementation =  new DOMImplementation();
 $implementation.namespaceAware = false;
 $implementation.errorChecking = false;
+    
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// End:

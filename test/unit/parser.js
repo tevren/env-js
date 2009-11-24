@@ -30,9 +30,10 @@ test("XML Standard Entities: Spot Check", function() {
     var htmlstr = 
         "<div id='xmlentity' \
             style='&lt;Hello&gt;, &quot;W&apos;rld&quot;!'\
-            >&lt;Hello&gt;, &quot;W&apos;rld&quot;!</div>",
-        domParser = new DOMParser(),
-        doc = domParser.parseFromString(htmlstr);
+            >&lt;Hello&gt;, &quot;W&apos;rld&quot;!</div>";
+
+    var doc = document.implementation.createHTMLDocument();
+    doc.body.innerHTML = htmlstr;
     
     should("Replace entities at nodeValue",{ 
         be:'equal',
@@ -59,10 +60,11 @@ test("HTML Standard Entities: Spot Check", function() {
                    "&nbsp; &copy; &reg; &yen; &para; " +
                    "&Ecirc; &Otilde; &aelig; &divide; &Kappa; &theta; "+
                    "&bull; &hellip; &trade; &rArr; &sum; &clubs; " +
-                   "&ensp; &mdash;</div>",
-        domParser = new DOMParser(),
-        doc = domParser.parseFromString(htmlstr);
+                   "&ensp; &mdash;</div>";
 
+    var doc = document.implementation.createHTMLDocument();
+    doc.body.innerHTML = htmlstr;
+    
     should("serialize only &amp;, &lt; and &gt; for TextNode with innerHTML",{
         be:'equal',
         actual:doc.
@@ -84,10 +86,10 @@ test("Serialization Conventions", function(){
 test("Ugly HTML Parsing", function() {
 
     expect(1);
-    var domParser = new DOMParser(),
-    	html = '<div id="pig"><p>this is a pig... &apos;oink! oink!&apos;</div>',
-        doc = domParser.parseFromString(html);
-       
+
+    var doc = document.implementation.createHTMLDocument();
+    doc.body.innerHTML = '<div id="pig"><p>this is a pig... &apos;oink! oink!&apos;</div>';
+    
     should('correct the unclosed p tag',{ 
         be:'equal',
         actual:doc.
@@ -110,3 +112,9 @@ test("Really Ugly HTML Parsing", function() {
     });
 
 });
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// End:
