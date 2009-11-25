@@ -1,4 +1,32 @@
 /*
+<<<<<<< HEAD
+=======
+ * Envjs env-js.1.1.rc2 
+ * Pure JavaScript Browser Environment
+ *   By John Resig <http://ejohn.org/>
+ * Copyright 2008-2009 John Resig, under the MIT License
+ */
+
+try {
+
+    Envjs.window = function($w,
+                            $env,
+                            $parentWindow,
+                            $openingWindow,
+                            $initTop,
+                            $thisIsTheOriginalWindow){
+
+        // The Window Object
+        var __this__ = $w;
+        $w.__defineGetter__('window', function(){
+            return __this__;
+        });
+        $w.$isOriginalWindow = $thisIsTheOriginalWindow;
+        $w.$haveCalledWindowLocationSetter = false;
+
+        
+        /*
+>>>>>>> thatcher
 *	window.js
 *   - this file will be wrapped in a closure providing the window object as $w
 */
@@ -1824,9 +1852,11 @@ __extend__(DOMElement.prototype, {
     set tagName(name){
         this.nodeName = name;  
     },
-    addEventListener        : function(){ $w.addEventListener.apply(this, arguments); },
-	removeEventListener     : function(){ $w.removeEventListener.apply(this, arguments); },
-	dispatchEvent           : function(){ $w.dispatchEvent.apply(this, arguments); },
+    
+    addEventListener        : function(type, fn, phase){ __addEventListener__(this, type, fn); },
+    removeEventListener     : function(type){ __removeEventListener__(this, type); },
+    dispatchEvent           : function(event, bubbles){ __dispatchEvent__(this, event, bubbles); },
+   
     getAttribute: function(name) {
         var ret = null;
         // if attribute exists, use it
@@ -4234,6 +4264,13 @@ var DOMDocument = function(implementation, docParentWindow) {
 };
 DOMDocument.prototype = new DOMNode;
 __extend__(DOMDocument.prototype, {	
+
+    addEventListener        : function(type, fn){ __addEventListener__(this, type, fn); },
+	removeEventListener     : function(type){ __removeEventListener__(this, type); },
+	attachEvent             : function(type, fn){ __addEventListener__(this, type, fn); },
+	detachEvent             : function(type){ __removeEventListener__(this, type); },
+	dispatchEvent           : function(event, bubbles){ __dispatchEvent__(this, event, bubbles); },
+
     toString : function(){
         return '[object DOMDocument]';
     },
@@ -4332,23 +4369,30 @@ __extend__(DOMDocument.prototype, {
         	$info("Sucessfully loaded document at "+url);
             }
 
-                // first fire body-onload event
-            var event = document.createEvent();
-            event.initEvent("load");
+            // first fire body-onload event
+            var bodyLoad = _this.createEvent();
+            bodyLoad.initEvent("load");
             try {  // assume <body> element, but just in case....
-                $w.document.getElementsByTagName('body')[0].
-                  dispatchEvent( event, false );
+                _this.getElementsByTagName('body')[0].
+                  dispatchEvent( bodyLoad, false );
             } catch (e){;}
 
-                // then fire window-onload event
-            event = document.createEvent();
-            event.initEvent("load");
-            $w.dispatchEvent( event, false );
+            // then fire this onload event
+            //event = _this.createEvent();
+            //event.initEvent("load");
+            //_this.dispatchEvent( event, false );
 			
 			//also use DOMContentLoaded event
-            var domContentLoaded = document.createEvent();
+            var domContentLoaded = _this.createEvent();
             domContentLoaded.initEvent("DOMContentLoaded");
-            $w.dispatchEvent( domContentLoaded, false );
+            _this.dispatchEvent( domContentLoaded, false );
+            
+            //finally fire the window.onload event
+            if(_this === document){
+                var windowLoad = _this.createEvent();
+                windowLoad.initEvent("load", false, false);
+                $w.dispatchEvent( windowLoad, false );
+            }
             
         };
         xhr.send();
@@ -5002,9 +5046,6 @@ var HTMLDocument = function(implementation, docParentWindow, docReferrer) {
 };
 HTMLDocument.prototype = new DOMDocument;
 __extend__(HTMLDocument.prototype, {
-    toString : function(){
-        return '[object HTMLDocument]';
-    },
     createElement: function(tagName){
           //print('createElement :'+tagName);
           // throw Exception if the tagName string contains an illegal character
@@ -5228,7 +5269,7 @@ var __elementPopped__ = function(ns, name, node){
                 // only fire event if we actually had something to load
                 if (node.src && node.src.length > 0){
                     var event = doc.createEvent();
-                    event.initEvent( okay ? "load" : "error" );
+                    event.initEvent( okay ? "load" : "error", false, false );
                     node.dispatchEvent( event, false );
                   }
             }
@@ -5250,7 +5291,7 @@ var __elementPopped__ = function(ns, name, node){
                 $master.first_script_window = save;
 
                 var event = doc.createEvent();
-                event.initEvent("load");
+                event.initEvent("load", false, false);
                 node.dispatchEvent( event, false );
             }
         }
@@ -5259,7 +5300,7 @@ var __elementPopped__ = function(ns, name, node){
             if (node.href && node.href.length > 0){
                 // don't actually load anything, so we're "done" immediately:
                 var event = doc.createEvent();
-                event.initEvent("load");
+                event.initEvent("load", false, false);
                 node.dispatchEvent( event, false );
             }
         }
@@ -5268,7 +5309,7 @@ var __elementPopped__ = function(ns, name, node){
             if (node.src && node.src.length > 0){
                 // don't actually load anything, so we're "done" immediately:
                 var event = doc.createEvent();
-                event.initEvent("load");
+                event.initEvent("load", false, false);
                 node.dispatchEvent( event, false );
             }
         }
@@ -7948,9 +7989,7 @@ __extend__(XSLTProcessor.prototype, {
 * event.js
 */
 var Event = function(options){
-  if(options === undefined){
-      options={target:window,currentTarget:window};
-  }
+      options={};
   __extend__(this,{
     CAPTURING_PHASE : 1,
     AT_TARGET       : 2,
@@ -7961,7 +8000,7 @@ var Event = function(options){
       $cancelable = options.cancelable?options.cancelable:true,
       $currentTarget = options.currentTarget?options.currentTarget:null,
       $eventPhase = options.eventPhase?options.eventPhase:Event.CAPTURING_PHASE,
-      $target = options.target?options.target:document,
+      $target = options.target?options.target:null,
       $timestamp = options.timestamp?options.timestamp:new Date().getTime().toString(),
       $type = options.type?options.type:"";
   return __extend__(this,{
@@ -7970,6 +8009,7 @@ var Event = function(options){
     get currentTarget(){return $currentTarget;},
     get eventPhase(){return $eventPhase;},
     get target(){return $target;},
+    set target(target){ $target = target;},
     get timestamp(){return $timestamp;},
     get type(){return $type;},
     initEvent: function(type,bubbles,cancelable){
@@ -8775,42 +8815,55 @@ $w.$wait = $timers.wait = $env.wait = $env.wait || function(wait) {
 * event.js
 */
 // Window Events
-$debug("Initializing Window Event.");
+//$debug("Initializing Window Event.");
 var $events = [{}],
     $onerror,
     $onload,
     $onunload;
 
-$w.addEventListener = function(type, fn){
-    $debug("adding event listener \n\t" + type +" \n\tfor "+this+" with callback \n\t"+fn);
-	if ( !this.uuid ) {
-		this.uuid = $events.length;
-		$events[this.uuid] = {};
-	}
-	if ( !$events[this.uuid][type] ){
-		$events[this.uuid][type] = [];
-	}
-	if ( $events[this.uuid][type].indexOf( fn ) < 0 ){
-		$events[this.uuid][type].push( fn );
-	}
+function __addEventListener__(target, type, fn){
+
+    //$debug("adding event listener \n\t" + type +" \n\tfor "+target+" with callback \n\t"+fn);
+    if ( !target.uuid ) {
+        target.uuid = $events.length;
+        $events[target.uuid] = {};
+    }
+    if ( !$events[target.uuid][type] ){
+        $events[target.uuid][type] = [];
+    }
+    if ( $events[target.uuid][type].indexOf( fn ) < 0 ){
+        $events[target.uuid][type].push( fn );
+    }
 };
 
-$w.removeEventListener = function(type, fn){
-  if ( !this.uuid ) {
-    this.uuid = $events.length;
-    $events[this.uuid] = {};
+
+$w.addEventListener = function(type, fn){
+    __addEventListener__(this, type, fn);
+};
+
+
+function __removeEventListener__(target, type, fn){
+  if ( !target.uuid ) {
+    target.uuid = $events.length;
+    $events[target.uuid] = {};
   }
-  if ( !$events[this.uuid][type] ){
-		$events[this.uuid][type] = [];
+  if ( !$events[target.uuid][type] ){
+		$events[target.uuid][type] = [];
 	}	
-  $events[this.uuid][type] =
-    $events[this.uuid][type].filter(function(f){
+  $events[target.uuid][type] =
+    $events[target.uuid][type].filter(function(f){
 			return f != fn;
 		});
 };
 
-$w.dispatchEvent = function(event, bubbles){
-    $debug("dispatching event " + event.type);
+$w.removeEventListener = function(type, fn){
+    __removeEventListener__(this, type, fn)
+};
+
+
+
+function __dispatchEvent__(target, event, bubbles){
+    //$debug("dispatching event " + event.type);
 
     //the window scope defines the $event object, for IE(^^^) compatibility;
     $event = event;
@@ -8819,6 +8872,7 @@ $w.dispatchEvent = function(event, bubbles){
         bubbles = true;
 
     if (!event.target) {
+<<<<<<< HEAD
         $debug("no event target : "+event.target);
         event.target = this;
     }
@@ -8833,22 +8887,43 @@ $w.dispatchEvent = function(event, bubbles){
             var _this = this;
             $events[this.uuid][event.type].forEach(function(fn){
                 $debug('calling event handler '+fn+' on target '+_this);
+=======
+        //$debug("no event target : "+event.target);
+        event.target = target;
+    }
+    //$debug("event target: " + event.target);
+    if ( event.type && (target.nodeType             ||
+                        target === window           ||
+                        target.__proto__ === window ||
+                        target.$thisWindowsProxyObject === window)) {
+        //$debug("nodeType: " + target.nodeType);
+        if ( target.uuid && $events[target.uuid][event.type] ) {
+            var _this = target;
+            //$debug('calling event handlers '+$events[target.uuid][event.type].length);
+            $events[target.uuid][event.type].forEach(function(fn){
+                //$debug('calling event handler '+fn+' on target '+_this);
+>>>>>>> thatcher
                 fn( event );
             });
         }
     
-        if (this["on" + event.type]) {
-            $debug('calling event handler on'+event.type+' on target '+this);
-            this["on" + event.type](event);
+        if (target["on" + event.type]) {
+            //$debug('calling event handler on'+event.type+' on target '+target);
+            target["on" + event.type](event);
         }
     }else{
-        $debug("non target: " + event.target + " \n this->"+this);
+        //$debug("non target: " + event.target + " \n this->"+target);
     }
-    if (bubbles && this.parentNode){
-        this.parentNode.dispatchEvent(event);
+    if (bubbles && target.parentNode){
+        //$debug('bubbling to parentNode '+target.parentNode);
+        __dispatchEvent__(target.parentNode, event, bubbles);
     }
 };
 	
+$w.dispatchEvent = function(event, bubbles){
+    __dispatchEvent__(this, event, bubbles);
+};
+
 $w.__defineGetter__('onerror', function(){
   return function(){
    //$w.dispatchEvent('error');

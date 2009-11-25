@@ -40,7 +40,7 @@
             location="${DIST_DIR}/env.rhino.js"/>
     
     <!-- BUILD TARGETS -->
-    <target name="all" depends="rhino,concat,test"/>
+    <target name="all" depends="concat,test"/>
     <target name="rhino">
         <ant antfile="rhino/build.xml" target="all" inheritAll="false"/>
     </target>

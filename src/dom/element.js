@@ -20,9 +20,11 @@ __extend__(DOMElement.prototype, {
     set tagName(name){
         this.nodeName = name;  
     },
-    addEventListener        : function(){ $w.addEventListener.apply(this, arguments); },
-	removeEventListener     : function(){ $w.removeEventListener.apply(this, arguments); },
-	dispatchEvent           : function(){ $w.dispatchEvent.apply(this, arguments); },
+    
+    addEventListener        : function(type, fn, phase){ __addEventListener__(this, type, fn); },
+    removeEventListener     : function(type){ __removeEventListener__(this, type); },
+    dispatchEvent           : function(event, bubbles){ __dispatchEvent__(this, event, bubbles); },
+   
     getAttribute: function(name) {
         var ret = null;
         // if attribute exists, use it
