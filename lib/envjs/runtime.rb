@@ -1,7 +1,9 @@
 require 'envjs'
 require "open-uri"
 require 'rubygems'
-require 'fsdb'
+begin
+  require 'fsdb'
+rescue LoadError; end
 require 'envjs/net/file'
 
 module Envjs::Runtime
