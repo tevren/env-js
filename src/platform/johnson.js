@@ -67,7 +67,7 @@ $env.connection = function(xhr, responseHandler, data){
     if ( /^file\:/.test(url) ) {
         // experimental hack
         try {
-            Ruby.require('envjs/net/cgi');
+            Ruby.eval("require 'envjs/net/cgi'");
             resp = connection = new Ruby.Envjs.Net.CGI( xhr, data );
         } catch(e) {
         try{
@@ -77,7 +77,7 @@ $env.connection = function(xhr, responseHandler, data){
             } else if ( xhr.method == "DELETE" ) {
                 $env.deleteFile(url);
             } else {
-                Ruby.require('envjs/net/file');
+                Ruby.eval("require 'envjs/net/file'");
                 var request = new Ruby.Envjs.Net.File.Get( url.path );
                 connection = Ruby.Envjs.Net.File.start( url.host, url.port );
                 resp = connection.request( request );
@@ -118,7 +118,7 @@ $env.connection = function(xhr, responseHandler, data){
         }
         }
     } else { 
-        Ruby.require('net/http');
+        Ruby.eval("require 'net/http'");
 
         var req;
         var path;
@@ -331,7 +331,7 @@ $env.writeToTempFile = function(text, suffix){
     $env.debug("writing text to temp url : " + suffix);
     // print(text);
     // Create temp file.
-    Ruby.require('envjs/tempfile');
+    Ruby.eval("require 'envjs/tempfile'");
     var temp = new Ruby.Envjs.TempFile( "envjs-tmp", suffix );
     
     // Write to temp file
