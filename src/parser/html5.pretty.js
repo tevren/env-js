@@ -572,7 +572,7 @@ function $schedule(this$static, delayMillis){
 }
 
 function createTimeout(timer, delay){
-  return $wnd.setTimeout(function(){
+  return psettimeout(function(){
     timer.fire();
   }
   , delay);
@@ -5777,7 +5777,7 @@ function $pump(this$static){
     }
   }
   timer = $HtmlParser$1(new HtmlParser$1(), this$static);
-  $schedule(timer, 1);
+  this$static.pschedule($schedule,timer,1);
 }
 
 function documentWrite(text){
@@ -5875,7 +5875,7 @@ function installDocWrite(doc, parser){
   ;
 }
 
-function parseHtmlDocument(source, document_0, readyCallback, errorHandler){
+function parseHtmlDocument(source, document_0, readyCallback, errorHandler, parse_sync){
   var parser;
   if (!readyCallback) {
     readyCallback = createFunction();
@@ -5883,7 +5883,9 @@ function parseHtmlDocument(source, document_0, readyCallback, errorHandler){
   zapChildren(document_0);
   parser = $HtmlParser(new HtmlParser(), document_0);
   installDocWrite(document_0, parser);
+  parse_sync ? sync(parser) : async(parser);
   $parse(parser, source, $ParseEndListener(new ParseEndListener(), readyCallback));
+  parser.pwait();
 }
 
 function zapChildren(node){

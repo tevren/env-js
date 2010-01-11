@@ -42,8 +42,7 @@ __extend__(HTMLElement.prototype, {
 		    //Should be replaced with HTMLPARSER usage
             //$debug('SETTING INNER HTML ('+this+'+'+html.substring(0,64));
             var doc = new HTMLDocument($implementation,null,"");
-            $w.parseHtmlDocument(html,doc,null,null);
-            $env.wait(-1);
+            $w.parseHtmlDocument(html,doc,null,null,true);
             var parent = doc.body;
 			while(this.firstChild != null){
 			    this.removeChild( this.firstChild );
