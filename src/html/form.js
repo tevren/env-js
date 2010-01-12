@@ -45,7 +45,7 @@ __extend__(HTMLFormElement.prototype,{
         
     },
     set method(action){
-        this.setAttribute('method', method);
+        this.setAttribute('method', action);
         
     },
 	get name() {
