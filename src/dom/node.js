@@ -437,7 +437,7 @@ __extend__(DOMNode.prototype, {
                 
                     // create attributes matching those of the importedNode
                     for(var i = 0; i < importedNode.attributes.length; i++) {
-                        importNode.setAttribute(importedNode.attributes.item(i).name, importedNode.attributes.item(i).value);
+                        importNode.setAttribute(importedNode.attributes.item(i).name, importedNode.getAttribute(importedNode.attributes.item(i).name));
                     }
                 }else {
                     // create a local Element (with the name & namespaceURI of the importedNode)
@@ -446,14 +446,15 @@ __extend__(DOMNode.prototype, {
                     // create attributes matching those of the importedNode
                     for(var i = 0; i < importedNode.attributes.length; i++) {
                         importNode.setAttributeNS(importedNode.attributes.item(i).namespaceURI, 
-                            importedNode.attributes.item(i).name, importedNode.attributes.item(i).value);
+                            importedNode.attributes.item(i).name, importedNode.getAttribute(importedNode.attributes.item(i).name));
                     }
                 
                     // create namespace definitions matching those of the importedNode
                     for(var i = 0; i < importedNode._namespaces.length; i++) {
-                        importNode._namespaces[i] = __ownerDocument__(this).createNamespace(importedNode._namespaces.item(i).localName);
+                        importNode._namespaces[i] = __ownerDocument__(this).createNamespace(importedNode._namespaces.item(i).name);
                         importNode._namespaces[i].value = importedNode._namespaces.item(i).value;
                     }
+                    importNode._namespaces.length = importedNode._namespaces.length;
                 }
             } else if (importedNode.nodeType == DOMNode.ATTRIBUTE_NODE) {
                 if (!__ownerDocument__(this).implementation.namespaceAware) {
@@ -463,11 +464,16 @@ __extend__(DOMNode.prototype, {
                     // create a local Attribute (with the name & namespaceURI of the importedAttribute)
                     importNode = __ownerDocument__(this).createAttributeNS(importedNode.namespaceURI, importedNode.nodeName);
                 
+
+/*
                     // create namespace definitions matching those of the importedAttribute
                     for(var i = 0; i < importedNode._namespaces.length; i++) {
                         importNode._namespaces[i] = __ownerDocument__(this).createNamespace(importedNode._namespaces.item(i).localName);
                         importNode._namespaces[i].value = importedNode._namespaces.item(i).value;
                     }
+*/
+
+
                 }
             
                 // set the value of the local Attribute to match that of the importedAttribute
@@ -478,7 +484,7 @@ __extend__(DOMNode.prototype, {
                 importNode = __ownerDocument__(this).createDocumentFragment();
             } else if (importedNode.nodeType == DOMNode.NAMESPACE_NODE) {
                 // create a local NamespaceNode (with the same name & value as the importedNode)
-                importNode = __ownerDocument__(this).createNamespace(importedNode.nodeName);
+                importNode = __ownerDocument__(this).createNamespace(importedNode.name);
                 importNode.value = importedNode.value;
             } else if (importedNode.nodeType == DOMNode.TEXT_NODE) {
                 // create a local TextNode (with the same data as the importedNode)

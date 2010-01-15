@@ -142,7 +142,7 @@ __extend__(DOMImplementation.prototype,{
  * @return : DOMDocument
  */
 
-/*function __parseLoop__(impl, doc, p, isWindowDocument) {
+function __parseLoop__(impl, doc, p, isWindowDocument) {
     var iEvt, iNode, iAttr, strName;
     var iNodeParent = doc;
 
@@ -191,7 +191,7 @@ __extend__(DOMImplementation.prototype,{
         iNode = doc.createElementNS("", p.getName());
 
         // duplicate ParentNode's Namespace definitions
-        iNode._namespaces = __cloneNamedNodes__(iNodeParent._namespaces, iNode);
+        iNode._namespaces = __cloneNamedNodes__(iNodeParent._namespaces, iNode, true);
 
         // add attributes to Element
         for(var i = 0; i < p.getAttributeCount(); i++) {
@@ -231,6 +231,8 @@ __extend__(DOMImplementation.prototype,{
         // resolve namespaceURIs for this Element
         if (iNode._namespaces.getNamedItem(iNode.prefix)) {
           iNode.namespaceURI = iNode._namespaces.getNamedItem(iNode.prefix).value;
+        } else {
+          iNode.namespaceURI = iNodeParent.namespaceURI;
         }
 
         //  for this Element's attributes
@@ -240,6 +242,14 @@ __extend__(DOMImplementation.prototype,{
               iNode.attributes.item(i).namespaceURI = iNode._namespaces.getNamedItem(iNode.attributes.item(i).prefix).value;
             }
           }
+        }
+
+        // We didn't know the NS of the node when we created it, which means we created a default DOM object.
+        // Now that we know the NS, if there is one, we clone this node so that it'll get created under
+        // with the right constructor. This makes things like SVG work. Might be nice not to create twice as
+        // as many nodes, but that's painfully given the complexity of namespaces.  
+        if(iNode.namespaceURI != ""){
+            iNode = iNode.cloneNode();
         }
       }
 
@@ -253,7 +263,6 @@ __extend__(DOMImplementation.prototype,{
     }
 
     else if(iEvt == XMLP._ELM_E) {                  // End-Element Event        
-        __endHTMLElement__(iNodeParent, doc, p);
         iNodeParent = iNodeParent.parentNode;         // ascend one level of the DOM Tree
     }
 
@@ -341,7 +350,6 @@ __extend__(DOMImplementation.prototype,{
       }
 
       iNodeParent.appendChild(iNode);               // attach Element to parentNode
-      __endHTMLElement__(iNode, doc, p);
     }
     else if(iEvt == XMLP._TEXT || iEvt == XMLP._ENTITY) {                   // TextNode and entity Events
       // get Text content
@@ -473,7 +481,7 @@ __extend__(DOMImplementation.prototype,{
     }
 
   }
-};*/
+};
 
 
 /**
@@ -581,7 +589,7 @@ function __parseQName__(qualifiedName) {
 
 $debug("Initializing document.implementation");
 var $implementation =  new DOMImplementation();
-$implementation.namespaceAware = false;
+// $implementation.namespaceAware = false;
 $implementation.errorChecking = false;
     
 // Local Variables:

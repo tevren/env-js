@@ -34,8 +34,8 @@ __extend__(DOMNamespace.prototype, {
         var ret = "";
 
           // serialize Namespace Declaration
-          if (this.nodeName != "") {
-            ret += this.nodeName +"=\""+ __escapeXML__(this.nodeValue) +"\"";
+          if (this.name != "") {
+            ret += this.name +"=\""+ __escapeXML__(this.nodeValue) +"\"";
           }
           else {  // handle default namespace
             ret += "xmlns=\""+ __escapeXML__(this.nodeValue) +"\"";
@@ -44,7 +44,7 @@ __extend__(DOMNamespace.prototype, {
           return ret;
     },
     toString: function(){
-        return "Namespace #" + this.id;
+        return "Namespace " + this.name + "=" + this.value;
     }
 });
 

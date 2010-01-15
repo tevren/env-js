@@ -79,7 +79,6 @@
             <fileset dir="${SRC_DIR}" includes="dom/implementation.js" />
             <fileset dir="${SRC_DIR}" includes="dom/document.js" />
             <fileset dir="${SRC_DIR}" includes="html/html.js" />
-            <fileset dir="${SRC_DIR}" includes="html/htmlparser.js" />
             <fileset dir="${SRC_DIR}" includes="html/document.js" />
             <fileset dir="${SRC_DIR}" includes="html/element.js" />
             <fileset dir="${SRC_DIR}" includes="html/collection.js" />
@@ -122,6 +121,17 @@
             <fileset dir="${SRC_DIR}" includes="html/textarea.js" />
             <fileset dir="${SRC_DIR}" includes="html/title.js" />
             <fileset dir="${SRC_DIR}" includes="html/tr.js" />
+
+            <fileset dir="${SRC_DIR}" includes="svg/document.js" />
+            <fileset dir="${SRC_DIR}" includes="svg/element.js" />
+            <fileset dir="${SRC_DIR}" includes="svg/animatedstring.js" />
+            <fileset dir="${SRC_DIR}" includes="svg/stylable.js" />
+            <fileset dir="${SRC_DIR}" includes="svg/rect.js" />
+            <fileset dir="${SRC_DIR}" includes="svg/locatable.js" />
+            <fileset dir="${SRC_DIR}" includes="svg/transformable.js" />
+            <fileset dir="${SRC_DIR}" includes="svg/svgelement.js" />
+            <fileset dir="${SRC_DIR}" includes="svg/rectelement.js" />
+
             <fileset dir="${SRC_DIR}" includes="serializer/xml.js" />
             <fileset dir="${SRC_DIR}" includes="xpath/expression.js" />
             <fileset dir="${SRC_DIR}" includes="xpath/result.js" />

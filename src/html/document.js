@@ -19,6 +19,33 @@ var HTMLDocument = function(implementation, docParentWindow, docReferrer) {
 };
 HTMLDocument.prototype = new DOMDocument;
 __extend__(HTMLDocument.prototype, {
+    loadXML : function(xmlString) {
+        // create DOM Document
+        if(this === $document){
+            $debug("Setting internal window.document");
+            $document = this;
+        }
+        // populate Document with Parsed Nodes
+        try {
+            // make sure thid document object is empty before we try to load ...
+            this.childNodes      = new DOMNodeList(this, this);
+            this.firstChild      = null;
+            this.lastChild       = null;
+            this.attributes      = new DOMNamedNodeMap(this, this);
+            this._namespaces     = new DOMNamespaceNodeMap(this, this);
+            this._readonly = false;
+            
+            $w.parseHtmlDocument(xmlString, this, null, null);
+
+            
+        } catch (e) {
+            $error(e);
+        }
+
+        // set parseComplete flag, (Some validation Rules are relaxed if this is false)
+        this._parseComplete = true;
+        return this;
+    },
     createElement: function(tagName){
           //print('createElement :'+tagName);
           // throw Exception if the tagName string contains an illegal character

@@ -205,16 +205,15 @@ __extend__(DOMNamedNodeMap.prototype, {
  *
  * @author Jon van Noort (jon@webarcana.com.au)
  * @param  name : string - the name of the required node
- * @param  isnsmap : if its a DOMNamespaceNodeMap
  * @return : int
  */
-var __findNamedItemIndex__ = function(namednodemap, name, isnsmap) {
+var __findNamedItemIndex__ = function(namednodemap, name) {
   var ret = -1;
 
   // loop through all nodes
   for (var i=0; i<namednodemap.length; i++) {
     // compare name to each node's nodeName
-    if(isnsmap){
+    if(namednodemap.isnsmap){
         if (namednodemap[i].localName.toLowerCase() == name.toLowerCase()) {         // found it!
           ret = i;
           break;
@@ -306,8 +305,8 @@ var __hasAttributeNS__ = function(namednodemap, namespaceURI, localName) {
  * @param  isnsmap : bool - is this a DOMNamespaceNodeMap
  * @return : DOMNamedNodeMap - NamedNodeMap containing clones of the Nodes in this DOMNamedNodeMap
  */
-var __cloneNamedNodes__ = function(namednodemap, parentNode, isnsmap) {
-  var cloneNamedNodeMap = isnsmap?
+var __cloneNamedNodes__ = function(namednodemap, parentNode) {
+  var cloneNamedNodeMap = namednodemap.isnsmap?
     new DOMNamespaceNodeMap(namednodemap.ownerDocument, parentNode):
     new DOMNamedNodeMap(namednodemap.ownerDocument, parentNode);
 
@@ -337,6 +336,7 @@ var DOMNamespaceNodeMap = function(ownerDocument, parentNode) {
     this.DOMNamedNodeMap = DOMNamedNodeMap;
     this.DOMNamedNodeMap(ownerDocument, parentNode);
     __setArray__(this, []);
+    this.isnsmap = true;
 };
 DOMNamespaceNodeMap.prototype = new DOMNamedNodeMap;
 __extend__(DOMNamespaceNodeMap.prototype, {
@@ -364,3 +364,9 @@ __extend__(DOMNamespaceNodeMap.prototype, {
           return ret;
     }
 });
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// End:

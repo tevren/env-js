@@ -107,7 +107,7 @@ test("Really Ugly HTML Parsing", function() {
     should('parse the document without error',{
         be:'safe',
         test:function(){
-            var doc = document.implementation.createDocument();
+            var doc = document.implementation.createHTMLDocument();
             doc.load('html/malformed.html');
         }
     });

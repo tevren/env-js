@@ -70,6 +70,9 @@ __extend__(DOMDocument.prototype, {
         return this._parentWindow;
     },
     loadXML : function(xmlString) {
+        // create SAX Parser
+        var parser = new XMLP(xmlString+'');
+        
         // create DOM Document
         if(this === $document){
             $debug("Setting internal window.document");
@@ -78,21 +81,18 @@ __extend__(DOMDocument.prototype, {
         // populate Document with Parsed Nodes
         try {
             // make sure thid document object is empty before we try to load ...
-            this.childNodes      = new DOMNodeList(this, this);
-            this.firstChild      = null;
-            this.lastChild       = null;
-            this.attributes      = new DOMNamedNodeMap(this, this);
-            this._namespaces     = new DOMNamespaceNodeMap(this, this);
+            this.childNodes = new DOMNodeList(this, this);
+            this.firstChild = null;
+            this.lastChild = null;
+            this.attributes = new DOMNamedNodeMap(this, this);
+            this._namespaces = new DOMNamespaceNodeMap(this, this);
             this._readonly = false;
-
-            $w.parseHtmlDocument(xmlString, this, null, null);
-            
-            $env.wait(-1);
-
+ 
+            __parseLoop__(this.implementation, this, parser);
         } catch (e) {
             $error(e);
         }
-
+ 
         // set parseComplete flag, (Some validation Rules are relaxed if this is false)
         this._parseComplete = true;
         return this;
@@ -260,7 +260,7 @@ __extend__(DOMDocument.prototype, {
         return node;
     },
     createElementNS : function(namespaceURI, qualifiedName) {
-        //$log("DOMDocument.createElement( "+namespaceURI+", "+qualifiedName+" )");
+        //$log("DOMDocument.createElementNS( "+namespaceURI+", "+qualifiedName+" )");
           // test for exceptions
           if (__ownerDocument__(this).implementation.errorChecking) {
             // throw Exception if the Namespace is invalid
@@ -274,10 +274,15 @@ __extend__(DOMDocument.prototype, {
             }
           }
         
-          // create DOMElement specifying 'this' as ownerDocument
-          var node  = new DOMElement(this);
           var qname = __parseQName__(qualifiedName);
-        
+
+          // create DOMElement specifying 'this' as ownerDocument
+          if(namespaceURI === "http://www.w3.org/2000/svg"){
+              var node = SVGDocument.prototype.createElement.call( this, qname.localName );
+          } else {
+              var node  = new DOMElement(this);
+          }
+
           // assign values to properties (and aliases)
           node.namespaceURI = namespaceURI;
           node.prefix       = qname.prefix;
