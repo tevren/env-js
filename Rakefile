@@ -64,14 +64,14 @@ task :test => "johnson:test"
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |s|
-    s.name = "smparkes-envjs"
+    s.name = "envjs"
     s.executables = "envjsrb"
     s.summary = "Browser environment for javascript interpreters"
     s.email = "smparkes@smparkes.net" # Just for the ruby part ...
     s.homepage = "http://github.com/thatcher/env-js"
     s.description = "Browser environment for javascript interpreters"
     s.authors = ["John Resig", "Chris Thatcher" ]
-    s.add_dependency "smparkes-johnson", ">= 1.1.2.2"
+    s.add_dependency "johnson", ">= 2.0.0.pre0"
     s.files = 
       FileList[ "",
                 "{bin,generators,lib,test}/**/*", 'lib/jeweler/templates/.gitignore']
