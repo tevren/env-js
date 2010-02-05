@@ -130,8 +130,11 @@ __extend__(DOMDocument.prototype, {
             xhr = ({
                 open: function(){},
                 send: function(){
-                    this.responseText = content;
-                    this.onreadystatechange();
+                    var self = this;
+                    setTimeout(function(){
+                        self.responseText = content;
+                        self.onreadystatechange();
+                    },0);
                 },
                 status: 200
             });
