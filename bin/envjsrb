@@ -12,7 +12,7 @@ require 'envjs/runtime'
 RUNTIME = js = Johnson::Runtime.new
 RUNTIME.extend Envjs::Runtime
 
-RUNTIME.load Envjs::ENVJS
+# RUNTIME.load Envjs::ENVJS
 
 EXIT_VERBS = [nil] + %w(exit quit)
   
@@ -124,24 +124,40 @@ if ARGV.length > 0
   begin
     about_blank = true
     ARGV.each do |file|
-      if file == "about:blank"
+
+      uri = URI.parse file
+
+      if uri.scheme == nil
+        uri.scheme = "file"
+        begin
+          uri.path = Pathname.new(uri.path).realpath.to_s
+        rescue Errno::ENOENT; end
+        uri = URI.parse uri.to_s
+      end
+
+      uri_s = uri.to_s.sub %r(^file:/([^/])), 'file:///\1'
+
+      if uri.scheme == "about" and uri.opaque == "blank"
         RUNTIME.wait
         RUNTIME.evaluate("window.location = 'about:blank'", "(comand line)", 1)
         about_blank = true
-      elsif file =~ /\.x?html?$/ || file =~ %r(^https?://)
+      elsif uri.path =~ /\.x?html?$/ || uri.scheme =~ %r(^https?)
+
         # this might want to go alway; jazrb does it manually now, which I think was the use case
         # that wanted this
         if !about_blank
           RUNTIME.wait
           RUNTIME.evaluate("window.location = 'about:blank'", "(comand line)", 1)
         end
+
         RUNTIME.wait
-        RUNTIME.evaluate("window.location = 'file://#{Pathname.new(file).realpath}'", file, 1)
+        # RUNTIME.evaluate("window.location = 'file://#{Pathname.new(file).realpath}'", file, 1)
+        RUNTIME.evaluate("window.location = '#{uri_s}'", file, 1)
         about_blank = false
       else
         RUNTIME.become_first_script_window
-        RUNTIME.top_level_load file
-        RUNTIME.load file
+        RUNTIME.top_level_load uri_s
+        RUNTIME.load uri_s
       end
     end
   rescue Johnson::Error => je

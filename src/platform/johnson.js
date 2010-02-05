@@ -23,9 +23,14 @@ $env.location = function(path, base){
             base.path = path;
             base = base + "";
         } else {
+            // debug("bb", base);
+            // base = base + Ruby.URI.parse(path);
+            b = Ruby.eval("lambda { |a,b| a+b; }");
+            base = b(base,path);
+            // base.path = base.path.substring(0, base.path.lastIndexOf('/'));
+            // base.path = base.path + '/' + path;
             base = base + "";
-            base = base.substring(0, base.lastIndexOf('/'));
-            base = base + '/' + path;
+            // debug("bbb", base);
         }
         var result = base;
         // ? This path only used for files?

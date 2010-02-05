@@ -1,6 +1,6 @@
 require 'envjs'
 require "open-uri"
-require 'rubygems'
+require 'pathname'
 begin
   require 'fsdb'
 rescue LoadError; end
@@ -90,7 +90,7 @@ EOJS
       top_level_js = nil
 
       add_dep = nil
-
+      
       clear_deps = lambda do |w|
         begin
           if db.call
@@ -138,7 +138,20 @@ EOJS
             end
           end
           if !loc || loc == "about:blank"
-            tll = "file://" + Pathname(top_level_js).realpath.to_s
+            uri = URI.parse top_level_js
+            if uri.scheme == nil
+              uri.scheme = "file"
+              begin
+                uri.path = Pathname.new(uri.path).realpath.to_s
+              rescue Errno::ENOENT; end
+              uri = URI.parse uri.to_s
+            end
+            uri_s = uri.to_s.sub %r(^file:/([^/])), 'file:///\1'
+
+            # tll = "file://" + Pathname(top_level_js).realpath.to_s
+
+            tll = uri_s
+
             if ( tll != path ) 
               loc = tll
             end
@@ -168,7 +181,25 @@ EOJS
         if files.length == 2 && !(String === files[1])
           f = files[0]
           w = files[1]
-          v = open(f).read.gsub(/\A#!.*$/, '')
+
+          # Hmmm ...
+          uri = URI.parse f
+
+          if uri.scheme == nil
+            uri.scheme = "file"
+            begin
+              uri.path = Pathname.new(uri.path).realpath.to_s
+            rescue Errno::ENOENT; end
+            uri = URI.parse uri.to_s
+          end
+
+          uri_s = uri.to_s.sub %r(^file:/([^/])), 'file:///\1'
+
+          if uri.scheme == "file"
+            uri_s = uri.path
+          end
+
+          v = open(uri_s).read.gsub(/\A#!.*$/, '')
           loc = nil
           add_dep.call w, f
           evaluate(v, f, 1, w, w, f)
@@ -176,6 +207,35 @@ EOJS
           load *files
         end
       }
+
+      def load *files
+        files.map { |f|
+          # Hmmm ...
+
+          uri = URI.parse f
+          if uri.scheme == nil
+            uri.scheme = "file"
+            begin
+              uri.path = Pathname.new(uri.path).realpath.to_s
+            rescue Errno::ENOENT; end
+            uri = URI.parse uri.to_s
+          end
+          uri_s = uri.to_s.sub %r(^file:/([^/])), 'file:///\1'
+          
+          if uri.scheme == "file"
+            super uri.path
+          else
+            raise "hell 1"
+          end
+
+          # v = open(uri_s).read.gsub(/\A#!.*$/, '')
+          # loc = nil
+          # add_dep.call w, f
+          # evaluate(v, f, 1, w, w, f)
+          # evaluate(File.read(f).gsub(/\A#!.*$/, ''), f, 1)
+
+        }.last
+      end
 
       master.reload = lambda { |*files|
         if files.length == 2 && !(String === files[1])
@@ -273,6 +333,8 @@ EOJS
       ( class << self; self; end ).send :define_method, :"[]=" do |k,v|
         @envjs[k] = v
       end
+
+      load Envjs::ENVJS
 
     end
   end
