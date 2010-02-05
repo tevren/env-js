@@ -1,6 +1,6 @@
 This is a fork of the env.js project (http://github.com/thatcher/env-js/). See that link for env.js details.
 
-This fork is based on the Johnson Ruby gem (http://github.com/jbarnette/johnson)and will become obsolete when the Johnson support has been reintegrated into the master repo.
+This fork is based on the Johnson Ruby gem (http://github.com/jbarnette/johnson) and will become obsolete when the Johnson support has been reintegrated into the master repo.
 
 For now, you can install the envjs gem by installing Johnson:
 
