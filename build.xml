@@ -59,6 +59,7 @@
             <fileset dir="${SRC_DIR}" includes="build.js" />
             <fileset dir="${SRC_DIR}" includes="intro.js" />
             -->
+            <fileset dir="${SRC_DIR}" includes="base64.js" />
             <fileset dir="${SRC_DIR}" includes="window/window.js" />
             <fileset dir="${SRC_DIR}" includes="dom/nodelist.js" />
             <fileset dir="${SRC_DIR}" includes="dom/namednodemap.js" />

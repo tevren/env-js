@@ -111,6 +111,30 @@ __extend__(DOMDocument.prototype, {
                 },
                 status: 200
             });
+        } else if (url.indexOf("data:") === 0) {
+            url = url.slice(5);
+            var fields = url.split(",");
+            var content = fields[1];
+            var fields = fields[0].split(";");
+            if(fields[1] === "base64" || (fields[1] && fields[1].indexOf("charset=") === 0 && fields[2] === "base64" ) ) {
+                content = Base64.decode(content);
+            } else {
+                content = unescape(content);
+            }
+            if(fields[0] === "text/html") {
+            } else if(fields[0] === "image/png") {
+                throw new Error("png");
+            } else {
+                content =  "<html><head><title></title></head><body>"+content+"</body></html>";
+            }
+            xhr = ({
+                open: function(){},
+                send: function(){
+                    this.responseText = content;
+                    this.onreadystatechange();
+                },
+                status: 200
+            });
         } else {
             xhr = new XMLHttpRequest();
         }

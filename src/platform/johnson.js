@@ -7,7 +7,7 @@ $env.location = function(path, base){
     if ( path == "about:blank" ) {
         return path;
     }
-    var protocol = new RegExp('(^file\:|^http\:|^https\:)');
+    var protocol = new RegExp('(^file\:|^http\:|^https\:|data:)');
     var m = protocol.exec(path);
     if(m&&m.length>1){
         var url = Ruby.URI.parse(path);
