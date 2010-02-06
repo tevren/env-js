@@ -82,6 +82,10 @@ end
 
 task :test => :check_dependencies
 
+namespace :gemspec do
+  task :generate => "johnson:compile"
+end
+
 # Local Variables:
 # mode:ruby
 # End:
