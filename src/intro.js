@@ -35,7 +35,8 @@
       $platform.init_window = function(window) {
         var index = master.window_index++;
         window.toString = function(){
-          return "[object Window "+index+"]";
+          // return "[object Window "+index+"]";
+          return "[object Window]";
         };
       };
 

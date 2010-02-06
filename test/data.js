@@ -6,7 +6,9 @@ url_escaped = "data:text/html,"+escape(doc);
 base64 = "data:text/html;base64,"+Base64.encode(doc);
 debug(url_escaped);
 window.location = "about:blank";
+Envjs.wait();
 window.location = url_escaped;
+Envjs.wait();
 debug(window.document.documentElement.innerHTML);
 if(window.document.documentElement.innerHTML != inner){
   debug(window.document.documentElement.innerHTML);
@@ -15,13 +17,17 @@ if(window.document.documentElement.innerHTML != inner){
 }
 debug(base64);
 window.location = "about:blank";
+Envjs.wait();
 window.location = base64;
+Envjs.wait();
 debug(window.document.documentElement.innerHTML);
 if(window.document.documentElement.innerHTML != inner){
   throw new Error("b"+window.document.documentElement.innerHTML);
 }
 window.location = "about:blank";
+Envjs.wait();
 window.location = "data:,"+escape("Hello, World from a data uri!");
+Envjs.wait();
 debug(window.location+"");
 debug(window.document.documentElement.innerHTML);
 inner = "<head><title></title></head><body>Hello, World from a data uri!</body>";

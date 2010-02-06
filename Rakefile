@@ -50,9 +50,9 @@ namespace :johnson do
 
   desc "run tests against johnson"
   task :test => :compile do
-    ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/primary-tests.js"
-    ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/prototype-test.js"
-    ruby "-Ilib:vendor/johnson/lib bin/envjsrb test/call-load-test.js"
+    ruby "bin/envjsrb test/primary-tests.js"
+    ruby "bin/envjsrb test/prototype-test.js"
+    ruby "bin/envjsrb test/call-load-test.js"
   end
 
 end
@@ -70,7 +70,7 @@ begin
     s.email = "smparkes@smparkes.net" # Just for the ruby part ...
     s.homepage = "http://github.com/thatcher/env-js"
     s.description = "Browser environment for javascript interpreters"
-    s.authors = ["John Resig", "Chris Thatcher" ]
+    s.authors = ["John Resig", "Chris Thatcher", "Steven Parkes" ]
     s.add_dependency "johnson", ">= 2.0.0.pre0"
     s.files = 
       FileList[ "",
