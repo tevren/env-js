@@ -197,6 +197,8 @@ EOJS
 
           if uri.scheme == "file"
             uri_s = uri.path
+          elsif uri.scheme == "data"
+            raise "implement 0"
           end
 
           v = open(uri_s).read.gsub(/\A#!.*$/, '')
@@ -224,6 +226,8 @@ EOJS
           
           if uri.scheme == "file"
             super uri.path
+          elsif uri.scheme == "data"
+            raise "implement 1"
           else
             raise "hell 1"
           end
@@ -272,6 +276,10 @@ EOJS
       window["$options"] = evaluate("new Object");
       window["$options"].proxy = outer
 
+      window.evaluate = lambda { |s|
+        return master.evaluate.call(s,window);
+      }
+
       window.load = lambda { |*files|
         files.each do |f|
           master.load.call f, window
@@ -309,6 +317,7 @@ EOJS
         if fn && !scripts[fn]
           scripts[fn] = compiled_script
         end
+        # p "?", script
         evaluate_compiled_script(compiled_script,scope)
       end
 

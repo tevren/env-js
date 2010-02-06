@@ -34,3 +34,12 @@ inner = "<head><title></title></head><body>Hello, World from a data uri!</body>"
 if(window.document.documentElement.innerHTML != inner){
   throw new Error("c"+window.document.documentElement.innerHTML);
 }
+
+/* not implemented yet ...
+w = open("about:blank");
+w.foo = 10;
+debug(w.foo);
+uri = "data:text/javascript;base64,"+"foo = 20;";
+w.load(uri);
+debug(w.foo);
+*/

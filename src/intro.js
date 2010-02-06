@@ -65,6 +65,9 @@
           $master.load(f,new_window);
         }
       };
+      new_window.evaluate = function(string){
+        return $master.evaluate.call(string,new_window);
+      };
       return [ proxy, new_window ];
     };
 
