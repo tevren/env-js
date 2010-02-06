@@ -70,7 +70,7 @@ begin
     s.email = "smparkes@smparkes.net" # Just for the ruby part ...
     s.homepage = "http://github.com/thatcher/env-js"
     s.description = "Browser environment for javascript interpreters"
-    s.authors = ["John Resig", "Chris Thatcher" ]
+    s.authors = ["John Resig", "Chris Thatcher", "Steven Parkes" ]
     s.add_dependency "johnson", ">= 2.0.0.pre0"
     s.files = 
       FileList[ "",
