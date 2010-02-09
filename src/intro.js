@@ -32,9 +32,9 @@
 
       ( master.window_index === undefined ) && ( master.window_index = 0 );
 
-      $platform.init_window = function(window) {
+      $platform.init_window = function(inner) {
         var index = master.window_index++;
-        window.toString = function(){
+        inner.toString = function(){
           // return "[object Window "+index+"]";
           return "[object Window]";
         };
@@ -47,10 +47,10 @@
       var swap_script_window = ( $master.first_script_window.window === proxy );
       if(!proxy){
         proxy = $platform.new_split_global_outer();
-        // $master.print("np",proxy);
       }
       $master.proxy = proxy;
       new_window = $platform.new_split_global_inner(proxy,undefined);
+      new_window.$inner = new_window;
       if(swap_script_window) {
         $master.first_script_window = new_window;
       }
@@ -78,13 +78,18 @@
       var options = this.$options;
       delete this.$options;
       $env.$master = $master;
-      $env.init_window.call(this,options);
+      var $inner = this.$inner; 
+      delete this.$inner;
+      $env.init_window.call($inner,$inner,options);
     };
 
-    $env.init_window = function(options){
+    $env.init_window = function(inner,options){
+      var $inner = inner;
+      var $w = this;
+
       options = options || {};
 
-      $platform.init_window(this);
+      $platform.init_window($w);
 
       var print = $master.print;
 
@@ -97,7 +102,5 @@
       }
       // print("setx",this);
       // print("setx",this.window);
-
-      var $w = this;
-      // print("$$w",$w);
-      // print("$$w",$w === this);
+      
+      // print("$$w",$w,this,$w.isInner,this.isInner,$w === this);

@@ -33,7 +33,8 @@
   })(); // close function definition begun in 'intro.js'
 
   // Initial window setup
-  $env.init.call(this);
+  var init = $env.init;
+  init();
 
 })();
 

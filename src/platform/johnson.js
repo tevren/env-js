@@ -320,16 +320,20 @@ $env.lineSource = function(e){
     
 $env.loadInlineScript = function(script){
     var original_script_window = $master.first_script_window;
+    // debug("lis",original_script_window,original_script_window.isInner);
+    // debug("XX",window,window.isInner);
     if ( !$master.first_script_window ) {
         $master.first_script_window = window;
     }
+    // debug("lix",$master.first_script_window,$master.first_script_window.isInner,$w,$w.isInner);
     try {
-        $master.evaluate(script.text,$w);
+        $master.evaluate(script.text,$inner);
     } catch(e) {
         $env.error("error evaluating script: "+script.text);
         $env.error(e);
     }
     $master.first_script_window = original_script_window;
+    // debug("lis",original_script_window,original_script_window.isInner);
 };
     
 $env.writeToTempFile = function(text, suffix){
@@ -380,7 +384,7 @@ $env.__eval__ = function(script,scope){
         if ( !$master.first_script_window ) {
             $master.first_script_window = window;
         }
-        var result = $master.evaluate(script,$w)(original,scopes);
+        var result = $master.evaluate(script,$inner)(original,scopes);
         $master.first_script_window = original_script_window;
         return result;
     }catch(e){
