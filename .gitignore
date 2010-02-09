@@ -4,8 +4,7 @@
 *~
 /dist/env.johnson.js
 /lib/envjs/env.js
-/*envjs*.gem
-/*envjs.gemspec
+/envjs.gemspec
 /rhino/build
 /jshost
 /htmlparser/gwt*
