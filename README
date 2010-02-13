@@ -24,7 +24,7 @@ js>
 It's also possible to embed the envjs interpreter similar to the way it's done in Johnson, e.g.,
 
 require 'rubygems' # if necessary
-require 'johnson/tramonkey'
+require 'johnson/tracemonkey'
 require 'envjs/runtime'
 
 envjs = Johnson::Runtime.new
