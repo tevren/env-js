@@ -388,9 +388,9 @@ __extend__(DOMDocument.prototype, {
      * @seealso
      *     Document.evaluate
      */
-    /*evaluate: function(xpathText, contextNode, nsuriMapper, resultType, result){
-        return new XPathExpression().evaluate();
-    },*/
+    evaluate: function(xpathText, contextNode, nsuriMapper, resultType, result){
+        return new XPathExpression(xpathText, contextNode, nsuriMapper, resultType, result).evaluate();
+    },
     getElementById : function(elementId) {
           var retNode = null,
               node;

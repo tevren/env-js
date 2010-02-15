@@ -134,9 +134,11 @@
             <fileset dir="${SRC_DIR}" includes="svg/rectelement.js" />
 
             <fileset dir="${SRC_DIR}" includes="serializer/xml.js" />
+            <fileset dir="${SRC_DIR}" includes="xpath/xmltoken.js" />
             <fileset dir="${SRC_DIR}" includes="xpath/expression.js" />
             <fileset dir="${SRC_DIR}" includes="xpath/result.js" />
-            <fileset dir="${SRC_DIR}" includes="xslt/processor.js" />
+            <fileset dir="${SRC_DIR}" includes="xpath/implementation.js" />
+            <fileset dir="${SRC_DIR}" includes="xpath/util.js" />
             <fileset dir="${SRC_DIR}" includes="event/event.js" />
             <fileset dir="${SRC_DIR}" includes="event/mouseevent.js" />
             <fileset dir="${SRC_DIR}" includes="event/uievent.js" />
