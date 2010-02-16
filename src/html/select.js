@@ -28,6 +28,10 @@ __extend__(HTMLSelectElement.prototype, {
         if (index !== undefined) {
             this.setAttribute('value', newValue);
             this.selectedIndex = index;
+
+            var event = document.createEvent();
+            event.initEvent("change");
+            this.dispatchEvent( event );
         }
     },
     get value() {
