@@ -145,10 +145,12 @@ __extend__(DOMNamedNodeMap.prototype, {
               throw(new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR));
             } else {
               this[itemIndex] = arg;                // over-write existing NamedNode
+              this[arg.name.toLowerCase()] = arg;
             }
           }else {
             // add new NamedNode
             Array.prototype.push.apply(this, [arg]);
+            this[arg.name.toLowerCase()] = arg;
           }
           arg.ownerElement = this.parentNode;
         
