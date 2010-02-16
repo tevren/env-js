@@ -19,7 +19,7 @@ __extend__(HTMLOptGroupElement.prototype, {
     },
     set label(value){
         this.setAttribute('label',value);
-    },
+    }
 });
 
 $w.HTMLOptGroupElement = HTMLOptGroupElement;		
