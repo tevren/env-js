@@ -32,5 +32,8 @@ envjs.extend Envjs::Runtime
 window = envjs.evaluate("window")
 puts window.location.to_s # == "about:blank"
 puts window.document.innerHTML # == "<html><head><title></title></head><body></body></html>"
+envjs.wait
+
+You need the Runtime#wait at the end to give env.js's event loop a chance to execute queued events and timers. You may need to do this at other times as well, depending on the asynchronous nature of your application.
 
 Comments to http://groups.google.com/group/envjs or #envjs on freenode.
