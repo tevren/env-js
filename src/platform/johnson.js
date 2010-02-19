@@ -19,20 +19,12 @@ $env.location = function(path, base){
         return s;
     }else if(base){
         base = Ruby.URI.parse(base);
-        if ( path[0] == "/" ) {
-            base.path = path;
-            base = base + "";
-        } else {
-            // debug("bb", base);
-            // base = base + Ruby.URI.parse(path);
-            b = Ruby.eval("lambda { |a,b| a+b; }");
-            base = b(base,path);
-            // base.path = base.path.substring(0, base.path.lastIndexOf('/'));
-            // base.path = base.path + '/' + path;
-            base = base + "";
-            // debug("bbb", base);
-        }
+        path = Ruby.URI.parse(path);
+        b = Ruby.eval("lambda { |a,b| a+b; }");
+        base = b(base,path);
+        base = base + "";
         var result = base;
+        // print("ZZ",result);
         // ? This path only used for files?
         if ( result.substring(0,6) == "file:/" && result[6] != "/" ) {
             result = "file://" + result.substring(5,result.length);
@@ -50,7 +42,12 @@ $env.location = function(path, base){
             base.href &&
             (base.href.length > 0) ) {
             base = base.href.substring(0, base.href.lastIndexOf('/'));
-            var result = base + '/' + path;
+            var result;
+            if ( base[base.length-1] == "/" ) {
+                result = base + path;
+            } else {
+                result = base + '/' + path;
+            }
             if ( result.substring(0,6) == "file:/" && result[6] != "/" ) {
                 result = "file://" + result.substring(5,result.length);
             }
@@ -63,7 +60,7 @@ $env.location = function(path, base){
     }
 };
 
-$env.connection = function(xhr, responseHandler, data){
+$env.connection = $master.connection || function(xhr, responseHandler, data){
     var url = Ruby.URI.parse(xhr.url);
     var connection;
     var resp;
@@ -392,14 +389,15 @@ $env.__eval__ = function(script,scope){
     }
 };
 
-$env.newwindow = function(openingWindow, parentArg, url, outer){
+$env.newwindow = function(openingWindow, parentArg, url, outer,xhr_options){
 // print(location);
 // print("url",url,window.location,openingWindow);
 // print("parent",parentArg);
     var options = {
         opener: openingWindow,
         parent: parentArg,
-        url: $env.location(url)
+        url: $env.location(url),
+        xhr: xhr_options
     };
 
     // print("$w",$w);
@@ -415,12 +413,13 @@ $env.newwindow = function(openingWindow, parentArg, url, outer){
     return proxy;
 };
 
-$env.reload = function(oldWindowProxy, url){
+$env.reload = function(oldWindowProxy, url,options){
     // print("reload",window,oldWindowProxy,url);
     $env.newwindow( oldWindowProxy.opener,
-                                 oldWindowProxy.parent,
-                                 url,
-                                 oldWindowProxy );
+                    oldWindowProxy.parent,
+                    url,
+                    oldWindowProxy,
+                    options );
 };
 
 $env.sleep = function(n){Ruby.sleep(n/1000.);};

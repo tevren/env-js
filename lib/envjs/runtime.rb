@@ -73,6 +73,7 @@ puts = function() {
 EOJS
 
       master = global["$master"] = evaluate("new Object")
+      master["runtime"] = self
       master.symbols = [ "Johnson", "Ruby", "print", "debug", "puts", "load", "reload", "whichInterpreter", "multiwindow" ]
       master.symbols.each { |symbol| master[symbol] = global[symbol] }
 
@@ -307,6 +308,7 @@ EOJS
 
       ( class << self; self; end ).send :define_method, :evaluate do |*args|
         ( script, file, line, global, scope, fn ) = *args
+        raise "cannot evaluate nil script" if script.nil?
         # print "eval in " + script[0,50].inspect + scope.inspect + " " + ( scope ? scope.isInner.inspect : "none" ) + "\n"
         global = nil
         scope ||= inner
@@ -314,16 +316,15 @@ EOJS
           compiled_script = scripts[fn]
         end
         compiled_script ||= compile(script, file, line, global)
-        # compiled_script = compile(script, file, line, global)
         if fn && !scripts[fn]
           scripts[fn] = compiled_script
         end
-        # p "?", script
         evaluate_compiled_script(compiled_script,scope)
       end
 
       ( class << self; self; end ).send :define_method, :reevaluate do |*args|
         ( script, file, line, global, scope, fn ) = *args
+        raise "cannot evaluate nil script" if script.nil?
         # print "eval in " + script[0,50].inspect + (scope ? scope.toString() : "nil") + "\n"
         global = nil
         scope ||= inner
@@ -345,7 +346,6 @@ EOJS
       end
 
       load Envjs::ENVJS
-
     end
   end
 

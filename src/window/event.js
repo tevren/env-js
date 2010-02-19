@@ -50,6 +50,7 @@ $w.removeEventListener = function(type, fn){
 
 
 function __dispatchEvent__(target, event, bubbles){
+try{
     //$debug("dispatching event " + event.type);
 
     //the window scope defines the $event object, for IE(^^^) compatibility;
@@ -82,6 +83,55 @@ function __dispatchEvent__(target, event, bubbles){
             //$debug('calling event handler on'+event.type+' on target '+target);
             target["on" + event.type](event);
         }
+
+      // SMP FIX: cancel/stop prop
+      
+      // print(event.type,target);
+
+      if ( event.type == "click" && target instanceof HTMLAnchorElement && target.href ) {
+        window.location = target.href;
+      }
+
+      if ( event.type == "click" &&
+           target.form &&
+           ( target instanceof HTMLInputElement || target instanceof HTMLTypeValueInputs ) &&
+           ( ( target.tagName === "INPUT" &&
+               (target.type === "submit" ||
+                target.type === "image" ) ) ||
+             ( target.tagName === "BUTTON" &&
+               ( !target.type ||
+                 target.type === "submit" ) ) ) ) {
+        target.form.clk = target;
+try{
+        __submit__(target.form);
+}catch(e){print("oops",e);print(e.stack);};
+        delete target.form.clk;
+      }
+
+      // print(event.type,target.type,target.constructor+"");
+      if ( event.type == "click" && target instanceof HTMLInputElement && target.type == "checkbox" ) {
+        target.checked = target.checked ? "" : "checked";
+      }
+
+      if ((event.type == "submit") && target instanceof HTMLFormElement) {
+        $env.unload($w);
+        var proxy = $w.window;
+        var data;
+        var boundary;
+        if (target.enctype === "multipart/form-data") {
+          boundary = (new Date).getTime();
+        }
+        data = __formSerialize__(target,undefined,boundary);
+        var options = {method: target.method || "get", data: data};
+        if (boundary) {
+          options["Content-Type"] = "multipart/form-data; boundary="+boundary;
+        } else {
+          options["Content-Type"] = 'application/x-www-form-urlencoded';
+        }
+        var action = target.action || window.location.href;
+        $env.reload(proxy, action, options );
+      }
+
     }else{
         //$debug("non target: " + event.target + " \n this->"+target);
     }
@@ -89,6 +139,10 @@ function __dispatchEvent__(target, event, bubbles){
         //$debug('bubbling to parentNode '+target.parentNode);
         __dispatchEvent__(target.parentNode, event, bubbles);
     }
+}catch(e){
+print("oops",e);
+print(e.stack);
+}
 };
 	
 $w.dispatchEvent = function(event, bubbles){

@@ -173,10 +173,10 @@ $env.unload = function(windowToUnload){
 };
   
   
-$env.load = function(url){
+$env.load = function(url,xhr_options){
     $location = $env.location(url);
     __setHistory__($location);
-    $w.document.load($location);
+    $w.document.load($location,xhr_options);
 };
 
 

@@ -80,6 +80,7 @@
       $env.$master = $master;
       var $inner = this.$inner; 
       delete this.$inner;
+      $inner.$envx = $env;
       $env.init_window.call($inner,$inner,options);
     };
 

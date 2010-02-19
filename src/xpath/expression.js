@@ -20,7 +20,7 @@ var XPathExpression =
     if(resultType!=XPathResult.ANY_TYPE) {
       throw new Error("result type not implemented");
     }
-    var context = new ExprContext($w.document);
+    var context = new ExprContext(contextNode);
     this.result = xpathParse(xpathText).evaluate(context);
   };
 __extend__(XPathExpression.prototype, {

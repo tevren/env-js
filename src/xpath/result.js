@@ -34,26 +34,32 @@ __extend__(XPathResult.prototype, {
     get stringValue(){
       this.impl.stringValue();
     },
+/*
     get invalidIteration(){
-      throw new Error("implement");
+      throw new Error("implement invalidIteration");
         //TODO
     },
+*/
     get numberValue(){
       this.impl.numberValue();
     },
+/*
     get resultType(){
-      throw new Error("implement");
+      throw new Error("implement resultType");
         //TODO
     },
+*/
     get singleNodeValue(){
       return this.impl.nodeSetValue()[0];
     },
+/*
+    snapshotItem: function(index){
+      throw new Error("implement snapshotItem");
+        //TODO
+    },
+*/
     iterateNext: function(){
       return this.impl.nodeSetValue()[this.current++];
-    },
-    snapshotItem: function(index){
-      throw new Error("implement");
-        //TODO
     }
 });
 

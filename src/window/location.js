@@ -7,6 +7,14 @@ $debug("Initializing Window Location.");
 var $location = '';
 
 $w.__defineSetter__("location", function(url){
+  if (url[0] === "#") {
+    return;
+  }
+  var now = window.location.href.replace(/^file:\/\//,"").replace(/#.*/,"");
+  var to = $env.location(url,window.location.href != "about:blank" ? window.location.href: undefined);
+  if (to.indexOf(now)===0 && to[now.length]==="#") {
+    return;
+  }
   if( !$location || $location == "about:blank" ) {
     // $w.__loadAWindowsDocument__(url);
     $env.load(url);

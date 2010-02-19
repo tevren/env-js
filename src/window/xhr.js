@@ -28,7 +28,9 @@ XMLHttpRequest.prototype = {
 		var _this = this;
 		
 		function makeRequest(){
+// print("MR",$env.connection);            
             $env.connection(_this, function(){
+// print("MC");            
                 if (_this.$continueProcessing){
                     var responseXML = null;
                     _this.__defineGetter__("responseXML", function(){
@@ -63,6 +65,8 @@ XMLHttpRequest.prototype = {
                 _this.onreadystatechange();
 		}
 
+try{
+// print("pk");
 		if (this.async){
 		    $debug("XHR sending asynch;");
 			$env.runAsync(makeRequest);
@@ -70,6 +74,8 @@ XMLHttpRequest.prototype = {
 		    $debug("XHR sending synch;");
 			makeRequest();
 		}
+}catch(e){print("oopsy",e);}
+
 	},
 	abort: function(){
         this.$continueProcessing = false;

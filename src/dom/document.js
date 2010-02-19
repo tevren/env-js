@@ -97,11 +97,10 @@ __extend__(DOMDocument.prototype, {
         this._parseComplete = true;
         return this;
     },
-    load: function(url){
+    load: function(url,xhr_options){
 		$debug("Loading url into DOM Document: "+ url + " - (Asynch? "+$w.document.async+")");
         var scripts, _this = this;
         var xhr;
-// print("KK",url,url =="about:blank"); 
         if (url == "about:blank"){
             xhr = ({
                 open: function(){},
@@ -141,7 +140,11 @@ __extend__(DOMDocument.prototype, {
         } else {
             xhr = new XMLHttpRequest();
         }
-        xhr.open("GET", url, $w.document.async);
+        xhr_options = xhr_options || {};
+        var method = (xhr_options.method || "GET").toUpperCase();
+        xhr.open(method, url, $w.document.async);
+        // FIXME: not all XHRs have this right now
+        xhr.setRequestHeader && xhr.setRequestHeader('Content-Type', xhr_options["Content-Type"] || 'application/x-www-form-urlencoded');
         xhr.onreadystatechange = function(){
             if (xhr.status != 200) {
                 $warn("Could not retrieve XHR content from " + url + ": status code " + xhr.status);
@@ -193,7 +196,7 @@ __extend__(DOMDocument.prototype, {
             }
             
         };
-        xhr.send();
+        xhr.send(xhr_options["data"]);
     },
 	createEvent             : function(eventType){ 
         var event;

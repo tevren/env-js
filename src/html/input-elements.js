@@ -169,7 +169,7 @@ HTMLInputCommon.prototype = new HTMLElement;
 __extend__(HTMLInputCommon.prototype, {
     get form(){
         var parent = this.parentNode;
-        while(parent.nodeName.toLowerCase() != 'form'){
+        while(parent && parent.nodeName.toLowerCase() != 'form'){
             parent = parent.parentNode;
         }
         return parent;
@@ -238,6 +238,30 @@ __extend__(HTMLTypeValueInputs.prototype, {
         this.setAttribute('value',newValue);
     },
     setAttribute: function(name, value){
+        if (this.type == "radio" && name == "checked" && value && this.name) {
+            // HTMLElement.prototype.setAttribute.apply(this, ["checked", "checked"]);
+            // return;
+            var parent = this.parentNode;
+            while(parent != document) {
+                if(parent.tagName == "FORM") {
+                    break;
+                }
+                parent = parent.parentNode;
+            }
+            if(parent.tagName == "FORM") {
+                var xpath = './/input[@type="radio" and @name="'+this.name+'"]';
+                var nodes =
+                    document.evaluate(xpath,parent, null, XPathResult.ANY_TYPE,null );
+                while(( node = nodes.iterateNext() )) {
+                    // FIX? events when we short circuit like this?
+                    if (node === this) {
+                        HTMLElement.prototype.setAttribute.call(node, "checked", "checked");
+                    } else {
+                        HTMLElement.prototype.removeAttribute.call(node, "checked");
+                    }
+                }
+            }
+        }
         if(name == 'value' && !this.defaultValue){
             this.defaultValue = value;
         }
@@ -275,3 +299,9 @@ __extend__(HTMLInputAreaCommon.prototype, {
 });
 
 $w.HTMLInputAreaCommon = HTMLInputAreaCommon;
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// End:

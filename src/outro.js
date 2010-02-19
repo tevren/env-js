@@ -25,7 +25,7 @@
       Envjs.evaluate = $env.$master.evaluate;
   
       // $w.__loadAWindowsDocument__(options.url || "about:blank");
-      $env.load(options.url || "about:blank");
+      $env.load(options.url || "about:blank", options.xhr);
     };
 
     return $env;

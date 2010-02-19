@@ -6,7 +6,8 @@
 
 // Dummy implmentation for the logging functions. Replace by something
 // useful when you want to debug.
-function xpathLog(msg) {};
+function xpathLog(msg) {print(msg)};
+function xpathLog(msg) {/*print(msg)*/};
 function xsltLog(msg) {};
 function xsltLogXml(msg) {};
 
@@ -46,13 +47,13 @@ function stringSplit(s, c) {
 // would do for us here; however that method is broken in Safari/1.3,
 // so we have to emulate it.
 function xmlImportNode(doc, node) {
-  if (node.nodeType == DOM_TEXT_NODE) {
+  if (node.nodeType == DOMNode.TEXT_NODE) {
     return domCreateTextNode(doc, node.nodeValue);
 
-  } else if (node.nodeType == DOM_CDATA_SECTION_NODE) {
+  } else if (node.nodeType == DOMNode.CDATA_SECTION_NODE) {
     return domCreateCDATASection(doc, node.nodeValue);
 
-  } else if (node.nodeType == DOM_ELEMENT_NODE) {
+  } else if (node.nodeType == DOMNode.ELEMENT_NODE) {
     var newNode = domCreateElement(doc, node.nodeName);
     for (var i = 0; i < node.attributes.length; ++i) {
       var an = node.attributes[i];
@@ -255,19 +256,19 @@ function xmlValue(node, disallowBrowserSpecificOptimization) {
   }
 
   var ret = '';
-  if (node.nodeType == DOM_TEXT_NODE ||
-      node.nodeType == DOM_CDATA_SECTION_NODE) {
+  if (node.nodeType == DOMNode.TEXT_NODE ||
+      node.nodeType == DOMNode.CDATA_SECTION_NODE) {
     ret += node.nodeValue;
 
-  } else if (node.nodeType == DOM_ATTRIBUTE_NODE) {
+  } else if (node.nodeType == DOMNode.ATTRIBUTE_NODE) {
     if (ajaxsltIsIE6) {
       ret += xmlValueIE6Hack(node);
     } else {
       ret += node.nodeValue;
     }
-  } else if (node.nodeType == DOM_ELEMENT_NODE ||
-             node.nodeType == DOM_DOCUMENT_NODE ||
-             node.nodeType == DOM_DOCUMENT_FRAGMENT_NODE) {
+  } else if (node.nodeType == DOMNode.ELEMENT_NODE ||
+             node.nodeType == DOMNode.DOCUMENT_NODE ||
+             node.nodeType == DOMNode.DOCUMENT_FRAGMENT_NODE) {
     if (!disallowBrowserSpecificOptimization) {
       // IE, Safari, Opera, and friends
       var innerText = node.innerText;
@@ -307,20 +308,20 @@ function xmlText(node, opt_cdata) {
 }
 
 function xmlTextR(node, buf, cdata) {
-  if (node.nodeType == DOM_TEXT_NODE) {
+  if (node.nodeType == DOMNode.TEXT_NODE) {
     buf.push(xmlEscapeText(node.nodeValue));
 
-  } else if (node.nodeType == DOM_CDATA_SECTION_NODE) {
+  } else if (node.nodeType == DOMNode.CDATA_SECTION_NODE) {
     if (cdata) {
       buf.push(node.nodeValue);
     } else {
       buf.push('<![CDATA[' + node.nodeValue + ']]>');
     }
 
-  } else if (node.nodeType == DOM_COMMENT_NODE) {
+  } else if (node.nodeType == DOMNode.COMMENT_NODE) {
     buf.push('<!--' + node.nodeValue + '-->');
 
-  } else if (node.nodeType == DOM_ELEMENT_NODE) {
+  } else if (node.nodeType == DOMNode.ELEMENT_NODE) {
     buf.push('<' + xmlFullNodeName(node));
     for (var i = 0; i < node.attributes.length; ++i) {
       var a = node.attributes[i];
@@ -340,8 +341,8 @@ function xmlTextR(node, buf, cdata) {
       buf.push('</' + xmlFullNodeName(node) + '>');
     }
 
-  } else if (node.nodeType == DOM_DOCUMENT_NODE ||
-             node.nodeType == DOM_DOCUMENT_FRAGMENT_NODE) {
+  } else if (node.nodeType == DOMNode.DOCUMENT_NODE ||
+             node.nodeType == DOMNode.DOCUMENT_FRAGMENT_NODE) {
     for (var i = 0; i < node.childNodes.length; ++i) {
       arguments.callee(node.childNodes[i], buf, cdata);
     }
@@ -387,7 +388,7 @@ function xmlEscapeTags(s) {
  * @return {Document}
  */
 function xmlOwnerDocument(node) {
-  if (node.nodeType == DOM_DOCUMENT_NODE) {
+  if (node.nodeType == DOMNode.DOCUMENT_NODE) {
     return node;
   } else {
     return node.ownerDocument;
