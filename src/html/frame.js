@@ -57,7 +57,14 @@ __extend__(HTMLFrameElement.prototype, {
         this.setAttribute('src', value);
 
         if (value && value.length > 0){
-            $env.loadFrame(this, $env.location(value));
+            var save = $master.first_script_window;
+            try {
+              $master.first_script_window = $inner;
+              $env.loadFrame(this, $env.location(value));
+            } finally {
+              $master.first_script_window = save;
+            }
+
             
             var event = document.createEvent();
             event.initEvent("load");

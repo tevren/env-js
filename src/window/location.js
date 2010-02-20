@@ -11,8 +11,9 @@ $w.__defineSetter__("location", function(url){
     return;
   }
   var now = window.location.href.replace(/^file:\/\//,"").replace(/#.*/,"");
-  var to = $env.location(url,window.location.href != "about:blank" ? window.location.href: undefined);
-  if (to.indexOf(now)===0 && to[now.length]==="#") {
+  var to = $master.first_script_window && $master.first_script_window.location.href;
+  // var to = $env.location(url,window.location.href != "about:blank" ? window.location.href: undefined);
+  if (to && to.indexOf(now)===0 && to[now.length]==="#") {
     return;
   }
   if( !$location || $location == "about:blank" ) {

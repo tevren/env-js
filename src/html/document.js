@@ -47,6 +47,7 @@ __extend__(HTMLDocument.prototype, {
         return this;
     },
     createElement: function(tagName){
+          var node;
           //print('createElement :'+tagName);
           // throw Exception if the tagName string contains an illegal character
           if (__ownerDocument__(this).implementation.errorChecking && 
@@ -283,12 +284,12 @@ var __elementPopped__ = function(ns, name, node){
     
                 // any JS here is DOM-instigated, so the JS scope is the window, not the first script
               
-                var save = $master.first_script_window;
-                $master.first_script_window = window;
+              var save = $master.first_script_window;
+              $master.first_script_window = $inner;
 
-                $env.loadFrame(node, $env.location(node.src));
+              $env.loadFrame(node, $env.location(node.src));
     
-                $master.first_script_window = save;
+              $master.first_script_window = save;
 
                 var event = doc.createEvent();
                 event.initEvent("load", false, false);

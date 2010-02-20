@@ -6,7 +6,7 @@ var SVGElement = function(ownerDocument,name) {
     DOMElement.apply(this,arguments);
 };
 
-SVGElement.prototype = new DOMElement;
+SVGElement.prototype = new DOMElement();
 __extend__(SVGElement.prototype, {
     toString : function(){
         return "SVGElement #"+this._id + " "+ this.tagName + (this.id?" => "+this.id:'');

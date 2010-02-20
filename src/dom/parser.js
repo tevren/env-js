@@ -13,7 +13,7 @@ __extend__(DOMParser.prototype,{
 
 $debug("Initializing Internal DOMParser.");
 //keep one around for internal use
-$domparser = new DOMParser();
+var $domparser = new DOMParser();
 
 $w.DOMParser = DOMParser;
 // =========================================================================

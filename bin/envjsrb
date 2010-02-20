@@ -155,7 +155,6 @@ if ARGV.length > 0
         RUNTIME.evaluate("window.location = '#{uri_s}'", file, 1)
         about_blank = false
       else
-        RUNTIME.become_first_script_window
         RUNTIME.top_level_load uri_s
         RUNTIME.load uri_s
       end

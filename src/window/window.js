@@ -148,6 +148,11 @@ $w.open = function(url, name, features, replace){
   if (replace)
     $env.warn("'replace' argument for 'window.open()' not yet implemented");
 
+  var undef;
+  if(url === undef || url === "") {
+    url = "about:blank";
+  }
+
   var newWindow = $env.newwindow(this, null, url);
   newWindow.$name = name;
   return newWindow;

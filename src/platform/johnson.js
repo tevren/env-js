@@ -20,7 +20,7 @@ $env.location = function(path, base){
     }else if(base){
         base = Ruby.URI.parse(base);
         path = Ruby.URI.parse(path);
-        b = Ruby.eval("lambda { |a,b| a+b; }");
+        var b = Ruby.eval("lambda { |a,b| a+b; }");
         base = b(base,path);
         base = base + "";
         var result = base;
@@ -37,6 +37,7 @@ $env.location = function(path, base){
     }else{
         //return an absolute url from a url relative to the window location
         // print("hi",  $master.first_script_window, $master.first_script_window && $master.first_script_window.location );
+        // if( ( base = window.location ) &&
         if( ( base = ( ( $master.first_script_window && $master.first_script_window.location ) || window.location ) ) &&
             ( base != "about:blank" ) &&
             base.href &&
@@ -320,7 +321,7 @@ $env.loadInlineScript = function(script){
     // debug("lis",original_script_window,original_script_window.isInner);
     // debug("XX",window,window.isInner);
     if ( !$master.first_script_window ) {
-        $master.first_script_window = window;
+        // $master.first_script_window = window;
     }
     // debug("lix",$master.first_script_window,$master.first_script_window.isInner,$w,$w.isInner);
     try {
@@ -329,7 +330,7 @@ $env.loadInlineScript = function(script){
         $env.error("error evaluating script: "+script.text);
         $env.error(e);
     }
-    $master.first_script_window = original_script_window;
+    // $master.first_script_window = original_script_window;
     // debug("lis",original_script_window,original_script_window.isInner);
 };
     
@@ -364,7 +365,7 @@ $env.deleteFile = function(url){
 
 $env.__eval__ = function(script,scope){
     if (script == "")
-        return;
+        return undefined;
     try {
         var scopes = [];
         var original = script;
@@ -373,16 +374,16 @@ $env.__eval__ = function(script,scope){
             while(scope) {
                 scopes.push(scope);
                 scope = scope.parentNode;
-                script = "with(scopes["+(scopes.length-1)+"] ){"+script+"};"
+                script = "with(scopes["+(scopes.length-1)+"] ){"+script+"};";
             }
         }
-        script = "function(original,scopes){"+script+"}"
+        script = "function(original,scopes){"+script+"}";
         var original_script_window = $master.first_script_window;
         if ( !$master.first_script_window ) {
-            $master.first_script_window = window;
+            // $master.first_script_window = window;
         }
         var result = $master.evaluate(script,$inner)(original,scopes);
-        $master.first_script_window = original_script_window;
+        // $master.first_script_window = original_script_window;
         return result;
     }catch(e){
         $error(e);

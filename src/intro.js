@@ -8,19 +8,11 @@
     var $public = (function(){
       var $public = {};
       return $public;
-    })();
+    }());
 
     var $platform = function(master){
 
       var $platform = {};
-
-      $platform.new_global = function() {
-        return $master.new_global();
-      };
-
-      $platform.set_global = function(global) {
-        return $master.set_global(global);
-      };
 
       $platform.new_split_global_outer = function() {
         return $master.new_split_global_outer();
@@ -30,10 +22,8 @@
         return $master.new_split_global_inner(proxy,undefined);
       };
 
-      ( master.window_index === undefined ) && ( master.window_index = 0 );
-
       $platform.init_window = function(inner) {
-        var index = master.window_index++;
+        var index = master.next_window_index()+0;
         inner.toString = function(){
           // return "[object Window "+index+"]";
           return "[object Window]";
@@ -44,12 +34,12 @@
     };
 
     $env.new_window = function(proxy){
-      var swap_script_window = ( $master.first_script_window.window === proxy );
+      var swap_script_window; // = ( $master.first_script_window.window === proxy );
       if(!proxy){
         proxy = $platform.new_split_global_outer();
       }
       $master.proxy = proxy;
-      new_window = $platform.new_split_global_inner(proxy,undefined);
+      var new_window = $platform.new_split_global_inner(proxy,undefined);
       new_window.$inner = new_window;
       if(swap_script_window) {
         $master.first_script_window = new_window;
@@ -59,27 +49,17 @@
         var symbol = $master.symbols[index];
         new_window[symbol] = $master[symbol];
       }
-      new_window.load = function(){
-        for(var i = 0; i < arguments.length; i++){
-          var f = arguments[i];
-          $master.load(f,new_window);
-        }
-      };
-      new_window.evaluate = function(string){
-        return $master.evaluate.call(string,new_window);
-      };
       return [ proxy, new_window ];
     };
 
     $env.init = function(){
-      $master = this.$master;
-      delete this.$master;
+      $env.$master = $master = this.$master;
       $platform = $platform($master);
-      var options = this.$options;
-      delete this.$options;
-      $env.$master = $master;
       var $inner = this.$inner; 
-      delete this.$inner;
+      var options = this.$options;
+      delete $inner.$master;
+      delete $inner.$platform;
+      delete $inner.$options;
       $inner.$envx = $env;
       $env.init_window.call($inner,$inner,options);
     };
@@ -87,8 +67,38 @@
     $env.init_window = function(inner,options){
       var $inner = inner;
       var $w = this;
+      
+      inner.load = function(){
+        for(var i = 0; i < arguments.length; i++){
+          var f = arguments[i];
+          $master.load(f,inner);
+        }
+      };
+      inner.evaluate = function(string){
+        return $master.evaluate.call(string,inner);
+      };
 
       options = options || {};
+
+      var new_opts = {};
+      var undef;
+      for(var xxx in options){
+        if (typeof options[xxx] === "undefined") {
+          new_opts[xxx] = undef;
+        } else if (options[xxx] === null) {
+          new_opts[xxx] = null;
+        } else if (typeof options[xxx] == "object" && options[xxx]+"" === "[object split_global]") {
+          new_opts[xxx] = options[xxx];
+        } else if (typeof options[xxx] == "object" && ((options[xxx]+"").match(/^\[object Window[ 0-9]*\]$/))) {
+          new_opts[xxx] = options[xxx];
+        } else if (typeof options[xxx] == "string") {
+          new_opts[xxx] = options[xxx]+"";
+        } else {
+          throw new Error("copy "+xxx+ " "+typeof options[xxx] + " " +options[xxx]);
+        }
+      }
+
+      options = new_opts;
 
       $platform.init_window($w);
 

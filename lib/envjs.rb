@@ -20,4 +20,9 @@ module Envjs
                                   "envjs",
                                   "env.js" ) )
 
+  EVENT_LOOP = 
+    File.expand_path( File.join( File.dirname(__FILE__),
+                                  "envjs",
+                                  "event_loop.js" ) )
+
 end

@@ -11,7 +11,46 @@ module Envjs::Runtime
   def self.extended object
     object.instance_eval do
 
-      evaluate <<'EOJS'
+      outer = nil
+      scripts = {}
+      
+      master = global["$master"] = evaluate("new Object", nil, nil, nil, global)
+      
+      ( class << self; self; end ).send :define_method, :evaluate do |*args|
+        ( script, file, line, global, scope, fn ) = *args
+        scope ||= outer["$inner"]
+        raise "cannot evaluate nil script" if script.nil?
+        raise "cannot evaluate without a scope" if scope.nil?
+        raise "outer given when inner needed" if !scope == global and !scope["isInner"]
+        # print "eval in " + script[0,50].inspect + scope.inspect + " " + ( scope ? scope.isInner.inspect : "none" ) + "\n"
+        global = nil
+        # scope ||= inner
+        if fn
+          compiled_script = scripts[fn]
+        end
+        compiled_script ||= compile(script, file, line, global)
+        if fn && !scripts[fn]
+          # scripts[fn] = compiled_script
+        end
+        save = master["first_script_window"]
+        if false
+          p scope
+          if master["first_script_window"]
+            print "ignored: " +  ( scope["location"] ? scope["location"]["href"] : "nil" ) + " using " + ( master["first_script_window"]["location"] ?  master["first_script_window"]["location"]["href"] : "nil" ) + "\n"
+          else
+            print "pushing into " + ( scope["location"] ? scope["location"]["href"] : "nil" ) + "\n"
+          end
+        end
+
+        master["first_script_window"] ||= scope
+        raise "hell" if !master["first_script_window"]["isInner"] && master["first_script_window"] != self.global
+        v = evaluate_compiled_script(compiled_script,scope)
+        master["first_script_window"] = save
+        # print "done\n"
+        v
+      end
+
+      evaluate( <<'EOJS', nil, nil, nil, global )
 print = function() {
   var l = arguments.length
   for( var i = 0; i < l; i++ ) {
@@ -33,7 +72,7 @@ print = function() {
 };
 EOJS
 
-      evaluate <<'EOJS'
+      evaluate <<'EOJS', nil, nil, nil, global
 debug = function() {
   var l = arguments.length
   for( var i = 0; i < l; i++ ) {
@@ -54,7 +93,7 @@ debug = function() {
 };
 EOJS
 
-      evaluate <<'EOJS'
+      evaluate <<'EOJS', nil, nil, nil, global
 puts = function() {
   var l = arguments.length
   for( var i = 0; i < l; i++ ) {
@@ -72,8 +111,9 @@ puts = function() {
 };
 EOJS
 
-      master = global["$master"] = evaluate("new Object")
       master["runtime"] = self
+      window_index = -1
+      master["next_window_index"] = lambda { window_index += 1 }
       master.symbols = [ "Johnson", "Ruby", "print", "debug", "puts", "load", "reload", "whichInterpreter", "multiwindow" ]
       master.symbols.each { |symbol| master[symbol] = global[symbol] }
 
@@ -265,61 +305,41 @@ EOJS
       # create an proto window object and proxy
 
       outer = new_split_global_outer
-      window = inner = new_split_global_inner( outer )
+      inner = new_split_global_inner( outer )
 
       master.symbols.each do |symbol|
-        window[symbol] = master[symbol]
+        inner[symbol] = master[symbol]
       end
 
-      master.first_script_window = window
+      inner["$inner"] = inner
+      inner["$master"] = master
+      inner["$options"] = evaluate("new Object", nil, nil, nil, inner);
+      inner["$options"].proxy = outer
 
-      window["$inner"] = inner
-      window["$master"] = master
-      window["$options"] = evaluate("new Object");
-      window["$options"].proxy = outer
-
-      window.evaluate = lambda { |s|
-        return master.evaluate.call(s,window);
+      inner.evaluate = lambda { |s|
+        return master.evaluate.call(s,inner);
       }
 
-      window.load = lambda { |*files|
+      inner.load = lambda { |*files|
         files.each do |f|
-          master.load.call f, window
+          master.load.call f, inner
         end
       }
 
-      window.reload = lambda { |*files|
+      inner.reload = lambda { |*files|
         files.each do |f|
-          master.reload.call f, window
+          master.reload.call f, inner
         end
       }
 
       ( class << self; self; end ).send :define_method, :wait do
         master["finalize"] && master.finalize.call
-        master.timers && master.timers.wait
+        master.eventLoop && master.eventLoop.wait
       end
 
-      scripts = {}
-
-      ( class << self; self; end ).send :define_method, :become_first_script_window do
+      ( class << self; self; end ).send :define_method, :_become_first_script_window do
         # p "heh ++++++++++++++++++++++++++++", inner, master.first_script_window
         inner = master.first_script_window
-      end
-
-      ( class << self; self; end ).send :define_method, :evaluate do |*args|
-        ( script, file, line, global, scope, fn ) = *args
-        raise "cannot evaluate nil script" if script.nil?
-        # print "eval in " + script[0,50].inspect + scope.inspect + " " + ( scope ? scope.isInner.inspect : "none" ) + "\n"
-        global = nil
-        scope ||= inner
-        if fn
-          compiled_script = scripts[fn]
-        end
-        compiled_script ||= compile(script, file, line, global)
-        if fn && !scripts[fn]
-          scripts[fn] = compiled_script
-        end
-        evaluate_compiled_script(compiled_script,scope)
       end
 
       ( class << self; self; end ).send :define_method, :reevaluate do |*args|
@@ -335,17 +355,20 @@ EOJS
         evaluate_compiled_script(compiled_script,scope)
       end
 
-      @envjs = inner
-
       ( class << self; self; end ).send :define_method, :"[]" do |key|
-        key == "this" && evaluate("this") || @envjs[key]
+        # key == "this" && evaluate("this", nil, nil, nil, inner) || @envjs[key]
+        key == "this" && outer || outer[key]
       end
 
       ( class << self; self; end ).send :define_method, :"[]=" do |k,v|
-        @envjs[k] = v
+        # inner[k] = v
+        outer[k] = v
       end
 
-      load Envjs::ENVJS
+      master.load.call Envjs::EVENT_LOOP, global
+      master.load.call Envjs::ENVJS, inner
+      
+      inner = nil
     end
   end
 

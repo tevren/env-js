@@ -11,7 +11,7 @@ $debug("Defining SVGDocument");
 var SVGDocument = function() {
   throw new Error("SVGDocument() not implemented");
 };
-SVGDocument.prototype = new DOMDocument;
+SVGDocument.prototype = new DOMDocument();
 __extend__(SVGDocument.prototype, {
   createElement: function(tagName){
     $debug("SVGDocument.createElement( "+tagName+" )");

@@ -2,8 +2,8 @@
 *	history.js
 */
 
-	$currentHistoryIndex = 0;
-	$history = [];
+	var $currentHistoryIndex = 0;
+	var $history = [];
 	
 	// Browser History
 	$w.__defineGetter__("history", function(){	

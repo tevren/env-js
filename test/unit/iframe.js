@@ -151,7 +151,7 @@ test("IFRAMEs can be nested, created dynamically", function() {
           getElementsByTagName('body')[0];
 
         bottomBody.appendChild(newIframe);
-        newIframe.src = "html/iframeN.html";
+        newIframe.src = "iframeN.html";
         bottomIframe = newIframe;
 
 

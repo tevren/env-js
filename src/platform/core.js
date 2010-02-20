@@ -5,18 +5,20 @@
 var Envjs = function(){
     if(arguments.length === 2){
         for ( var i in arguments[1] ) {
-    		var g = arguments[1].__lookupGetter__(i), 
+            var g = arguments[1].__lookupGetter__(i), 
                 s = arguments[1].__lookupSetter__(i);
-    		if ( g || s ) {
-    			if ( g ) Envjs.__defineGetter__(i, g);
-    			if ( s ) Envjs.__defineSetter__(i, s);
-    		} else
-    			Envjs[i] = arguments[1][i];
-    	}
+            if ( g || s ) {
+                if ( g ) { Envjs.__defineGetter__(i, g); }
+                if ( s ) { Envjs.__defineSetter__(i, s); }
+            } else {
+                Envjs[i] = arguments[1][i];
+            }
+        }
     }
 
-    if (arguments[0] != null && arguments[0] != "")
+    if (arguments[0] !== null && arguments[0] !== "") {
         window.location = arguments[0];
+    }
 };
 
 /*
@@ -47,24 +49,27 @@ var Envjs = function(){
     $env.logLevel = $env.WARN;
     
     $env.debug  = function(msg){
-		if($env.logLevel >= $env.DEBUG)
+		if($env.logLevel >= $env.DEBUG) {
             $env.log(msg,"DEBUG"); 
+        }
     };
     $env.info = function(msg){
-        if($env.logLevel >= $env.INFO)
+        if($env.logLevel >= $env.INFO) {
             $env.log(msg,"INFO"); 
+        }
     };
     $env.warn   = function(msg){
-        if($env.logLevel >= $env.WARN)
+        if($env.logLevel >= $env.WARN) {
             $env.log(msg,"WARNIING");    
+        }
     };
     $env.error = function(msg, e){
         if ($env.logLevel >= $env.ERROR) {
           var line = $env.lineSource(e);
-          line != "" && ( line = " Line: "+ line );
+            if ( line !== "" ) { line = " Line: "+ line ;}
 			$env.log(msg + line, 'ERROR');
                         if(e) {
-  			  $env.log(e || "", 'ERROR');
+                            $env.log(e || "", 'ERROR');
                         }
 		}
     };
@@ -230,7 +235,7 @@ var Envjs = function(){
                 $env.reload(frameElement._content, url);
             }
             else {
-              var v = $env.newwindow(this,
+              var v = $env.newwindow($w,
                     frameElement.ownerDocument.parentWindow, url);
               frameElement._content = v;
             }
@@ -308,3 +313,9 @@ print("TT");
     }
 
 })($env);
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// End:

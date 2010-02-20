@@ -52,12 +52,12 @@ __extend__(XPathResult.prototype, {
     get singleNodeValue(){
       return this.impl.nodeSetValue()[0];
     },
-/*
-    snapshotItem: function(index){
-      throw new Error("implement snapshotItem");
-        //TODO
+    get snapshotLength(){
+      return this.impl.nodeSetValue().length;
     },
-*/
+    snapshotItem: function(index){
+      return this.impl.nodeSetValue()[index];
+    },
     iterateNext: function(){
       return this.impl.nodeSetValue()[this.current++];
     }
