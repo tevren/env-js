@@ -57,7 +57,7 @@
       $platform = $platform($master);
       var $inner = this.$inner; 
       var options = this.$options;
-      delete $inner.$master;
+      // delete $inner.$master;
       delete $inner.$platform;
       delete $inner.$options;
       $inner.$envx = $env;
@@ -80,25 +80,30 @@
 
       options = options || {};
 
-      var new_opts = {};
-      var undef;
-      for(var xxx in options){
-        if (typeof options[xxx] === "undefined") {
-          new_opts[xxx] = undef;
-        } else if (options[xxx] === null) {
-          new_opts[xxx] = null;
-        } else if (typeof options[xxx] == "object" && options[xxx]+"" === "[object split_global]") {
-          new_opts[xxx] = options[xxx];
-        } else if (typeof options[xxx] == "object" && ((options[xxx]+"").match(/^\[object Window[ 0-9]*\]$/))) {
-          new_opts[xxx] = options[xxx];
-        } else if (typeof options[xxx] == "string") {
-          new_opts[xxx] = options[xxx]+"";
-        } else {
-          throw new Error("copy "+xxx+ " "+typeof options[xxx] + " " +options[xxx]);
+      var copy_opts = function copy_opts(options){
+        var new_opts = {};
+        var undef;
+        for(var xxx in options){
+          if (typeof options[xxx] === "undefined") {
+            new_opts[xxx] = undef;
+          } else if (options[xxx] === null) {
+            new_opts[xxx] = null;
+          } else if (typeof options[xxx] == "object" && options[xxx]+"" === "[object split_global]") {
+            new_opts[xxx] = options[xxx];
+          } else if (typeof options[xxx] == "object" && ((options[xxx]+"").match(/^\[object Window[ 0-9]*\]$/))) {
+            new_opts[xxx] = options[xxx];
+          } else if (typeof options[xxx] == "string") {
+            new_opts[xxx] = options[xxx]+"";
+          } else if (typeof options[xxx] == "object" && (options[xxx].constructor+"").match(/^function Object\(\)/) ) {
+            new_opts[xxx] = copy_opts(options[xxx]);
+          } else {
+            throw new Error("copy "+xxx+ " "+typeof options[xxx] + " " +options[xxx] + " " + options[xxx].constructor);
+          }
         }
-      }
+        return new_opts;
+      };
 
-      options = new_opts;
+      options = copy_opts(options);
 
       $platform.init_window($w);
 

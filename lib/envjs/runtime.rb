@@ -16,6 +16,10 @@ module Envjs::Runtime
       
       master = global["$master"] = evaluate("new Object", nil, nil, nil, global)
       
+      ( class << self; self; end ).send :define_method, :master do
+        master
+      end
+
       ( class << self; self; end ).send :define_method, :evaluate do |*args|
         ( script, file, line, global, scope, fn ) = *args
         scope ||= outer["$inner"]
