@@ -74,7 +74,10 @@ try{
 		    $debug("XHR sending synch;");
 			makeRequest();
 		}
-}catch(e){print("oopsy",e);}
+}catch(e){
+    print("oopsy",e);
+    print("oopsy",e.stack);
+}
 
 	},
 	abort: function(){

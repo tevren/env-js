@@ -4,6 +4,7 @@
 *~
 /dist/env.johnson.js
 /lib/envjs/env.js
+/lib/envjs/static.js
 /envjs.gemspec
 /rhino/build
 /jshost

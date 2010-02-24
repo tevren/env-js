@@ -5,9 +5,11 @@ $debug("Defining XPathResult");
 /*
 * XPathResult 
 */
+/*
 $w.__defineGetter__("XPathResult", function(){
     return XPathResult;
 });
+*/
 
 var XPathResult = function(impl) {
     this.current = 0;
