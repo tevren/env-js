@@ -21,7 +21,7 @@ __extend__(HTMLTableElement.prototype, {
         var tFoot = this.tFoot;
        
         if (!tFoot) {
-            tFoot = document.createElement("tfoot");
+            tFoot = this.ownerDocument.createElement("tfoot");
             this.appendChild(tFoot);
         }
         
@@ -44,7 +44,7 @@ __extend__(HTMLTableElement.prototype, {
         var tHead = this.tHead;
        
         if (!tHead) {
-            tHead = document.createElement("thead");
+            tHead = this.ownerDocument.createElement("thead");
             this.insertBefore(tHead, this.firstChild);
         }
         
@@ -66,7 +66,7 @@ __extend__(HTMLTableElement.prototype, {
             if (tagName === "tr") {
                 // need an implcit <tbody> to contain this...
                 if (!this.currentBody) {
-                    this.currentBody = document.createElement("tbody");
+                    this.currentBody = this.ownerDocument.createElement("tbody");
                 
                     DOMNode.prototype.appendChild.apply(this, [this.currentBody]);
                 }
@@ -110,7 +110,7 @@ __extend__(HTMLTableElement.prototype, {
             throw new Error("Index > rows.length in call to HTMLTableElement.insertRow");
         }
         
-        var inserted = document.createElement("tr");
+        var inserted = this.ownerDocument.createElement("tr");
         // If index is -1 or equal to the number of rows, 
         // the row is appended as the last row. If index is omitted 
         // or greater than the number of rows, an error will result
@@ -196,4 +196,4 @@ __extend__(HTMLTableElement.prototype, {
     
 });
 
-$w.HTMLTableElement = HTMLTableElement;		
+// $w.HTMLTableElement = HTMLTableElement;		

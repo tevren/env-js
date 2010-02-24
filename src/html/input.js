@@ -55,5 +55,5 @@ __extend__(HTMLInputElement.prototype, {
     }
 });
 
-$w.HTMLInputElement = HTMLInputElement;
+// $w.HTMLInputElement = HTMLInputElement;
 

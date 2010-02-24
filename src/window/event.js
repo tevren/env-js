@@ -103,8 +103,9 @@ try{
                  target.type === "submit" ) ) ) ) {
         target.form.clk = target;
 try{
-        __submit__(target.form);
-}catch(e){print("oops",e);print(e.stack);};
+  target.form.submit();
+  // __submit__(target.form);
+}catch(e){print("oopse",e);print(e.stack);};
         delete target.form.clk;
       }
 
@@ -121,7 +122,7 @@ try{
         if (target.enctype === "multipart/form-data") {
           boundary = (new Date).getTime();
         }
-        data = __formSerialize__(target,undefined,boundary);
+        data = $master["static"].__formSerialize__(target,undefined,boundary);
         var options = {method: target.method || "get", data: data};
         if (boundary) {
           options["Content-Type"] = "multipart/form-data; boundary="+boundary;
@@ -145,6 +146,10 @@ print(e.stack);
 }
 };
 	
+$env.__removeEventListener__ = __removeEventListener__;
+$env.__addEventListener__ = __addEventListener__;
+$env.__dispatchEvent__ = __dispatchEvent__;
+
 $w.dispatchEvent = function(event, bubbles){
     __dispatchEvent__(this, event, bubbles);
 };

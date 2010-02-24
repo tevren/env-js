@@ -6,7 +6,7 @@ SVGTransformable.prototype = new SVGLocatable;
 __extend__(SVGLocatable.prototype, {
 });
 
-$w.SVGTransformable = SVGTransformable;
+// $w.SVGTransformable = SVGTransformable;
 
 // Local Variables:
 // espresso-indent-level:4

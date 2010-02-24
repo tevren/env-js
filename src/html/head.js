@@ -41,4 +41,4 @@ var __evalScript__ = function(newChild){
     }
 };
 
-$w.HTMLHeadElement = HTMLHeadElement;
+// $w.HTMLHeadElement = HTMLHeadElement;

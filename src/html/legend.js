@@ -16,4 +16,4 @@ __extend__(HTMLLegendElement.prototype, {
     }
 });
 
-$w.HTMLLegendElement = HTMLLegendElement;
+// $w.HTMLLegendElement = HTMLLegendElement;

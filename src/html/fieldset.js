@@ -16,4 +16,4 @@ __extend__(HTMLFieldSetElement.prototype, {
     }
 });
 
-$w.HTMLFieldSetElement = HTMLFieldSetElement;
+// $w.HTMLFieldSetElement = HTMLFieldSetElement;

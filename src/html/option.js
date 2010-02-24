@@ -8,6 +8,12 @@ var HTMLOptionElement = function(ownerDocument) {
 };
 HTMLOptionElement.prototype = new HTMLInputCommon;
 __extend__(HTMLOptionElement.prototype, {
+    setAttributeNS : function(namespaceURI, qualifiedName, value) {
+        if (namespaceURI) {
+            throw new Error("unexpected namespaceURI");
+        }
+        this.setAttribute(qualifiedName, value);
+    },
     setAttribute: function(name, value){
         if (name != "selected") {
             HTMLInputCommon.prototype.setAttribute.apply(this, arguments);
@@ -25,7 +31,7 @@ __extend__(HTMLOptionElement.prototype, {
             if (value) {
                 // set select's value to this option's value (this also 
                 // unselects previously selected value)
-                this.parentNode.value = this.value;
+                this.parentNode && (this.parentNode.value = this.value);
             } else {
                 // if no other option is selected, select the first option in the select
                 var i, anythingSelected;
@@ -82,7 +88,7 @@ __extend__(HTMLOptionElement.prototype, {
     }
 });
 
-$w.HTMLOptionElement = HTMLOptionElement;
+// $w.HTMLOptionElement = HTMLOptionElement;
 
 // Local Variables:
 // espresso-indent-level:4

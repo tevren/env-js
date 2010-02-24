@@ -48,4 +48,4 @@ __extend__(DOMProcessingInstruction.prototype, {
     }
 });
 
-$w.ProcessesingInstruction = DOMProcessingInstruction;
+// $w.ProcessesingInstruction = DOMProcessingInstruction;

@@ -116,4 +116,4 @@ __extend__(DOMCharacterData.prototype,{
     }
 });
 
-$w.CharacterData = DOMCharacterData;
+// $w.CharacterData = DOMCharacterData;

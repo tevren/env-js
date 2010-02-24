@@ -28,4 +28,4 @@ __extend__(HTMLStyleElement.prototype, {
     }
 });
 
-$w.HTMLStyleElement = HTMLStyleElement;
+// $w.HTMLStyleElement = HTMLStyleElement;

@@ -7,6 +7,7 @@ var DOMParser = function(){};
 __extend__(DOMParser.prototype,{
     parseFromString: function(xmlString){
         $debug("Parsing XML String: " +xmlString);
+        throw new Error("implement when testable");
         return document.implementation.createDocument().loadXML(xmlString);
     }
 });
@@ -15,7 +16,7 @@ $debug("Initializing Internal DOMParser.");
 //keep one around for internal use
 var $domparser = new DOMParser();
 
-$w.DOMParser = DOMParser;
+// $w.DOMParser = DOMParser;
 // =========================================================================
 //
 // xmlsax.js - an XML SAX parser in JavaScript.

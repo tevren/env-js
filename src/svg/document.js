@@ -22,4 +22,4 @@ __extend__(SVGDocument.prototype, {
     return node;
   }});
 
-$w.SVGDocument = SVGDocument;
+// $w.SVGDocument = SVGDocument;

@@ -1,21 +1,26 @@
-(function () {window.nu_validator_htmlparser_HtmlParser = function(){
-  var $wnd_0 = window, $doc_0 = document, gwtOnLoad, bodyDone, base = '', metaProps = {}, values = [], providers = [], answers = [], onLoadErrorFunc, propertyErrorFunc;
-  if (!$wnd_0.__gwt_stylesLoaded) {
-    $wnd_0.__gwt_stylesLoaded = {};
+var nu_validator_htmlparser_HtmlParser;
+var alert = $error;
+(function () {
+  nu_validator_htmlparser_HtmlParser = function(){
+
+  envjs_init_0 = function($envjs_wnd_0){
+  if (!$envjs_wnd_0.__gwt_stylesLoaded) {
+    $envjs_wnd_0.__gwt_stylesLoaded = {};
   }
-  if (!$wnd_0.__gwt_scriptsLoaded) {
-    $wnd_0.__gwt_scriptsLoaded = {};
+  if (!$envjs_wnd_0.__gwt_scriptsLoaded) {
+    $envjs_wnd_0.__gwt_scriptsLoaded = {};
   }
-  function maybeStartModule(){
-    if (gwtOnLoad && bodyDone) {
-      gwtOnLoad(onLoadErrorFunc, 'nu.validator.htmlparser.HtmlParser', base);
+  };
+  function maybeStartModule($envjs_wnd_0){
+    if ($envjs_wnd_0.__nu__.gwtOnLoad && $envjs_wnd_0.__nu__.bodyDone) {
+      $envjs_wnd_0.__nu__.gwtOnLoad($envjs_wnd_0.__nu__.onLoadErrorFunc, 'nu.validator.htmlparser.HtmlParser', $envjs_wnd_0.__nu__.base);
     }
   }
 
-  function computeScriptBase(){
+  function computeScriptBase($envjs_wnd_0,$envjs_doc_0){
     var thisScript, markerScript;
-    $doc_0.write('<script id="__gwt_marker_nu.validator.htmlparser.HtmlParser"><\/script>');
-    markerScript = $doc_0.getElementById('__gwt_marker_nu.validator.htmlparser.HtmlParser');
+    $envjs_doc_0.write('<script id="__gwt_marker_nu.validator.htmlparser.HtmlParser"><\/script>');
+    markerScript = $envjs_doc_0.getElementById('__gwt_marker_nu.validator.htmlparser.HtmlParser');
     if (markerScript) {
       thisScript = markerScript.previousSibling;
     }
@@ -34,30 +39,30 @@
 
     ;
     if (thisScript && thisScript.src) {
-      base = getDirectoryOfFile(thisScript.src);
+      $envjs_wnd_0.__nu__.base = getDirectoryOfFile(thisScript.src);
     }
-    if (base == '') {
-      var baseElements = $doc_0.getElementsByTagName('base');
+    if ($envjs_wnd_0.__nu__.base == '') {
+      var baseElements = $envjs_doc_0.getElementsByTagName('base');
       if (baseElements.length > 0) {
-        base = baseElements[baseElements.length - 1].href;
+        $envjs_wnd_0.__nu__.base = baseElements[baseElements.length - 1].href;
       }
        else {
-        base = getDirectoryOfFile($doc_0.location.href);
+        $envjs_wnd_0.__nu__.base = getDirectoryOfFile($envjs_doc_0.location.href);
       }
     }
-     else if (base.match(/^\w+:\/\//)) {
+     else if ($envjs_wnd_0.__nu__.base.match(/^\w+:\/\//)) {
     }
      else {
-      var img = $doc_0.createElement('img');
-      img.src = base + 'clear.cache.gif';
-      base = getDirectoryOfFile(img.src);
+      var img = $envjs_doc_0.createElement('img');
+      img.src = $envjs_wnd_0.__nu__.base + 'clear.cache.gif';
+      $envjs_wnd_0.__nu__.base = getDirectoryOfFile(img.src);
     }
     if (markerScript) {
       markerScript.parentNode.removeChild(markerScript);
     }
   }
 
-  function processMetas(){
+  function processMetas(document){
     var metas = document.getElementsByTagName('meta');
     for (var i = 0, n = metas.length; i < n; ++i) {
       var meta = metas[i], name = meta.getAttribute('name'), content;
@@ -74,14 +79,14 @@
               name = content;
               value = '';
             }
-            metaProps[name] = value;
+            $envjs_wnd_0.__nu__.metaProps[name] = value;
           }
         }
          else if (name == 'gwt:onPropertyErrorFn') {
           content = meta.getAttribute('content');
           if (content) {
             try {
-              propertyErrorFunc = eval(content);
+              $envjs_wnd_0.__nu__.propertyErrorFunc = eval(content);
             }
              catch (e) {
               alert('Bad handler "' + content + '" for "gwt:onPropertyErrorFn"');
@@ -92,7 +97,7 @@
           content = meta.getAttribute('content');
           if (content) {
             try {
-              onLoadErrorFunc = eval(content);
+              $envjs_wnd_0.__nu__.onLoadErrorFunc = eval(content);
             }
              catch (e) {
               alert('Bad handler "' + content + '" for "gwt:onLoadErrorFn"');
@@ -103,42 +108,44 @@
     }
   }
 
-  nu_validator_htmlparser_HtmlParser.onScriptLoad = function(gwtOnLoadFunc){
-    nu_validator_htmlparser_HtmlParser = null;
-    gwtOnLoad = gwtOnLoadFunc;
-    maybeStartModule();
+  nu_validator_htmlparser_HtmlParser.onScriptLoad = function($envjs_wnd_0,gwtOnLoadFunc){
+    // nu_validator_htmlparser_HtmlParser = null;
+    $envjs_wnd_0.__nu__.gwtOnLoad = gwtOnLoadFunc;
+    maybeStartModule($envjs_wnd_0);
   }
   ;
-  computeScriptBase();
-  processMetas();
-  var onBodyDoneTimerId;
+  envjs_init_1 = function($envjs_wnd_0,$envjs_doc_0) {
+  computeScriptBase($envjs_wnd_0,$envjs_doc_0);
+  processMetas($envjs_doc_0);
+  // var onBodyDoneTimerId;
   /*envjsedit*/var onBodyDone = Html5Parser = function(){
-    if (!bodyDone) {
-      bodyDone = true;
-      maybeStartModule();
+    if (!$envjs_wnd_0.__nu__.bodyDone) {
+      $envjs_wnd_0.__nu__.bodyDone = true;
+      maybeStartModule($envjs_wnd_0);
       if(false/*envjsedit*/) {
-        $doc_0.removeEventListener('DOMContentLoaded', onBodyDone, false);
+        $envjs_doc_0.removeEventListener('DOMContentLoaded', onBodyDone, false);
       }
-      if (onBodyDoneTimerId) {
-        clearInterval(onBodyDoneTimerId);
+      if ($envjs_wnd_0.__nu__.onBodyDoneTimerId) {
+        clearInterval($envjs_wnd_0.__nu__.onBodyDoneTimerId);
       }
     }
-  }
+  };
+  };
 
   /*envjsedit {
-    $doc_0.addEventListener('DOMContentLoaded', onBodyDone, false);
+    $envjs_doc_0.addEventListener('DOMContentLoaded', onBodyDone, false);
   }
   var onBodyDoneTimerId = setInterval(function(){
-    if (/loaded|complete/.test($doc_0.readyState)) {
+    if (/loaded|complete/.test($envjs_doc_0.readyState)) {
       onBodyDone();
     }
   }
   envjsedit*/
 }
 ;
-nu_validator_htmlparser_HtmlParser.__gwt_initHandlers = function(resize, beforeunload, unload){
-  var $wnd_0 = window, oldOnResize = $wnd_0.onresize, oldOnBeforeUnload = $wnd_0.onbeforeunload, oldOnUnload = $wnd_0.onunload;
-  $wnd_0.onresize = function(evt){
+nu_validator_htmlparser_HtmlParser.__gwt_initHandlers = function($envjs_wnd_0, resize, beforeunload, unload){
+  var oldOnResize = $envjs_wnd_0.onresize, oldOnBeforeUnload = $envjs_wnd_0.onbeforeunload, oldOnUnload = $envjs_wnd_0.onunload;
+  $envjs_wnd_0.onresize = function(evt){
     try {
       resize();
     }
@@ -147,7 +154,7 @@ nu_validator_htmlparser_HtmlParser.__gwt_initHandlers = function(resize, beforeu
     }
   }
   ;
-  $wnd_0.onbeforeunload = function(evt){
+  $envjs_wnd_0.onbeforeunload = function(evt){
     var ret, oldRet;
     try {
       ret = beforeunload();
@@ -163,22 +170,35 @@ nu_validator_htmlparser_HtmlParser.__gwt_initHandlers = function(resize, beforeu
     }
   }
   ;
-  $wnd_0.onunload = function(evt){
+  $envjs_wnd_0.onunload = function(evt){
     try {
       unload();
     }
      finally {
       oldOnUnload && oldOnUnload(evt);
-      $wnd_0.onresize = null;
-      $wnd_0.onbeforeunload = null;
-      $wnd_0.onunload = null;
+      $envjs_wnd_0.onresize = null;
+      $envjs_wnd_0.onbeforeunload = null;
+      $envjs_wnd_0.onunload = null;
     }
   }
   ;
 }
 ;
 nu_validator_htmlparser_HtmlParser();
-})();(function () {var $gwt_version = "1.5.1";var $wnd = window;var $doc = $wnd.document;var $moduleName, $moduleBase;var $stats = $wnd.__gwtStatsEvent ? function(a) {$wnd.__gwtStatsEvent(a)} : null;var _, N8000000000000000_longLit = [0, -9223372036854775808], P1000000_longLit = [16777216, 0], P7fffffffffffffff_longLit = [4294967295, 9223372032559808512];
+})();
+
+(function () {var $gwt_version = "1.5.1";
+
+              // var $wnd = window;
+              // var $doc = $wnd.document;
+
+              var $moduleName, $moduleBase;
+
+              envjs_init_2 = function($envjs_wnd) {
+                $envjs_wnd.__nu__.$stats = $envjs_wnd.__gwtStatsEvent ? function(a) {$envjs_wnd.__gwtStatsEvent(a)} : null;
+              };
+
+              var _, N8000000000000000_longLit = [0, -9223372036854775808], P1000000_longLit = [16777216, 0], P7fffffffffffffff_longLit = [4294967295, 9223372032559808512];
 function equals_1(other){
   return (this == null?null:this) === (other == null?null:other);
 }
@@ -538,48 +558,57 @@ function $clinit_7(){
 }
 
 var MAX_VALUE, MIN_VALUE, ZERO;
-function $clinit_12(){
-  $clinit_12 = nullMethod;
-  timers = $ArrayList(new ArrayList());
-  addWindowCloseListener(new Timer$1());
+function $clinit_12($envjs_wnd_0){
+  // $clinit_12 = nullMethod;
+  if (!$envjs_wnd_0.__nu__.timers) { 
+    $envjs_wnd_0.__nu__.timers = $ArrayList(new ArrayList());
+    addWindowCloseListener($envjs_wnd_0,new Timer$1());
+  }
 }
 
-function $cancel(this$static){
+function $cancel($envjs_wnd,this$static){
   if (this$static.isRepeating) {
-    $wnd.clearInterval(this$static.timerId);
+    $envjs_wnd.clearInterval(this$static.timerId);
   }
    else {
-    $wnd.clearTimeout(this$static.timerId);
+    $envjs_wnd.clearTimeout(this$static.timerId);
   }
-  $remove_0(timers, this$static);
+  $remove_0($envjs_wnd.__nu__.timers, this$static);
 }
 
-function $fireImpl(this$static){
+function $fireImpl($envjs_wnd_0,this$static){
   if (!this$static.isRepeating) {
-    $remove_0(timers, this$static);
+    $remove_0($envjs_wnd_0.__nu__.timers, this$static);
   }
-  $run(this$static);
+  $run(this$static,$envjs_wnd_0);
 }
 
-function $schedule(this$static, delayMillis){
+function $schedule($envjs_wnd,this$static, delayMillis){
   if (delayMillis <= 0) {
     throw $IllegalArgumentException(new IllegalArgumentException(), 'must be positive');
   }
-  $cancel(this$static);
+  $cancel($envjs_wnd,this$static);
   this$static.isRepeating = false;
-  this$static.timerId = createTimeout(this$static, delayMillis);
-  $add(timers, this$static);
+  this$static.timerId = createTimeout($envjs_wnd,this$static, delayMillis);
+  $add($envjs_wnd.__nu__.timers, this$static);
 }
 
-function createTimeout(timer, delay){
+function createTimeout($envjs_wnd_0,timer, delay){
+  // $error("sched",timer);
   return psettimeout(function(){
-    timer.fire();
+    try{
+    // $error("deliv",timer);
+    timer.fire($envjs_wnd_0);
+    // $error("deliverd",timer);
+    } catch(e) {
+      $error("oopsp",e);
+    }
   }
   , delay);
 }
 
-function fire(){
-  $fireImpl(this);
+function fire($envjs_wnd_0){
+  $fireImpl($envjs_wnd_0,this);
 }
 
 function getClass_4(){
@@ -595,10 +624,10 @@ _.getClass$ = getClass_4;
 _.typeId$ = 0;
 _.isRepeating = false;
 _.timerId = 0;
-var timers;
-function $onWindowClosed(){
-  while (($clinit_12() , timers).size > 0) {
-    $cancel(dynamicCast($get_0(timers, 0), 3));
+// var timers;
+function $onWindowClosed($envjs_wnd_0){
+  while (($clinit_12($envjs_wnd_0) , $envjs_wnd_0.__nu__.timers).size > 0) {
+    $cancel($envjs_wnd_0,dynamicCast($get_0($envjs_wnd_0.__nu__.timers, 0), 3));
   }
 }
 
@@ -612,29 +641,29 @@ function Timer$1(){
 _ = Timer$1.prototype = new Object_0();
 _.getClass$ = getClass_3;
 _.typeId$ = 7;
-function addWindowCloseListener(listener){
-  maybeInitializeHandlers();
-  if (!closingListeners) {
-    closingListeners = $ArrayList(new ArrayList());
+function addWindowCloseListener($envjs_wnd_0,listener){
+  maybeInitializeHandlers($envjs_wnd_0);
+  if (!$envjs_wnd_0.__nu__.closingListeners) {
+    $envjs_wnd_0.__nu__.closingListeners = $ArrayList(new ArrayList());
   }
-  $add(closingListeners, listener);
+  $add($envjs_wnd_0.__nu__.closingListeners, listener);
 }
 
-function fireClosedImpl(){
+function fireClosedImpl($envjs_wnd_0){
   var listener$iterator;
-  if (closingListeners) {
-    for (listener$iterator = $AbstractList$IteratorImpl(new AbstractList$IteratorImpl(), closingListeners); listener$iterator.i < listener$iterator.this$0.size_0();) {
+  if ($envjs_wnd_0.__nu__.closingListeners) {
+    for (listener$iterator = $AbstractList$IteratorImpl(new AbstractList$IteratorImpl(), $envjs_wnd_0.__nu__.closingListeners); listener$iterator.i < listener$iterator.this$0.size_0();) {
       dynamicCast($next(listener$iterator), 4);
-      $onWindowClosed();
+      $onWindowClosed($envjs_wnd_0);
     }
   }
 }
 
-function fireClosingImpl(){
+function fireClosingImpl($envjs_wnd_0){
   var listener$iterator, ret;
   ret = null;
-  if (closingListeners) {
-    for (listener$iterator = $AbstractList$IteratorImpl(new AbstractList$IteratorImpl(), closingListeners); listener$iterator.i < listener$iterator.this$0.size_0();) {
+  if ($envjs_wnd_0.__nu__.closingListeners) {
+    for (listener$iterator = $AbstractList$IteratorImpl(new AbstractList$IteratorImpl(), $envjs_wnd_0.__nu__.closingListeners); listener$iterator.i < listener$iterator.this$0.size_0();) {
       dynamicCast($next(listener$iterator), 4);
       ret = null;
     }
@@ -642,26 +671,29 @@ function fireClosingImpl(){
   return ret;
 }
 
-function init(){
-  __gwt_initHandlers(function(){
+function init($envjs_wnd_0){
+  __gwt_initHandlers($envjs_wnd_0, function(){
   }
   , function(){
-    return fireClosingImpl();
+    return fireClosingImpl($envjs_wnd_0);
   }
   , function(){
-    fireClosedImpl();
+    fireClosedImpl($envjs_wnd_0);
   }
   );
 }
 
-function maybeInitializeHandlers(){
-  if (!handlersAreInitialized) {
-    init();
-    handlersAreInitialized = true;
+function maybeInitializeHandlers($envjs_wnd_0){
+  if (!$envjs_wnd_0.__nu__.handlersAreInitialized) {
+    init($envjs_wnd_0);
+    $envjs_wnd_0.__nu__.handlersAreInitialized = true;
   }
 }
 
-var closingListeners = null, handlersAreInitialized = false;
+envjs_init_5 = function($envjs_wnd_0){
+/* var */ $envjs_wnd_0.__nu__.closingListeners = null, $envjs_wnd_0.__nu__.handlersAreInitialized = false;
+}
+
 function $ArrayStoreException(this$static, message){
   this$static.detailMessage = message;
   return this$static;
@@ -5641,22 +5673,22 @@ function installExplorerCreateElementNS(doc){
       }
        else if ('http://www.w3.org/1998/Math/MathML' == uri) {
         if (!doc.mathplayerinitialized) {
-          var obj = document.createElement('object');
+          var obj = doc.createElement('object');
           obj.setAttribute('id', 'mathplayer');
           obj.setAttribute('classid', 'clsid:32F66A20-7614-11D4-BD11-00104BD3F987');
-          document.getElementsByTagName('head')[0].appendChild(obj);
-          document.namespaces.add('m', 'http://www.w3.org/1998/Math/MathML', '#mathplayer');
+          doc.getElementsByTagName('head')[0].appendChild(obj);
+          doc.namespaces.add('m', 'http://www.w3.org/1998/Math/MathML', '#mathplayer');
           doc.mathplayerinitialized = true;
         }
         return doc.createElement('m:' + local);
       }
        else if ('http://www.w3.org/2000/svg' == uri) {
         if (!doc.renesisinitialized) {
-          var obj = document.createElement('object');
+          var obj = doc.createElement('object');
           obj.setAttribute('id', 'renesis');
           obj.setAttribute('classid', 'clsid:AC159093-1683-4BA2-9DCF-0C350141D7F2');
-          document.getElementsByTagName('head')[0].appendChild(obj);
-          document.namespaces.add('s', 'http://www.w3.org/2000/svg', '#renesis');
+          doc.getElementsByTagName('head')[0].appendChild(obj);
+          doc.namespaces.add('s', 'http://www.w3.org/2000/svg', '#renesis');
           doc.renesisinitialized = true;
         }
         return doc.createElement('s:' + local);
@@ -5715,7 +5747,7 @@ function $HtmlParser(this$static, document_0){
   return this$static;
 }
 
-function $parse(this$static, source, callback){
+function $parse(this$static, source, callback,$envjs_wnd_0){
   this$static.parseEndListener = callback;
   $setFragmentContext(this$static.domTreeBuilder, null);
   this$static.lastWasCR = false;
@@ -5727,10 +5759,11 @@ function $parse(this$static, source, callback){
   $addLast(this$static.bufferStack, this$static.stream);
   $setFragmentContext(this$static.domTreeBuilder, null);
   $start_0(this$static.tokenizer);
-  $pump(this$static);
+  $pump(this$static,$envjs_wnd_0);
 }
 
-function $pump(this$static){
+function $pump(this$static,$envjs_wnd_0){
+try{
   var buffer, docWriteLen, newBuf, newEnd, timer;
   if (this$static.ending) {
     $end(this$static.tokenizer);
@@ -5776,8 +5809,11 @@ function $pump(this$static){
       continue;
     }
   }
-  timer = $HtmlParser$1(new HtmlParser$1(), this$static);
+  timer = $HtmlParser$1(new HtmlParser$1(), this$static, $envjs_wnd_0);
   this$static.pschedule($schedule,timer,1);
+}catch(e){
+$error("oopsz",e);
+}
 }
 
 function documentWrite(text){
@@ -5787,6 +5823,7 @@ function documentWrite(text){
     $adjust(buffer, this.lastWasCR);
     this.lastWasCR = false;
     if (buffer.start < buffer.end) {
+// print(buffer.start,buffer.end);      
       this.lastWasCR = $tokenizeBuffer(this.tokenizer, buffer);
       $maybeRunScript(this.domTreeBuilder);
     }
@@ -5811,21 +5848,21 @@ _.parseEndListener = null;
 _.stream = null;
 _.streamLength = 0;
 _.tokenizer = null;
-function $clinit_83(){
-  $clinit_83 = nullMethod;
-  $clinit_12();
+function $clinit_83($envjs_wnd_0){
+  // $clinit_83 = nullMethod;
+  $clinit_12($envjs_wnd_0);
 }
 
-function $HtmlParser$1(this$static, this$0){
-  $clinit_83();
+function $HtmlParser$1(this$static, this$0,$envjs_wnd_0){
+  $clinit_83($envjs_wnd_0);
   this$static.this$0 = this$0;
   return this$static;
 }
 
-function $run(this$static){
+function $run(this$static,$envjs_wnd_0){
   var $e0;
   try {
-    $pump(this$static.this$0);
+    $pump(this$static.this$0,$envjs_wnd_0);
   }
    catch ($e0) {
     $e0 = caught($e0);
@@ -5883,8 +5920,8 @@ function parseHtmlDocument(source, document_0, readyCallback, errorHandler, pars
   zapChildren(document_0);
   parser = $HtmlParser(new HtmlParser(), document_0);
   installDocWrite(document_0, parser);
-  parse_sync ? sync(parser) : async(parser);
-  $parse(parser, source, $ParseEndListener(new ParseEndListener(), readyCallback));
+  parse_sync ? sync(this,parser) : async(this,parser);
+  $parse(parser, source, $ParseEndListener(new ParseEndListener(), readyCallback), this);
   parser.pwait();
 }
 
@@ -10735,28 +10772,44 @@ function SAXParseException(){
 _ = SAXParseException.prototype = new SAXException();
 _.getClass$ = getClass_60;
 _.typeId$ = 41;
-function init_0(){
-  !!$stats && $stats({moduleName:$moduleName, subSystem:'startup', evtGroup:'moduleStartup', millis:(new Date()).getTime(), type:'onModuleLoadStart', className:'nu.validator.htmlparser.gwt.HtmlParserModule'});
-  $wnd.parseHtmlDocument = parseHtmlDocument;
+function init_0($envjs_wnd){
+  !!$envjs_wnd.__nu__.$stats && $envjs_wnd.__nu__.$stats({moduleName:$moduleName, subSystem:'startup', evtGroup:'moduleStartup', millis:(new Date()).getTime(), type:'onModuleLoadStart', className:'nu.validator.htmlparser.gwt.HtmlParserModule'});
+  $envjs_wnd.parseHtmlDocument = parseHtmlDocument;
 }
 
-function gwtOnLoad(errFn, modName, modBase){
+function gwtOnLoad($envjs_wnd_0,errFn, modName, modBase){
+// print("YY",arguments.length,$envjs_wnd_0);
   $moduleName = modName;
   $moduleBase = modBase;
   if (errFn)
     try {
-      init_0();
+      init_0($envjs_wnd_0);
     }
      catch (e) {
       errFn(modName);
     }
    else {
-    init_0();
+    init_0($envjs_wnd_0);
   }
-}
+};
 
 function nullMethod(){
 }
 
 var Ljava_lang_Object_2_classLit = createForClass('java.lang.', 'Object'), Lcom_google_gwt_user_client_Timer_2_classLit = createForClass('com.google.gwt.user.client.', 'Timer'), Ljava_lang_Throwable_2_classLit = createForClass('java.lang.', 'Throwable'), Ljava_lang_Exception_2_classLit = createForClass('java.lang.', 'Exception'), Ljava_lang_RuntimeException_2_classLit = createForClass('java.lang.', 'RuntimeException'), Lcom_google_gwt_core_client_JavaScriptException_2_classLit = createForClass('com.google.gwt.core.client.', 'JavaScriptException'), Lcom_google_gwt_core_client_JavaScriptObject_2_classLit = createForClass('com.google.gwt.core.client.', 'JavaScriptObject$'), _3Ljava_lang_String_2_classLit = createForArray('[Ljava.lang.', 'String;'), Ljava_lang_Enum_2_classLit = createForClass('java.lang.', 'Enum'), _3_3D_classLit = createForArray('', '[[D'), Ljava_util_AbstractCollection_2_classLit = createForClass('java.util.', 'AbstractCollection'), Ljava_util_AbstractList_2_classLit = createForClass('java.util.', 'AbstractList'), Ljava_util_ArrayList_2_classLit = createForClass('java.util.', 'ArrayList'), Lcom_google_gwt_user_client_Timer$1_2_classLit = createForClass('com.google.gwt.user.client.', 'Timer$1'), Ljava_lang_IndexOutOfBoundsException_2_classLit = createForClass('java.lang.', 'IndexOutOfBoundsException'), Ljava_lang_ArrayStoreException_2_classLit = createForClass('java.lang.', 'ArrayStoreException'), _3C_classLit = createForArray('', '[C'), Ljava_lang_Class_2_classLit = createForClass('java.lang.', 'Class'), Ljava_lang_ClassCastException_2_classLit = createForClass('java.lang.', 'ClassCastException'), Ljava_lang_IllegalArgumentException_2_classLit = createForClass('java.lang.', 'IllegalArgumentException'), _3I_classLit = createForArray('', '[I'), Ljava_lang_NullPointerException_2_classLit = createForClass('java.lang.', 'NullPointerException'), Ljava_lang_String_2_classLit = createForClass('java.lang.', 'String'), Ljava_lang_StringBuffer_2_classLit = createForClass('java.lang.', 'StringBuffer'), Ljava_lang_StringBuilder_2_classLit = createForClass('java.lang.', 'StringBuilder'), Ljava_lang_StringIndexOutOfBoundsException_2_classLit = createForClass('java.lang.', 'StringIndexOutOfBoundsException'), Ljava_lang_UnsupportedOperationException_2_classLit = createForClass('java.lang.', 'UnsupportedOperationException'), _3Ljava_lang_Object_2_classLit = createForArray('[Ljava.lang.', 'Object;'), Ljava_util_AbstractMap_2_classLit = createForClass('java.util.', 'AbstractMap'), Ljava_util_AbstractHashMap_2_classLit = createForClass('java.util.', 'AbstractHashMap'), Ljava_util_AbstractSet_2_classLit = createForClass('java.util.', 'AbstractSet'), Ljava_util_AbstractHashMap$EntrySet_2_classLit = createForClass('java.util.', 'AbstractHashMap$EntrySet'), Ljava_util_AbstractHashMap$EntrySetIterator_2_classLit = createForClass('java.util.', 'AbstractHashMap$EntrySetIterator'), Ljava_util_AbstractMapEntry_2_classLit = createForClass('java.util.', 'AbstractMapEntry'), Ljava_util_AbstractHashMap$MapEntryNull_2_classLit = createForClass('java.util.', 'AbstractHashMap$MapEntryNull'), Ljava_util_AbstractHashMap$MapEntryString_2_classLit = createForClass('java.util.', 'AbstractHashMap$MapEntryString'), Ljava_util_AbstractList$IteratorImpl_2_classLit = createForClass('java.util.', 'AbstractList$IteratorImpl'), Ljava_util_AbstractList$ListIteratorImpl_2_classLit = createForClass('java.util.', 'AbstractList$ListIteratorImpl'), Ljava_util_AbstractSequentialList_2_classLit = createForClass('java.util.', 'AbstractSequentialList'), Ljava_util_Comparators$1_2_classLit = createForClass('java.util.', 'Comparators$1'), Ljava_util_HashMap_2_classLit = createForClass('java.util.', 'HashMap'), Ljava_util_LinkedList_2_classLit = createForClass('java.util.', 'LinkedList'), Ljava_util_LinkedList$ListIteratorImpl_2_classLit = createForClass('java.util.', 'LinkedList$ListIteratorImpl'), Ljava_util_LinkedList$Node_2_classLit = createForClass('java.util.', 'LinkedList$Node'), Ljava_util_NoSuchElementException_2_classLit = createForClass('java.util.', 'NoSuchElementException'), Lnu_validator_htmlparser_common_DoctypeExpectation_2_classLit = createForEnum('nu.validator.htmlparser.common.', 'DoctypeExpectation'), Lnu_validator_htmlparser_common_DocumentMode_2_classLit = createForEnum('nu.validator.htmlparser.common.', 'DocumentMode'), Lnu_validator_htmlparser_common_XmlViolationPolicy_2_classLit = createForEnum('nu.validator.htmlparser.common.', 'XmlViolationPolicy'), Lnu_validator_htmlparser_impl_TreeBuilder_2_classLit = createForClass('nu.validator.htmlparser.impl.', 'TreeBuilder'), Lnu_validator_htmlparser_impl_CoalescingTreeBuilder_2_classLit = createForClass('nu.validator.htmlparser.impl.', 'CoalescingTreeBuilder'), Lnu_validator_htmlparser_gwt_BrowserTreeBuilder_2_classLit = createForClass('nu.validator.htmlparser.gwt.', 'BrowserTreeBuilder'), Lnu_validator_htmlparser_gwt_BrowserTreeBuilder$ScriptHolder_2_classLit = createForClass('nu.validator.htmlparser.gwt.', 'BrowserTreeBuilder$ScriptHolder'), Lnu_validator_htmlparser_gwt_HtmlParser_2_classLit = createForClass('nu.validator.htmlparser.gwt.', 'HtmlParser'), Lnu_validator_htmlparser_gwt_HtmlParser$1_2_classLit = createForClass('nu.validator.htmlparser.gwt.', 'HtmlParser$1'), Lnu_validator_htmlparser_gwt_ParseEndListener_2_classLit = createForClass('nu.validator.htmlparser.gwt.', 'ParseEndListener'), _3Z_classLit = createForArray('', '[Z'), _3Lnu_validator_htmlparser_impl_AttributeName_2_classLit = createForArray('[Lnu.validator.htmlparser.impl.', 'AttributeName;'), Lnu_validator_htmlparser_impl_AttributeName_2_classLit = createForClass('nu.validator.htmlparser.impl.', 'AttributeName'), _3Lnu_validator_htmlparser_impl_ElementName_2_classLit = createForArray('[Lnu.validator.htmlparser.impl.', 'ElementName;'), Lnu_validator_htmlparser_impl_ElementName_2_classLit = createForClass('nu.validator.htmlparser.impl.', 'ElementName'), Lnu_validator_htmlparser_impl_Tokenizer_2_classLit = createForClass('nu.validator.htmlparser.impl.', 'Tokenizer'), Lnu_validator_htmlparser_impl_ErrorReportingTokenizer_2_classLit = createForClass('nu.validator.htmlparser.impl.', 'ErrorReportingTokenizer'), Lnu_validator_htmlparser_impl_HtmlAttributes_2_classLit = createForClass('nu.validator.htmlparser.impl.', 'HtmlAttributes'), Lnu_validator_htmlparser_impl_LocatorImpl_2_classLit = createForClass('nu.validator.htmlparser.impl.', 'LocatorImpl'), _3_3C_classLit = createForArray('', '[[C'), Lnu_validator_htmlparser_impl_StackNode_2_classLit = createForClass('nu.validator.htmlparser.impl.', 'StackNode'), _3Lnu_validator_htmlparser_impl_StackNode_2_classLit = createForArray('[Lnu.validator.htmlparser.impl.', 'StackNode;'), Lnu_validator_htmlparser_impl_UTF16Buffer_2_classLit = createForClass('nu.validator.htmlparser.impl.', 'UTF16Buffer'), Lorg_xml_sax_SAXException_2_classLit = createForClass('org.xml.sax.', 'SAXException'), Lorg_xml_sax_SAXParseException_2_classLit = createForClass('org.xml.sax.', 'SAXParseException');
-if (nu_validator_htmlparser_HtmlParser) {  var __gwt_initHandlers = nu_validator_htmlparser_HtmlParser.__gwt_initHandlers;  nu_validator_htmlparser_HtmlParser.onScriptLoad(gwtOnLoad);}})();
+
+if (nu_validator_htmlparser_HtmlParser) {
+  var __gwt_initHandlers = nu_validator_htmlparser_HtmlParser.__gwt_initHandlers;
+  envjs_init_4 = function($envjs_wnd_0) {
+    var curried = function() {
+      var args = [ $envjs_wnd_0 ]
+      for(var i=0; i < arguments.length; i++) {
+        args.push(arguments[i]);
+      }
+// print("XX",args.length,arguments.length);
+      return gwtOnLoad.apply(this,args);
+    };
+  nu_validator_htmlparser_HtmlParser.onScriptLoad($envjs_wnd_0,curried);
+  };
+}
+             })();

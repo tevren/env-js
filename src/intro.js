@@ -1,5 +1,28 @@
 (function(){
 
+try {
+
+(function(){
+  for(var symbol in $master["static"]) {
+    if(symbol.match(/^(DOM|HTML|XPath)/)){
+      // $master.print("import",symbol);
+      if(typeof $master["static"][symbol] === "undefined") {
+        throw new Error("Cannot import " + symbol + ": undefined");
+      }
+      this[symbol] = $master["static"][symbol];
+    }
+  }
+  var symbols = [ "Event" ];
+  for(var i in symbols) {
+    symbol = symbols[i];
+    // $master.print("import",symbol);
+    if(typeof $master["static"][symbol] === "undefined") {
+      throw new Error("Cannot import " + symbol + ": undefined");
+    }
+    this[symbol] = $master["static"][symbol];
+  }
+}());
+
   var $env = (function(){
     
     var $env = {};
@@ -25,8 +48,8 @@
       $platform.init_window = function(inner) {
         var index = master.next_window_index()+0;
         inner.toString = function(){
-          // return "[object Window "+index+"]";
-          return "[object Window]";
+          return "[object Window "+index+"]";
+          // return "[object Window]";
         };
       };
 
@@ -39,7 +62,10 @@
         proxy = $platform.new_split_global_outer();
       }
       $master.proxy = proxy;
+// try{throw new Error("huh?");}catch(e){print("here",e.stack);}
+// var now = Date.now();
       var new_window = $platform.new_split_global_inner(proxy,undefined);
+// print("nw "+(Date.now()-now));
       new_window.$inner = new_window;
       if(swap_script_window) {
         $master.first_script_window = new_window;
@@ -67,13 +93,14 @@
     $env.init_window = function(inner,options){
       var $inner = inner;
       var $w = this;
-      
+
       inner.load = function(){
         for(var i = 0; i < arguments.length; i++){
           var f = arguments[i];
           $master.load(f,inner);
         }
       };
+
       inner.evaluate = function(string){
         return $master.evaluate.call(string,inner);
       };
@@ -109,14 +136,6 @@
 
       var print = $master.print;
 
-      // print("set",this);
-      // print("set",this.window);
-      // print("set",options.proxy);
-      // print("set",this === options.proxy);
-      if ( !this.window) {
+      if (!this.window) {
         this.window = this;
       }
-      // print("setx",this);
-      // print("setx",this.window);
-      
-      // print("$$w",$w,this,$w.isInner,this.isInner,$w === this);

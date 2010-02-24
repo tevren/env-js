@@ -40,7 +40,7 @@ __extend__(SVGStylable.prototype, {
 	}
 });
 
-$w.SVGStylable = SVGStylable;
+// $w.SVGStylable = SVGStylable;
 
 // Local Variables:
 // espresso-indent-level:4

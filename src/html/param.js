@@ -34,5 +34,5 @@ __extend__(HTMLParamElement.prototype, {
     }
 });
 
-$w.HTMLParamElement = HTMLParamElement;
+// $w.HTMLParamElement = HTMLParamElement;
 		

@@ -16,7 +16,7 @@ __extend__(SVGAnimatedString.prototype, {
     }
 });
 
-$w.SVGAnimatedString = SVGAnimatedString;
+// $w.SVGAnimatedString = SVGAnimatedString;
 
 // Local Variables:
 // espresso-indent-level:4

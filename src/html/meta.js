@@ -34,4 +34,4 @@ __extend__(HTMLMetaElement.prototype, {
     }
 });
 
-$w.HTMLMetaElement = HTMLMetaElement;
+// $w.HTMLMetaElement = HTMLMetaElement;

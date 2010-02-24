@@ -28,4 +28,4 @@ __extend__(DOMCDATASection.prototype,{
     }
 });
 
-$w.CDATASection = DOMCDATASection;
+// $w.CDATASection = DOMCDATASection;

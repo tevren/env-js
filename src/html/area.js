@@ -53,5 +53,5 @@ __extend__(HTMLAreaElement.prototype, {
     }
 });
 
-$w.HTMLAreaElement = HTMLAreaElement;
+// $w.HTMLAreaElement = HTMLAreaElement;
 			

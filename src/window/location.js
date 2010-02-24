@@ -8,20 +8,34 @@ var $location = '';
 
 $w.__defineSetter__("location", function(url){
   if (url[0] === "#") {
+    // print("return anchor only");
     return;
   }
   var now = window.location.href.replace(/^file:\/\//,"").replace(/#.*/,"");
   var to = $master.first_script_window && $master.first_script_window.location.href;
   // var to = $env.location(url,window.location.href != "about:blank" ? window.location.href: undefined);
+  // I'm not sure why this code is here ... looking at the FSW
   if (to && to.indexOf(now)===0 && to[now.length]==="#") {
+    // print("return diff anchor only");
     return;
   }
+  if (url && url.indexOf(now)===0 && url[now.length]==="#") {
+    // print("return diff anchor only");
+    return;
+  }
+  // print($location, window.location.href === $location,  $location.indexOf("#")>0);
+  if (url === window.location.href && $location.indexOf("#")>0) {
+    // print('returning same with anchor');
+    return;
+  }
+  // print("ft",window.location.href,$location,url);
   if( !$location || $location == "about:blank" ) {
     // $w.__loadAWindowsDocument__(url);
     $env.load(url);
   } else {
     $env.unload($w);
     var proxy = $w.window;
+// print("re",url);
     $env.reload(proxy, url);
   }
 });

@@ -6,4 +6,4 @@ var DOMDocumentType    = function() {
     $error("DOMDocumentType.constructor(): Not Implemented"   ); 
 };
 
-$w.DocumentType = DOMDocumentType;
+// $w.DocumentType = DOMDocumentType;

@@ -70,4 +70,4 @@ __extend__(DOMText.prototype,{
     }
 });
 
-$w.Text = DOMText;
+// $w.Text = DOMText;

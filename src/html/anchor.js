@@ -77,4 +77,4 @@ var Anchor = function(ownerDocument) {
 
 })();
 
-$w.Anchor = Anchor;
+// $w.Anchor = Anchor;

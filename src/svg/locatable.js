@@ -8,7 +8,7 @@ __extend__(SVGLocatable.prototype, {
     }
 });
 
-$w.SVGLocatable = SVGLocatable;
+// $w.SVGLocatable = SVGLocatable;
 
 // Local Variables:
 // espresso-indent-level:4

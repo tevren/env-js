@@ -9,7 +9,7 @@ SVGRect.prototype = {};
 __extend__(SVGRect.prototype, {
 });
 
-$w.SVGRect = SVGRect;
+// $w.SVGRect = SVGRect;
 
 // Local Variables:
 // espresso-indent-level:4

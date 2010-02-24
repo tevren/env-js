@@ -22,4 +22,4 @@ __extend__(HTMLOptGroupElement.prototype, {
     }
 });
 
-$w.HTMLOptGroupElement = HTMLOptGroupElement;		
+// $w.HTMLOptGroupElement = HTMLOptGroupElement;		

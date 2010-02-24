@@ -41,8 +41,10 @@ __extend__(HTMLElement.prototype, {
 		set innerHTML(html){
 		    //Should be replaced with HTMLPARSER usage
             //$debug('SETTING INNER HTML ('+this+'+'+html.substring(0,64));
-            var doc = new HTMLDocument($implementation,null,"");
-            $w.parseHtmlDocument(html,doc,null,null,true);
+            var doc = new HTMLDocument(this.ownerDocument.implementation,
+                                        this.ownerDocument._parentWindow,
+                                        "");
+            this.ownerDocument._parentWindow.parseHtmlDocument(html,doc,null,null,true);
             var parent = doc.body;
 			while(this.firstChild != null){
 			    this.removeChild( this.firstChild );
@@ -188,29 +190,31 @@ var __recursivelyGatherText__ = function(aNode) {
     return accumulateText;
 };
     
-var __eval__ = $env.__eval__ || function(script, startingNode){
+var __eval__ = function(script,node){
     if (script == "")
-        return;                    // don't assemble environment if no script...
-
-    try{
-        var doEval = function(scriptText){
-            eval(scriptText);
-        };
-
-        var listOfScopes = [];
-        for (var node = startingNode; node != null; node = node.parentNode)
-            listOfScopes.push(node);
-        listOfScopes.push($w);
-
-
-        var oldScopesArray = $env.configureScope(
-          doEval,        // the function whose scope chain to change
-          listOfScopes); // last array element is "head" of new chain
-        doEval.call(startingNode, script);
-        $env.restoreScope(oldScopesArray);
-                         // oldScopesArray is N-element array of two-element
-                         // arrays.  First element is JS object whose scope
-                         // was modified, second is original value to restore.
+        return undefined;
+    try {
+        var scope = node;
+        var scopes = [];
+        var original = script;
+        if(scope) {
+            script = "(function(){return eval(original)}).call(scopes[0])";
+            while(scope) {
+                scopes.push(scope);
+                scope = scope.parentNode;
+                script = "with(scopes["+(scopes.length-1)+"] ){"+script+"};";
+            }
+        }
+        script = "function(original,scopes){"+script+"}";
+        var original_script_window = $master.first_script_window;
+        if ( !$master.first_script_window ) {
+            // $master.first_script_window = window;
+        }
+        // FIX!!!
+        var $inner = node.ownerDocument._parentWindow["$inner"];
+        var result = $master.evaluate(script,$inner)(original,scopes);
+        // $master.first_script_window = original_script_window;
+        return result;
     }catch(e){
         $error(e);
     }
@@ -291,7 +295,7 @@ var __blur__ = function(element){
 	element.dispatchEvent(event);
 };
 
-$w.HTMLElement = HTMLElement;
+// $w.HTMLElement = HTMLElement;
 
 // Local Variables:
 // espresso-indent-level:4

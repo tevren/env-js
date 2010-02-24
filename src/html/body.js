@@ -16,4 +16,4 @@ __extend__(HTMLBodyElement.prototype, {
     }
 });
 
-$w.HTMLBodyElement = HTMLBodyElement;
+// $w.HTMLBodyElement = HTMLBodyElement;

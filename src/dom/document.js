@@ -9,6 +9,9 @@ $debug("Defining Document");
  * @param  implementation : DOMImplementation - the creator Implementation
  */
 var DOMDocument = function(implementation, docParentWindow) {
+    // if (!( implementation === undefined && docParentWindow == undefined)) {
+    //     print("DD",implementation, docParentWindow, docParentWindow && docParentWindow.isInner);
+    // }
     //$log("\tcreating dom document");
     this.DOMNode = DOMNode;
     this.DOMNode(this);
@@ -45,11 +48,11 @@ __extend__(DOMDocument.prototype, {
     toString : function(){
         return '[object DOMDocument]';
     },
-    addEventListener        : function(){ $w.addEventListener.apply(this, arguments); },
-	removeEventListener     : function(){ $w.removeEventListener.apply(this, arguments); },
-	attachEvent             : function(){ $w.addEventListener.apply(this, arguments); },
-	detachEvent             : function(){ $w.removeEventListener.apply(this, arguments); },
-	dispatchEvent           : function(){ $w.dispatchEvent.apply(this, arguments); },
+    addEventListener        : function(){ this._parentWindow.addEventListener.apply(this, arguments); },
+	removeEventListener     : function(){ this._parentWindow.removeEventListener.apply(this, arguments); },
+	attachEvent             : function(){ this._parentWindow.addEventListener.apply(this, arguments); },
+	detachEvent             : function(){ this._parentWindow.removeEventListener.apply(this, arguments); },
+	dispatchEvent           : function(){ this._parentWindow.dispatchEvent.apply(this, arguments); },
 
     get styleSheets(){ 
         return [];/*TODO*/ 
@@ -98,7 +101,7 @@ __extend__(DOMDocument.prototype, {
         return this;
     },
     load: function(url,xhr_options){
-		$debug("Loading url into DOM Document: "+ url + " - (Asynch? "+$w.document.async+")");
+		$debug("Loading url into DOM Document: "+ url + " - (Asynch? "+this._parentWindow.document.async+")");
         var scripts, _this = this;
         var xhr;
         if (url == "about:blank"){
@@ -138,11 +141,11 @@ __extend__(DOMDocument.prototype, {
                 status: 200
             });
         } else {
-            xhr = new XMLHttpRequest();
+            xhr = new _this._parentWindow.XMLHttpRequest();
         }
         xhr_options = xhr_options || {};
         var method = (xhr_options.method || "GET").toUpperCase();
-        xhr.open(method, url, $w.document.async);
+        xhr.open(method, url, this._parentWindow.document.async);
         // FIXME: not all XHRs have this right now
         xhr.setRequestHeader && xhr.setRequestHeader('Content-Type', xhr_options["Content-Type"] || 'application/x-www-form-urlencoded');
         xhr.onreadystatechange = function(){
@@ -189,10 +192,10 @@ __extend__(DOMDocument.prototype, {
             _this.dispatchEvent( domContentLoaded, false );
             
             //finally fire the window.onload event
-            if(_this === document){
+            if(_this === _this._parentWindow.document){
                 var windowLoad = _this.createEvent();
                 windowLoad.initEvent("load", false, false);
-                $w.dispatchEvent( windowLoad, false );
+                _this._parentWindow.dispatchEvent( windowLoad, false );
             }
             
         };
@@ -392,7 +395,13 @@ __extend__(DOMDocument.prototype, {
      *     Document.evaluate
      */
     evaluate: function(xpathText, contextNode, nsuriMapper, resultType, result){
-        return new XPathExpression(xpathText, contextNode, nsuriMapper, resultType, result).evaluate();
+        try {
+            return new XPathExpression(xpathText, contextNode, nsuriMapper, resultType, result).evaluate();
+        } catch(e) {
+print("xpath failure: " + e);
+            throw e;
+        }
+        
     },
     getElementById : function(elementId) {
           var retNode = null,
@@ -428,8 +437,9 @@ __extend__(DOMDocument.prototype, {
 	    return "DOMDocument" +  (typeof this._url == "string" ? ": " + this._url : ""); 
     },
 	get defaultView(){ 
+        var doc = this;
 		return { getComputedStyle: function(elem){
-			return $w.getComputedStyle(elem);
+			return doc._parentWindow.getComputedStyle(elem);
 		}};
 	},
     _genId : function() {
@@ -484,7 +494,33 @@ var __isValidNamespace__ = function(doc, namespaceURI, qualifiedName, isAttribut
       return valid;
 };
 
-$w.Document = DOMDocument;
+/**
+ * @method DOMImplementation._parseQName - parse the qualified name
+ * @author Jon van Noort (jon@webarcana.com.au)
+ * @param  qualifiedName : string - The qualified name
+ * @return : QName
+ */
+function __parseQName__(qualifiedName) {
+  var resultQName = new Object();
+
+  resultQName.localName = qualifiedName;  // unless the qname has a prefix, the local name is the entire String
+  resultQName.prefix    = "";
+
+  // split on ':'
+  var delimPos = qualifiedName.indexOf(':');
+
+  if (delimPos > -1) {
+    // get prefix
+    resultQName.prefix    = qualifiedName.substring(0, delimPos);
+
+    // get localName
+    resultQName.localName = qualifiedName.substring(delimPos +1, qualifiedName.length);
+  }
+
+  return resultQName;
+};
+
+// $w.Document = DOMDocument;
 
 // Local Variables:
 // espresso-indent-level:4

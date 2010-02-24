@@ -85,5 +85,5 @@ __extend__(HTMLObjectElement.prototype, {
     }
 });
 
-$w.HTMLObjectElement = HTMLObjectElement;
+// $w.HTMLObjectElement = HTMLObjectElement;
 			

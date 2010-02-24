@@ -23,4 +23,4 @@ __extend__(HTMLLabelElement.prototype, {
     }
 });
 
-$w.HTMLLabelElement = HTMLLabelElement;
+// $w.HTMLLabelElement = HTMLLabelElement;

@@ -13,7 +13,7 @@ __extend__(SVGSVGElement.prototype, {
 });
 SVGSVGElement.prototype.constructor = SVGSVGElement;
 
-$w.SVGSVGElement = SVGSVGElement;
+// $w.SVGSVGElement = SVGSVGElement;
 
 // Local Variables:
 // espresso-indent-level:4

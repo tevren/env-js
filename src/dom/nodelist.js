@@ -192,4 +192,4 @@ var __cloneNodes__ = function(nodelist, deep, parentNode) {
     return cloneNodeList;
 };
 
-$w.NodeList = DOMNodeList;
+// $w.NodeList = DOMNodeList;

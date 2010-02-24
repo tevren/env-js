@@ -83,7 +83,7 @@ __extend__(HTMLTableRowElement.prototype, {
             throw new Error("Index > rows.length in call to HTMLTableRow.insertCell");
         }
         
-        var cell = document.createElement("td");
+        var cell = this.ownerDocument.createElement("td");
 
         if (idx === -1 || idx === numCells) {
             this.appendChild(cell);
@@ -111,4 +111,4 @@ __extend__(HTMLTableRowElement.prototype, {
 
 });
 
-$w.HTMLTableRowElement = HTMLTableRowElement;
+// $w.HTMLTableRowElement = HTMLTableRowElement;

@@ -17,5 +17,5 @@ __extend__(HTMLButtonElement.prototype, {
     }
 });
 
-$w.HTMLButtonElement = HTMLButtonElement;
+// $w.HTMLButtonElement = HTMLButtonElement;
 

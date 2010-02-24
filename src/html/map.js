@@ -19,4 +19,4 @@ __extend__(HTMLMapElement.prototype, {
     }
 });
 
-$w.HTMLMapElement = HTMLMapElement;
+// $w.HTMLMapElement = HTMLMapElement;

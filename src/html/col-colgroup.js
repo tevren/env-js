@@ -46,4 +46,4 @@ __extend__(HTMLTableColElement.prototype, {
     }
 });
 
-$w.HTMLTableColElement = HTMLTableColElement;
+// $w.HTMLTableColElement = HTMLTableColElement;

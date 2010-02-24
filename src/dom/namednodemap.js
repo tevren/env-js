@@ -196,7 +196,7 @@ __extend__(DOMNamedNodeMap.prototype, {
           if (this.length > 0) {
             ret += this[this.length -1].xml;
           }
-        
+
           return ret;
     }
 
@@ -362,7 +362,7 @@ __extend__(DOMNamespaceNodeMap.prototype, {
               ret += this[ind].xml +" ";
             }
           }
-        
+
           return ret;
     }
 });

@@ -44,7 +44,7 @@ __extend__(HTMLImageElement.prototype, {
     set src(value){
         this.setAttribute('src', value);
 
-        var event = document.createEvent();
+        var event = this.ownerDocument.createEvent();
         event.initEvent("load");
         this.dispatchEvent( event, false );
     },
@@ -59,4 +59,4 @@ __extend__(HTMLImageElement.prototype, {
     }
 });
 
-$w.HTMLImageElement = HTMLImageElement;
+// $w.HTMLImageElement = HTMLImageElement;d

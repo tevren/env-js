@@ -84,7 +84,7 @@ __extend__(HTMLFormElement.prototype,{
     }
 });
 
-$w.HTMLFormElement	= HTMLFormElement;
+// $w.HTMLFormElement	= HTMLFormElement;
 
 /**
  * Form Submissions
@@ -203,7 +203,7 @@ var __formSerialize__ = function(form, semantic,boundary) {
     // print("v",v);
     return v;
 };
-
+this.__formSerialize__ = __formSerialize__;
 
 /**
  * Serializes all field elements inputs Array into a query string.
@@ -331,6 +331,7 @@ var __fieldValue__ = function(element, successful) {
 
     if (tag == 'select') {
         index = element.selectedIndex;
+        // print("i",index);
         if (index < 0) 
             // return null;
             index = 0;

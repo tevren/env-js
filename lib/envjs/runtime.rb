@@ -33,8 +33,9 @@ module Envjs::Runtime
           compiled_script = scripts[fn]
         end
         compiled_script ||= compile(script, file, line, global)
+        raise "hell" if !compiled_script
         if fn && !scripts[fn]
-          # scripts[fn] = compiled_script
+          scripts[fn] = compiled_script
         end
         save = master["first_script_window"]
         if false
@@ -48,8 +49,16 @@ module Envjs::Runtime
 
         master["first_script_window"] ||= scope
         raise "hell" if !master["first_script_window"]["isInner"] && master["first_script_window"] != self.global
-        v = evaluate_compiled_script(compiled_script,scope)
-        master["first_script_window"] = save
+        v = nil
+        begin
+          v = evaluate_compiled_script(compiled_script,scope)
+          # p "pe", v, compiled_script, scope
+        rescue Exception => e
+          # p "oopsrt", e
+          raise e
+        ensure
+          master["first_script_window"] = save
+        end
         # print "done\n"
         v
       end
@@ -118,8 +127,12 @@ EOJS
       master["runtime"] = self
       window_index = -1
       master["next_window_index"] = lambda { window_index += 1 }
-      master.symbols = [ "Johnson", "Ruby", "print", "debug", "puts", "load", "reload", "whichInterpreter", "multiwindow" ]
+      master.symbols = [ "Johnson", "Ruby", "print", "debug", "puts", "load", "reload", "whichInterpreter", "multiwindow", "seal" ]
       master.symbols.each { |symbol| master[symbol] = global[symbol] }
+      master["seal"] = lambda do |*args|
+        object, deep = *args
+        seal object, deep
+      end
 
       master.whichInterpreter = "Johnson"
 
@@ -224,8 +237,10 @@ EOJS
 
       master.load = lambda { |*files|
         if files.length == 2 && !(String === files[1])
+          # now = Time.now
           f = files[0]
           w = files[1]
+          # p "load", f, w
 
           # Hmmm ...
           uri = URI.parse f
@@ -250,6 +265,7 @@ EOJS
           loc = nil
           add_dep.call w, f
           evaluate(v, f, 1, w, w, f)
+          # print "load #{uri_s}: #{Time.now-now}\n"
         else
           load *files
         end
@@ -356,7 +372,12 @@ EOJS
         if fn
           scripts[fn] = compiled_script
         end
-        evaluate_compiled_script(compiled_script,scope)
+        begin
+          evaluate_compiled_script(compiled_script,scope)
+        rescue Exception => e
+          p e
+          raise e
+        end
       end
 
       ( class << self; self; end ).send :define_method, :"[]" do |key|
@@ -370,8 +391,38 @@ EOJS
       end
 
       master.load.call Envjs::EVENT_LOOP, global
-      master.load.call Envjs::ENVJS, inner
       
+if false
+      static_outer = new_split_global_outer
+      static_inner = new_split_global_inner static_outer
+      
+      master.symbols.each do |symbol|
+        static_inner[symbol] = master[symbol]
+      end
+
+      static_inner["$inner"] = static_inner
+      static_inner["$master"] = master
+
+      master.load.call Envjs::STATIC, static_inner
+
+      master["static"] = static_inner
+end
+if true
+      static = new_global
+      
+      master.symbols.each do |symbol|
+        static[symbol] = master[symbol]
+      end
+
+      static["$master"] = master
+
+      master.load.call Envjs::STATIC, static
+
+      master["static"] = static
+end
+
+      master.load.call Envjs::ENVJS, inner
+
       inner = nil
     end
   end

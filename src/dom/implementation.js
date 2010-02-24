@@ -37,10 +37,11 @@ __extend__(DOMImplementation.prototype,{
     createDocument : function(nsuri, qname, doctype){
         //TODO - this currently returns an empty doc
         //but needs to handle the args
-        return new Document($implementation, null);
+        return new Document(this, null);
     },
     createHTMLDocument : function(title){
-        var doc = new HTMLDocument($implementation, null, "");
+        // N.B. explict window on purpose ...
+        var doc = new HTMLDocument(this, window, "");
         var html = doc.createElement("html"); doc.appendChild(html);
         var head = doc.createElement("head"); html.appendChild(head);
         var body = doc.createElement("body"); html.appendChild(body);
@@ -587,10 +588,12 @@ function __parseQName__(qualifiedName) {
   return resultQName;
 };
 
+if(false){
 $debug("Initializing document.implementation");
 var $implementation =  new DOMImplementation();
 // $implementation.namespaceAware = false;
 $implementation.errorChecking = false;
+}
     
 // Local Variables:
 // espresso-indent-level:4

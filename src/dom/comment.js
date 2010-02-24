@@ -27,4 +27,4 @@ __extend__(DOMComment.prototype, {
     }
 });
 
-$w.Comment = DOMComment;
+// $w.Comment = DOMComment;

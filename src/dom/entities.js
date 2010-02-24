@@ -269,5 +269,5 @@ var $entityDefinitions = {
 };
 
 
-$w.$entityDefinitions = $entityDefinitions;
+// $w.$entityDefinitions = $entityDefinitions;
 

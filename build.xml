@@ -154,11 +154,14 @@
             <fileset dir="${SRC_DIR}" includes="window/css.js" />
             <fileset dir="${SRC_DIR}" includes="window/screen.js" />
             <fileset dir="${SRC_DIR}" includes="window/dialog.js" />
+<!--
             <fileset dir="${SRC_DIR}" includes="profile/aop.js" />
             <fileset dir="${SRC_DIR}" includes="profile/profile.js" />
+-->
             <fileset dir="${SRC_DIR}" includes="window/document.js" />
-            <fileset dir="${SRC_DIR}" includes="html/cookie.js" />
+            <fileset dir="${SRC_DIR}" includes="html/cookie.js" />                
             <fileset dir="${SRC_DIR}" includes="parser/intro.js" />
+            <!-- <fileset dir="${SRC_DIR}" includes="parser/html5.min.js" /> needs update from thatcher -->
             <fileset dir="${SRC_DIR}" includes="parser/html5.pretty.js" />
             <fileset dir="${SRC_DIR}" includes="parser/outro.js" />
         </concat>

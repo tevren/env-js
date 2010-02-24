@@ -22,4 +22,4 @@ __extend__(HTMLTextAreaElement.prototype, {
     }
 });
 
-$w.HTMLTextAreaElement = HTMLTextAreaElement;
+// $w.HTMLTextAreaElement = HTMLTextAreaElement;

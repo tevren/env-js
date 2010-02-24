@@ -523,7 +523,7 @@ __extend__(DOMNode.prototype, {
         var a = this;
         var number = (a != b && a.contains(b) && 16) + (a != b && b.contains(a) && 8);
         //find position of both
-        var all = document.getElementsByTagName("*");
+        var all = this.ownerDocument.getElementsByTagName("*");
         var my_location = 0, node_location = 0;
         for(var i=0; i < all.length; i++){
             if(all[i] == a) my_location = i;
@@ -608,7 +608,7 @@ var __ownerDocument__ = function(node){
     return (node.nodeType == DOMNode.DOCUMENT_NODE)?node:node.ownerDocument;
 };
 
-$w.Node = DOMNode;
+// $w.Node = DOMNode;
 
 // Local Variables:
 // espresso-indent-level:4

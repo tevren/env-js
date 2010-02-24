@@ -19,4 +19,4 @@ var CSSRule = function(options){
       }
     });
 };
-$w.CSSRule = CSSRule;
+// $w.CSSRule = CSSRule;

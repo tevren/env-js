@@ -8,6 +8,11 @@
 *
 */
 
+$debug("Initializing document.implementation");
+var $implementation =  new DOMImplementation();
+// $implementation.namespaceAware = false;
+$implementation.errorChecking = false;
+
 // read only reference to the Document object
 var $document;
 {    // a temporary scope, nothing more

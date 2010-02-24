@@ -29,7 +29,7 @@ HTMLCollection.prototype = {
     }
 };
 
-$w.HTMLCollection = HTMLCollection;
+// $w.HTMLCollection = HTMLCollection;
 
 /*var HTMLCollection = function(nodelist, type){
   var $items = [], 

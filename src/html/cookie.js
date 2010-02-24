@@ -4,6 +4,7 @@ $debug("Defining document.cookie");
 *   - requires env
 */
 
+/*
 var $cookies = {
 	persistent:{
 		//domain - key on domain name {
@@ -21,9 +22,11 @@ var $cookies = {
 		//like above
 	}
 };
+*/
 
 //HTMLDocument cookie
-document.__defineSetter__("cookie", function(cookie){
+__extend__(HTMLDocument.prototype, {
+set cookie(cookie){
 	var i,name,value,properties = {},attr,attrs = cookie.split(";");
 	//for now the strategy is to simply create a json object
 	//and post it to a file in the .cookies.js file.  I hate parsing
@@ -73,9 +76,8 @@ document.__defineSetter__("cookie", function(cookie){
 		mergeCookie($cookies.persistent, cookie, properties);
 		persistCookies();
 	}
-});
-
-document.__defineGetter__("cookie", function(c){
+},
+get cookie(c){
 	//The cookies that are returned must belong to the same domain
 	//and be at or below the current window.location.path.  Also
 	//we must check to see if the cookie was set to 'secure' in which
@@ -83,7 +85,7 @@ document.__defineGetter__("cookie", function(c){
 	//https:
 	var allcookies = [], i;
 	return cookieString($cookies.temporary) + cookieString($cookies.persistent); 	
-});
+}});
 
 var cookieString = function(cookies) {
     var cookieString = "";

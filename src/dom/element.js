@@ -21,9 +21,18 @@ __extend__(DOMElement.prototype, {
         this.nodeName = name;  
     },
     
-    addEventListener        : function(type, fn, phase){ __addEventListener__(this, type, fn); },
-    removeEventListener     : function(type){ __removeEventListener__(this, type); },
-    dispatchEvent           : function(event, bubbles){ __dispatchEvent__(this, event, bubbles); },
+    addEventListener        : function(type, fn, phase){
+      this.ownerDocument._parentWindow.$envx.
+        __addEventListener__(this, type, fn);
+    },
+    removeEventListener     : function(type){
+      this.ownerDocument._parentWindow.$envx.
+        __removeEventListener__(this, type);
+    },
+    dispatchEvent           : function(event, bubbles){
+      this.ownerDocument._parentWindow.$envx.
+        __dispatchEvent__(this, event, bubbles);
+    },
    
     getAttribute: function(name) {
         var ret = null;
@@ -144,9 +153,9 @@ __extend__(DOMElement.prototype, {
         }
         
         // if this Attribute is an ID
-        if (__isIdDeclaration__(name)) {
+        /* if (__isIdDeclaration__(name)) {
             this.id = value;  // cache ID for getElementById()
-        }
+        } */
         
         // assign values to properties (and aliases)
         attr.value     = value;
@@ -205,4 +214,4 @@ __extend__(DOMElement.prototype, {
     }
 });
 
-$w.Element = DOMElement;
+// $w.Element = DOMElement;

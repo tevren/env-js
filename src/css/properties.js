@@ -290,4 +290,4 @@ for(var style in __supportedStyles__()){
 };
 
 
-$w.CSS2Properties = CSS2Properties;
+// $w.CSS2Properties = CSS2Properties;

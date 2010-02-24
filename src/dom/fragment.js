@@ -34,4 +34,4 @@ __extend__(DOMDocumentFragment.prototype,{
     }
 });
 
-$w.DocumentFragment = DOMDocumentFragment;
+// $w.DocumentFragment = DOMDocumentFragment;

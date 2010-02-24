@@ -17,4 +17,4 @@ __extend__(HTMLTitleElement.prototype, {
     }
 });
 
-$w.HTMLTitleElement = HTMLTitleElement;
+// $w.HTMLTitleElement = HTMLTitleElement;

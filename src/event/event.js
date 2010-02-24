@@ -36,4 +36,4 @@ var Event = function(options){
   });
 };
 
-$w.Event = Event;
+// $w.Event = Event;

@@ -25,6 +25,7 @@ __extend__(HTMLScriptElement.prototype, {
     },
     set text(value){
         this.nodeValue = value;
+        var $env = this.ownerDocument._parentWindow.$envx;
         $env.loadInlineScript(this);
     },
     get htmlFor(){
@@ -71,4 +72,4 @@ __extend__(HTMLScriptElement.prototype, {
     }
 });
 
-$w.HTMLScriptElement = HTMLScriptElement;
+// $w.HTMLScriptElement = HTMLScriptElement;

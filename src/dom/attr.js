@@ -52,4 +52,4 @@ __extend__(DOMAttr.prototype, {
     }
 });
 
-$w.Attr = DOMAttr;
+// $w.Attr = DOMAttr;

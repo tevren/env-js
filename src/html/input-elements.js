@@ -144,7 +144,7 @@ var inputElements_focusEvents = {
         __blur__(this);
 
         if (this._oldValue != this.value){
-            var event = document.createEvent();
+            var event = this.ownerDocument.createEvent();
             event.initEvent("change");
             this.dispatchEvent( event );
         }
@@ -194,7 +194,7 @@ __extend__(HTMLInputCommon.prototype, {
     }
 });
 
-$w.HTMLInputCommon = HTMLInputCommon;
+// $w.HTMLInputCommon = HTMLInputCommon;
 
 
 $debug("Defining HTMLTypeValueInputs");
@@ -242,7 +242,7 @@ __extend__(HTMLTypeValueInputs.prototype, {
             // HTMLElement.prototype.setAttribute.apply(this, ["checked", "checked"]);
             // return;
             var parent = this.parentNode;
-            while(parent != document) {
+            while(parent != this.ownderDocument) {
                 if(parent.tagName == "FORM") {
                     break;
                 }
@@ -251,7 +251,7 @@ __extend__(HTMLTypeValueInputs.prototype, {
             if(parent.tagName == "FORM") {
                 var xpath = './/input[@type="radio" and @name="'+this.name+'"]';
                 var nodes =
-                    document.evaluate(xpath,parent, null, XPathResult.ANY_TYPE,null );
+                    this.ownerDocument.evaluate(xpath,parent, null, XPathResult.ANY_TYPE,null );
                 while(( node = nodes.iterateNext() )) {
                     // FIX? events when we short circuit like this?
                     if (node === this) {
@@ -269,7 +269,7 @@ __extend__(HTMLTypeValueInputs.prototype, {
     }
 });
 
-$w.HTMLTypeValueInputs = HTMLTypeValueInputs;
+// $w.HTMLTypeValueInputs = HTMLTypeValueInputs;
 
 
 
@@ -298,7 +298,7 @@ __extend__(HTMLInputAreaCommon.prototype, {
     }
 });
 
-$w.HTMLInputAreaCommon = HTMLInputAreaCommon;
+// $w.HTMLInputAreaCommon = HTMLInputAreaCommon;
 
 // Local Variables:
 // espresso-indent-level:4

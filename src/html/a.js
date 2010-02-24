@@ -107,4 +107,4 @@ __extend__(HTMLAnchorElement.prototype, {
     }
 });
 
-$w.HTMLAnchorElement = HTMLAnchorElement;
+// $w.HTMLAnchorElement = HTMLAnchorElement;

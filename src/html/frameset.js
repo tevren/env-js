@@ -22,4 +22,4 @@ __extend__(HTMLFrameSetElement.prototype, {
     }
 });
 
-$w.HTMLFrameSetElement = HTMLFrameSetElement;	
+// $w.HTMLFrameSetElement = HTMLFrameSetElement;	

@@ -15,4 +15,4 @@ __extend__(HTMLTableCellElement.prototype, {
     
 });
 
-$w.HTMLTableCellElement	= HTMLTableCellElement;
+// $w.HTMLTableCellElement	= HTMLTableCellElement;

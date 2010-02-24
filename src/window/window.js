@@ -181,7 +181,11 @@ $env.unload = function(windowToUnload){
 $env.load = function(url,xhr_options){
     $location = $env.location(url);
     __setHistory__($location);
+try{
     $w.document.load($location,xhr_options);
+}catch(e){
+  print("oopsw",e,e.stack);
+}
 };
 
 

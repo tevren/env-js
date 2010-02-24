@@ -23,4 +23,4 @@ __extend__(HTMLBaseElement.prototype, {
     }
 });
 
-$w.HTMLBaseElement = HTMLBaseElement;		
+// $w.HTMLBaseElement = HTMLBaseElement;		

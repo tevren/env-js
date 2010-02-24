@@ -49,4 +49,4 @@ var CSSStyleSheet = function(options){
     });
 };
 
-$w.CSSStyleSheet = CSSStyleSheet;
+// $w.CSSStyleSheet = CSSStyleSheet;

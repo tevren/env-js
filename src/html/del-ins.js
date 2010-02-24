@@ -22,4 +22,4 @@ __extend__(HTMLModElement.prototype, {
     }
 });
 
-$w.HTMLModElement = HTMLModElement;	
+// $w.HTMLModElement = HTMLModElement;	

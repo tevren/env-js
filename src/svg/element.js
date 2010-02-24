@@ -13,7 +13,7 @@ __extend__(SVGElement.prototype, {
     }
 });
 
-$w.SVGElement = SVGElement;
+// $w.SVGElement = SVGElement;
 
 // Local Variables:
 // espresso-indent-level:4

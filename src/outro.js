@@ -25,6 +25,25 @@
       Envjs.evaluate = $env.$master.evaluate;
   
       // $w.__loadAWindowsDocument__(options.url || "about:blank");
+
+      (function(){
+          var fns = [];
+          for(var key in $master["static"]) {
+              if(key.match(/^envjs_init_\d+$/)){
+                  fns.push(key);
+              }
+          }
+          fns.sort();
+          var nu = this.__nu__ = {};
+          nu.base = '';
+          nu.metaProps = {};
+          for(var i in fns) {
+              // print(fns[i]);
+              // print($master["static"][fns[i]]);
+              $master["static"][fns[i]](this,this.document);
+          }
+      }());
+
       $env.load(options.url || "about:blank", options.xhr);
     };
 
@@ -35,6 +54,12 @@
   // Initial window setup
   var init = $env.init;
   init();
+
+} catch(e) {
+    print("oops0",e);
+    print("oops0",e.stack);
+    throw e;
+}
 
 })();
 

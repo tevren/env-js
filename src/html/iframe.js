@@ -22,5 +22,5 @@ __extend__(HTMLIFrameElement.prototype, {
     }
 });
 
-$w.HTMLIFrameElement = HTMLIFrameElement;
+// $w.HTMLIFrameElement = HTMLIFrameElement;
 			

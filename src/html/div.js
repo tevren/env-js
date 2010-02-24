@@ -25,4 +25,4 @@ __extend__(HTMLDivElement.prototype, {
     }
 });
 
-$w.HTMLDivElement = HTMLDivElement;
+// $w.HTMLDivElement = HTMLDivElement;

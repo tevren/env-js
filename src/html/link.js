@@ -1,3 +1,4 @@
+if(false){
 /**
 * Link - HTMLElement 
 */
@@ -6,6 +7,7 @@ $w.__defineGetter__("Link", function(){
     throw new Error("Object cannot be created in this context");
   };
 });
+}
 
 
 $debug("Defining HTMLLinkElement");
@@ -77,4 +79,4 @@ __extend__(HTMLLinkElement.prototype, {
     }
 });
 
-$w.HTMLLinkElement = HTMLLinkElement;
+// $w.HTMLLinkElement = HTMLLinkElement;

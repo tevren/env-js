@@ -24,5 +24,6 @@
   "regexp": false,
   "plusplus": false,
   "strict": false,
+  "eqeqeq": false,
   "evil": true
 }

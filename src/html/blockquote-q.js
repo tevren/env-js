@@ -16,4 +16,4 @@ __extend__(HTMLQuoteElement.prototype, {
     }
 });
 
-$w.HTMLQuoteElement = HTMLQuoteElement;		
+// $w.HTMLQuoteElement = HTMLQuoteElement;		

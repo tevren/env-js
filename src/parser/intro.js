@@ -1,37 +1,42 @@
 /**
  * @author thatcher
  */
-(function(window,document){
+
+(function(/*window,document*/){
 
 var Html5Parser;
 
 var psettimeout;
 
-var sync = function(parser){
+var sync = function(window,parser){
   parser.ptimeouts = [];
   parser.pschedule = function($schedule,timer,t) {
     var old = psettimeout; 
     psettimeout = function(fn){
       parser.ptimeouts.push(fn);
     };
-    $schedule(timer,t);
+    $schedule(window,timer,t);
     psettimeout = old;
   };
   parser.pwait = function() {
     var fn;
-    while(fn = parser.ptimeouts.pop()){
+    while ((fn = parser.ptimeouts.pop())) {
       fn();
     };
   };
 };
 
-var async = function(parser){
+var async = function(window,parser) {
   delete parser.ptimeouts;
   parser.pschedule = function($schedule,timer,t) {
     var old = psettimeout; 
     psettimeout = window.setTimeout;
-    $schedule(timer,t);
+    $schedule(window,timer,t);
     psettimeout = old;
   };
-  parser.pwait = function(){$env.wait(-1);};
+  parser.pwait = function(){
+    // $master.print("wait called");
+    window.$envx.wait(-1);
+    // $master.print("after wait");
+  };
 };
