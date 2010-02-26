@@ -44,7 +44,8 @@ $env.location = function(path, base){
             (base.href.length > 0) ) {
             base = base.href.substring(0, base.href.lastIndexOf('/'));
             var result;
-            if ( base[base.length-1] == "/" ) {
+            // print("XXXXX",base);
+            if ( base[base.length-1] == "/" || path[0] == "/" ) {
                 result = base + path;
             } else {
                 result = base + '/' + path;

@@ -15,6 +15,9 @@ $w.__defineSetter__("location", function(url){
   var to = $master.first_script_window && $master.first_script_window.location.href;
   // var to = $env.location(url,window.location.href != "about:blank" ? window.location.href: undefined);
   // I'm not sure why this code is here ... looking at the FSW
+  // print("nu",now,url,to);
+  to = to || $env.location(url,window.location.href);
+  // print("nu",now,url,to);
   if (to && to.indexOf(now)===0 && to[now.length]==="#") {
     // print("return diff anchor only");
     return;
