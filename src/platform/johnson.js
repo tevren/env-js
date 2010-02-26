@@ -3,7 +3,8 @@ $env.log = function(msg, level){
 };
 
 $env.location = function(path, base){
-    // print("loc",path,base);
+    var debug = false;
+    debug && print("loc",path,base);
     if ( path == "about:blank" ) {
         return path;
     }
@@ -15,7 +16,7 @@ $env.location = function(path, base){
         if ( s.substring(0,6) == "file:/" && s[6] != "/" ) {
             s = "file://" + s.substring(5,s.length);
         }
-        // print("YY",s);
+        debug && print("YY",s);
         return s;
     }else if(base){
         base = Ruby.URI.parse(base);
@@ -32,7 +33,7 @@ $env.location = function(path, base){
         if ( result.substring(0,7) == "file://" ) {
             result = result.substring(7,result.length);
         }
-        // print("ZZ",result);
+        debug  && print("ZZ",result);
         return result;
     }else{
         //return an absolute url from a url relative to the window location
@@ -42,6 +43,13 @@ $env.location = function(path, base){
             ( base != "about:blank" ) &&
             base.href &&
             (base.href.length > 0) ) {
+
+            base_uri = Ruby.URI.parse(base.href);
+            new_uri = Ruby.URI.parse(path);
+            result = Ruby.eval("lambda { |a,b| a+b; }")(base_uri,new_uri)+"";
+            debug && print("IIII",result);
+            return result;
+
             base = base.href.substring(0, base.href.lastIndexOf('/'));
             var result;
             // print("XXXXX",base);
@@ -53,7 +61,7 @@ $env.location = function(path, base){
             if ( result.substring(0,6) == "file:/" && result[6] != "/" ) {
                 result = "file://" + result.substring(5,result.length);
             }
-            // print("****",result);
+            debug &&  print("****",result);
             return result;
         } else {
             // print("RRR",result);
@@ -368,22 +376,28 @@ $env.__eval__ = function(script,scope){
     if (script == "")
         return undefined;
     try {
-        var scopes = [];
+        var scope = node;
+        var __scopes__ = [];
         var original = script;
         if(scope) {
-            script = "(function(){return eval(original)}).call(scopes[0])";
+            // script = "(function(){return eval(original)}).call(__scopes__[0])";
+            script = "return (function(){"+original+"}).call(__scopes__[0])";
             while(scope) {
-                scopes.push(scope);
+                __scopes__.push(scope);
                 scope = scope.parentNode;
-                script = "with(scopes["+(scopes.length-1)+"] ){"+script+"};";
+                script = "with(__scopes__["+(__scopes__.length-1)+"] ){"+script+"};";
             }
         }
-        script = "function(original,scopes){"+script+"}";
+        script = "function(original,__scopes__){"+script+"}";
+        // print("scripta",script);
+        // print("scriptb",original);
         var original_script_window = $master.first_script_window;
         if ( !$master.first_script_window ) {
             // $master.first_script_window = window;
         }
-        var result = $master.evaluate(script,$inner)(original,scopes);
+        // FIX!!!
+        var $inner = node.ownerDocument._parentWindow["$inner"];
+        var result = $master.evaluate(script,$inner)(original,__scopes__);
         // $master.first_script_window = original_script_window;
         return result;
     }catch(e){

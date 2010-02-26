@@ -51,7 +51,7 @@ $w.removeEventListener = function(type, fn){
 
 function __dispatchEvent__(target, event, bubbles){
 try{
-    //$debug("dispatching event " + event.type);
+    $debug("dispatching event " + event.type);
 
     //the window scope defines the $event object, for IE(^^^) compatibility;
     $event = event;
@@ -64,6 +64,7 @@ try{
         event.target = target;
     }
     //$debug("event target: " + event.target);
+    var handled = false;
     if ( event.type && (target.nodeType             ||
                         target.window === window    || // compares outer objects under TM (inner == outer, but !== (currently)
                         target === window           ||
@@ -72,27 +73,27 @@ try{
         //$debug("nodeType: " + target.nodeType);
         if ( target.uuid && $events[target.uuid][event.type] ) {
             var _this = target;
-            //$debug('calling event handlers '+$events[target.uuid][event.type].length);
+            $debug('calling event handlers '+$events[target.uuid][event.type].length);
             $events[target.uuid][event.type].forEach(function(fn){
-                //$debug('calling event handler '+fn+' on target '+_this);
-                fn( event );
+                $debug('calling event handler '+fn+' on target '+_this);
+                handled = (fn(event) == false) || handled;
             });
         }
     
         if (target["on" + event.type]) {
-            //$debug('calling event handler on'+event.type+' on target '+target);
-            target["on" + event.type](event);
+            $debug('calling event handler on'+event.type+' on target '+target);
+            handled = (target["on" + event.type](event) == false) || handled;
         }
 
-      // SMP FIX: cancel/stop prop
+        // SMP FIX: cancel/stop prop
       
-      // print(event.type,target);
+        // print(event.type,target,handled);
 
-      if ( event.type == "click" && target instanceof HTMLAnchorElement && target.href ) {
+      if (!handled && event.type == "click" && target instanceof HTMLAnchorElement && target.href ) {
         window.location = target.href;
       }
 
-      if ( event.type == "click" &&
+      if (!handled && event.type == "click" &&
            target.form &&
            ( target instanceof HTMLInputElement || target instanceof HTMLTypeValueInputs ) &&
            ( ( target.tagName === "INPUT" &&
@@ -110,11 +111,11 @@ try{
       }
 
       // print(event.type,target.type,target.constructor+"");
-      if ( event.type == "click" && target instanceof HTMLInputElement && target.type == "checkbox" ) {
+      if (!handled && event.type == "click" && target instanceof HTMLInputElement && target.type == "checkbox" ) {
         target.checked = target.checked ? "" : "checked";
       }
 
-      if ((event.type == "submit") && target instanceof HTMLFormElement) {
+      if (!handled && (event.type == "submit") && target instanceof HTMLFormElement) {
         $env.unload($w);
         var proxy = $w.window;
         var data;
@@ -136,7 +137,7 @@ try{
     }else{
         //$debug("non target: " + event.target + " \n this->"+target);
     }
-    if (bubbles && target.parentNode){
+    if (!handled && bubbles && target.parentNode){
         //$debug('bubbling to parentNode '+target.parentNode);
         __dispatchEvent__(target.parentNode, event, bubbles);
     }
@@ -185,3 +186,9 @@ $w.__defineGetter__('onunload', function(){
 $w.__defineSetter__('onunload', function(fn){
   //$w.addEventListener('unload', fn);
 });*/
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// End:

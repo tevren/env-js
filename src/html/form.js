@@ -73,14 +73,18 @@ __extend__(HTMLFormElement.prototype,{
 	    
     },
     onsubmit:function(){
-        if (__eval__(this.getAttribute('onsubmit')||'', this)) {
-            this.submit();
+        var v;
+        if ((v = __eval__(this.getAttribute('onsubmit')||'', this)) != false) {
+            // this.submit();
         }
+        return v;
     },
     onreset:function(){
-        if (__eval__(this.getAttribute('onreset')||'', this)) {
+        var v;
+        if ((v = __eval__(this.getAttribute('onreset')||'', this)) != false) {
             this.reset();
         }
+        return v;
     }
 });
 

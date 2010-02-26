@@ -75,8 +75,9 @@ try{
 			makeRequest();
 		}
 }catch(e){
-    print("oopsy",e);
-    print("oopsy",e.stack);
+    print("oops xhr",e);
+    print("oops xhr",e.stack);
+    throw e;
 }
 
 	},

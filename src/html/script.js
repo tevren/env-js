@@ -65,10 +65,10 @@ __extend__(HTMLScriptElement.prototype, {
         this.setAttribute('type',value);
     },
     onload: function(event){
-        __eval__(this.getAttribute('onload')||'', this);
+        return __eval__(this.getAttribute('onload')||'', this);
     },
     onerror: function(event){
-        __eval__(this.getAttribute('onerror')||'', this);
+        return __eval__(this.getAttribute('onerror')||'', this);
     }
 });
 

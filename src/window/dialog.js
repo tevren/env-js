@@ -7,7 +7,8 @@ $w.alert = function(message){
 };
 
 $w.confirm = function(question){
-  //TODO
+  //FIX (?)
+  return true;
 };
 
 $w.prompt = function(message, defaultMsg){

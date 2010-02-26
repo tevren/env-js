@@ -143,36 +143,36 @@ __extend__(HTMLElement.prototype, {
         },
 
 		onclick: function(event){
-		    __eval__(this.getAttribute('onclick')||'', this);
+            return __eval__(this.getAttribute('onclick')||'', this);
 	    },
         
 
 		ondblclick: function(event){
-            __eval__(this.getAttribute('ondblclick')||'', this);
+            return __eval__(this.getAttribute('ondblclick')||'', this);
 	    },
 		onkeydown: function(event){
-            __eval__(this.getAttribute('onkeydown')||'', this);
+            return __eval__(this.getAttribute('onkeydown')||'', this);
 	    },
 		onkeypress: function(event){
-            __eval__(this.getAttribute('onkeypress')||'', this);
+            return __eval__(this.getAttribute('onkeypress')||'', this);
 	    },
 		onkeyup: function(event){
-            __eval__(this.getAttribute('onkeyup')||'', this);
+            return __eval__(this.getAttribute('onkeyup')||'', this);
 	    },
 		onmousedown: function(event){
-            __eval__(this.getAttribute('onmousedown')||'', this);
+            return __eval__(this.getAttribute('onmousedown')||'', this);
 	    },
 		onmousemove: function(event){
-            __eval__(this.getAttribute('onmousemove')||'', this);
+            return __eval__(this.getAttribute('onmousemove')||'', this);
 	    },
 		onmouseout: function(event){
-            __eval__(this.getAttribute('onmouseout')||'', this);
+            return __eval__(this.getAttribute('onmouseout')||'', this);
 	    },
 		onmouseover: function(event){
-            __eval__(this.getAttribute('onmouseover')||'', this);
+            return __eval__(this.getAttribute('onmouseover')||'', this);
 	    },
 		onmouseup: function(event){
-            __eval__(this.getAttribute('onmouseup')||'', this);
+            return __eval__(this.getAttribute('onmouseup')||'', this);
 	    }
 });
 
@@ -195,24 +195,27 @@ var __eval__ = function(script,node){
         return undefined;
     try {
         var scope = node;
-        var scopes = [];
+        var __scopes__ = [];
         var original = script;
         if(scope) {
-            script = "(function(){return eval(original)}).call(scopes[0])";
+            // script = "(function(){return eval(original)}).call(__scopes__[0])";
+            script = "return (function(){"+original+"}).call(__scopes__[0])";
             while(scope) {
-                scopes.push(scope);
+                __scopes__.push(scope);
                 scope = scope.parentNode;
-                script = "with(scopes["+(scopes.length-1)+"] ){"+script+"};";
+                script = "with(__scopes__["+(__scopes__.length-1)+"] ){"+script+"};";
             }
         }
-        script = "function(original,scopes){"+script+"}";
+        script = "function(original,__scopes__){"+script+"}";
+        // print("scripta",script);
+        // print("scriptb",original);
         var original_script_window = $master.first_script_window;
         if ( !$master.first_script_window ) {
             // $master.first_script_window = window;
         }
         // FIX!!!
         var $inner = node.ownerDocument._parentWindow["$inner"];
-        var result = $master.evaluate(script,$inner)(original,scopes);
+        var result = $master.evaluate(script,$inner)(original,__scopes__);
         // $master.first_script_window = original_script_window;
         return result;
     }catch(e){

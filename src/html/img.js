@@ -55,7 +55,7 @@ __extend__(HTMLImageElement.prototype, {
         this.setAttribute('width', value);
     },
     onload: function(event){
-        __eval__(this.getAttribute('onload')||'', this)
+        return __eval__(this.getAttribute('onload')||'', this)
     }
 });
 
