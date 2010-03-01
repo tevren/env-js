@@ -66,7 +66,6 @@ XMLHttpRequest.prototype = {
 		}
 
 try{
-// print("pk");
 		if (this.async){
 		    $debug("XHR sending asynch;");
 			$env.runAsync(makeRequest);
@@ -75,8 +74,7 @@ try{
 			makeRequest();
 		}
 }catch(e){
-    print("oops xhr",e);
-    print("oops xhr",e.stack);
+    $warn("Exception while processing XHR: " + e);
     throw e;
 }
 

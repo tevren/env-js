@@ -111,7 +111,7 @@ $env.connection = $master.connection || function(xhr, responseHandler, data){
                     //xhr.responseHeaders['Content-Length'] = headerValue+'';
                     //xhr.responseHeaders['Date'] = new Date()+'';*/
                 }catch(e){
-                    $env.error('failed to load response headers',e);
+                    $env.warn('failed to load response headers',e);
                 }
                 
             }
@@ -158,9 +158,15 @@ $env.connection = $master.connection || function(xhr, responseHandler, data){
             }
 	}
 	
-        connection = Ruby.Net.HTTP.start( url.host, url.port );
+        try {
+            connection = Ruby.Net.HTTP.start( url.host, url.port );
+            resp = connection.request(req);
+        } catch(e) {
+            $env.warn("XHR net request failed: "+e);
+            // FIX: do the on error stuff ...
+            throw e;
+        }
 
-        resp = connection.request(req);
     }
     if(connection){
         try{
@@ -178,7 +184,8 @@ $env.connection = $master.connection || function(xhr, responseHandler, data){
                 xhr.responseHeaders[k] = v;
             });
         }catch(e){
-            $env.error('failed to load response headers',e);
+            $env.error('failed to load response headers: '+e);
+            throw e;
         }
         
         xhr.readyState = 4;
@@ -401,7 +408,8 @@ $env.__eval__ = function(script,scope){
         // $master.first_script_window = original_script_window;
         return result;
     }catch(e){
-        $error(e);
+        $warn("Exception during on* event eval: "+e);
+        throw e;
     }
 };
 

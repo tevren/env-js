@@ -184,7 +184,8 @@ $env.load = function(url,xhr_options){
 try{
     $w.document.load($location,xhr_options);
 }catch(e){
-  print("oopsw",e,e.stack);
+  $warn("Exception while loading window: "+e);
+  throw e;
 }
 };
 

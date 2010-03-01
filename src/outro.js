@@ -56,8 +56,7 @@
   init();
 
 } catch(e) {
-    print("oops0",e);
-    print("oops0",e.stack);
+    // $warn("Exception during load: "+e);
     throw e;
 }
 

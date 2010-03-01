@@ -142,8 +142,11 @@ try{
         __dispatchEvent__(target.parentNode, event, bubbles);
     }
 }catch(e){
-print("oops",e);
-print(e.stack);
+$warn("Exception while dispatching events: "+e);
+// print("oops e",e.stack);
+// print("oops e",e.backtrace && e.backtrace().join("\n"));
+// try { throw new Error("here"); } catch(x) { print("oops e",x.stack); }
+throw e;
 }
 };
 	

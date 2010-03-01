@@ -219,7 +219,8 @@ var __eval__ = function(script,node){
         // $master.first_script_window = original_script_window;
         return result;
     }catch(e){
-        $error(e);
+        $warn("Exception during on* event eval: "+e);
+        throw e;
     }
 };
 

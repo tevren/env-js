@@ -265,7 +265,6 @@ EOJS
           loc = nil
           add_dep.call w, f
           evaluate(v, f, 1, w, w, f)
-          # print "load #{uri_s}: #{Time.now-now}\n"
         else
           load *files
         end
@@ -416,6 +415,8 @@ if true
 
       static["$master"] = master
 
+      # fake it ...
+      static["isInner"] = true
       master.load.call Envjs::STATIC, static
 
       master["static"] = static
