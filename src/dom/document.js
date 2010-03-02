@@ -149,8 +149,13 @@ __extend__(DOMDocument.prototype, {
         // FIXME: not all XHRs have this right now
         xhr.setRequestHeader && xhr.setRequestHeader('Content-Type', xhr_options["Content-Type"] || 'application/x-www-form-urlencoded');
         xhr.setRequestHeader && xhr.setRequestHeader('Cookie', _this.cookie);
+        // print("rf",xhr_options["referer"]);
+        xhr.setRequestHeader && xhr_options["referer"] && xhr.setRequestHeader('Referer', xhr_options["referer"]);
+        // print(_this._parentWindow.location.href);
         xhr.onreadystatechange = function(){
-            if(xhr.status == 302) {
+            // print(url,xhr.status,xhr.responseText);
+            if(xhr.status === 302) {
+                // print(302,xhr.responseHeaders["location"]);
                 _this.load(xhr.responseHeaders["location"],{});
                 return;
             }
@@ -163,11 +168,18 @@ __extend__(DOMDocument.prototype, {
             } else {
                 try{
         	        _this.loadXML(xhr.responseText);
+                    _this.__original_text__ = xhr.responseText;
                     if(xhr.responseHeaders && xhr.responseHeaders["set-cookie"]) {
                         try {
                             _this.cookie = xhr.responseHeaders["set-cookie"];
                         } catch(e) {
                             $error("could not set cookie: "+e);
+                        }
+                    }
+                    if(xhr.responseHeaders) {
+                        var h = _this.__headers__ = {};
+                        for(var key in xhr.responseHeaders) {
+                            h[key] = xhr.responseHeaders[key];
                         }
                     }
                 }catch(e){

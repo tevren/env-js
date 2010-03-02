@@ -90,7 +90,46 @@ try{
         // print(event.type,target,handled);
 
       if (!handled && event.type == "click" && target instanceof HTMLAnchorElement && target.href ) {
-        window.location = target.href;
+          // window.location = target.href;
+
+          var url = target.href; 
+
+          var skip = false;
+
+          if (url[0] === "#") {
+              // print("return anchor only");
+              skip = true;
+          }
+
+          if (!skip) {
+              var now = window.location.href.replace(/^file:\/\//,"").replace(/#.*/,"");
+              var to = $master.first_script_window && $master.first_script_window.location.href;
+              // var to = $env.location(url,window.location.href != "about:blank" ? window.location.href: undefined);
+              // I'm not sure why this code is here ... looking at the FSW
+              // print("nu",now,url,to);
+              to = to || $env.location(url,window.location.href);
+              // print("nu",now,url,to);
+              if (to && to.indexOf(now)===0 && to[now.length]==="#") {
+                  skip = true;
+              }
+          }
+          if (!skip) {
+              if (url && url.indexOf(now)===0 && url[now.length]==="#") {
+                  // print("return diff anchor only");
+                  skip = true;
+              }
+          }
+          if (!skip) {
+              // print($location, window.location.href === $location,  $location.indexOf("#")>0);
+              if (url === window.location.href && $location.indexOf("#")>0) {
+                  // print('returning same with anchor');
+                  skip = true;
+              }
+          }
+
+          if (!skip){
+              $env.reload(window, target.href, {referer: window.location.href});
+          }
       }
 
       if (!handled && event.type == "click" &&
@@ -106,7 +145,12 @@ try{
 try{
   target.form.submit();
   // __submit__(target.form);
-}catch(e){print("oopse",e);print(e.stack);};
+}catch(e){
+    print("oopse",e);
+    print(e.stack);
+    e.backtrace && print(e.backtrace().join("\n"));
+    throw e;
+};
         delete target.form.clk;
       }
 
@@ -125,13 +169,33 @@ try{
           boundary = (new Date).getTime();
         }
         data = $master["static"].__formSerialize__(target,undefined,boundary);
-        var options = {method: target.method || "get", data: data};
+        var options = {method: target.method || "get", referer: this.location.href};
+        if (options.method === "post" || options.method === "put") {
+            options.data = data;
+            var undef;
+            data = undef;
+        }
         if (boundary) {
           options["Content-Type"] = "multipart/form-data; boundary="+boundary;
         } else {
           options["Content-Type"] = 'application/x-www-form-urlencoded';
         }
         var action = target.action || window.location.href;
+        if (data) {
+            if (action.indexOf("?") < 0) {
+                action = action + "?";
+            }
+            if (action[action.length-1] != "?") {
+                action = action + "&";
+            }
+            var params = unescape(data).split("&");
+            var new_params = [];
+            for(var pi=0; pi < params.length; pi++) {
+                var pair = params[pi].split("=");
+                new_params.push(escape(pair[0])+"="+escape(pair[1]));
+            }
+            action = action + new_params.join("&");
+        }
         $env.reload(proxy, action, options );
       }
 
