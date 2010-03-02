@@ -111,7 +111,8 @@ try{
       }
 
       // print(event.type,target.type,target.constructor+"");
-      if (!handled && event.type == "click" && target instanceof HTMLInputElement && target.type == "checkbox" ) {
+      // print("A",handled,event.type,target,target.type);
+      if (!handled && event.type == "click" && target instanceof HTMLInputElement && ( target.type == "checkbox"  || target.type == "radio" ) ) {
         target.checked = target.checked ? "" : "checked";
       }
 
