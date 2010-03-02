@@ -148,7 +148,12 @@ __extend__(DOMDocument.prototype, {
         xhr.open(method, url, this._parentWindow.document.async);
         // FIXME: not all XHRs have this right now
         xhr.setRequestHeader && xhr.setRequestHeader('Content-Type', xhr_options["Content-Type"] || 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader && xhr.setRequestHeader('Cookie', _this.cookie);
         xhr.onreadystatechange = function(){
+            if(xhr.status == 302) {
+                _this.load(xhr.responseHeaders["location"],{});
+                return;
+            }
             if (xhr.status != 200) {
                 $warn("Could not retrieve XHR content from " + url + ": status code " + xhr.status);
                 _this.loadXML(
@@ -157,7 +162,14 @@ __extend__(DOMDocument.prototype, {
                         "</body></html>");
             } else {
                 try{
-        	    _this.loadXML(xhr.responseText);
+        	        _this.loadXML(xhr.responseText);
+                    if(xhr.responseHeaders && xhr.responseHeaders["set-cookie"]) {
+                        try {
+                            _this.cookie = xhr.responseHeaders["set-cookie"];
+                        } catch(e) {
+                            $error("could not set cookie: "+e);
+                        }
+                    }
                 }catch(e){
                     $error("Error Parsing XML - ",e);
                     _this.loadXML(

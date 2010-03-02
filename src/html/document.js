@@ -43,6 +43,7 @@ try{
             this._parentWindow.parseHtmlDocument(xmlString, this, null, null);
 }catch(e){
   print("oopsd",e);
+  throw e;
 }
 // print("end parse");
 //          print("parse time: "+(Date.now() - now)/1000.);

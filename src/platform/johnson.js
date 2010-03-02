@@ -154,7 +154,8 @@ $env.connection = $master.connection || function(xhr, responseHandler, data){
 	//write data to output stream if required
         if(data&&data.length&&data.length>0){
 	    if ( xhr.method == "PUT" || xhr.method == "POST" ) {
-                req.body = data;
+                Ruby.eval("lambda { |req,data| req.body = data}").call(req,data);
+                // req.body= data;
             }
 	}
 	
