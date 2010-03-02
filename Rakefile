@@ -176,7 +176,7 @@ begin
     s.homepage = "http://github.com/smparkes/env-js"
     s.description = "Browser environment for javascript interpreters"
     s.authors = ["John Resig", "Chris Thatcher", "Steven Parkes" ]
-    s.add_dependency "johnson", ">= 2.0.0.pre2"
+    s.add_dependency "johnson", ">= 2.0.0.pre3"
     s.files = 
       FileList[ "",
                 "{bin,generators,lib,test}/**/*", 'lib/jeweler/templates/.gitignore']
