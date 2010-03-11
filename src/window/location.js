@@ -7,6 +7,7 @@ $debug("Initializing Window Location.");
 var $location = '';
 
 $w.__defineSetter__("location", function(url){
+  if (false) {
   if (url[0] === "#") {
     // print("return anchor only");
     return;
@@ -32,6 +33,7 @@ $w.__defineSetter__("location", function(url){
     return;
   }
   // print("ft",window.location.href,$location,url);
+  }
   if( !$location || $location == "about:blank" ) {
     // $w.__loadAWindowsDocument__(url);
     $env.load(url);

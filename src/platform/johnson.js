@@ -334,6 +334,12 @@ $env.lineSource = function(e){
 };
     
 $env.loadInlineScript = function(script){
+    var undef;
+    if (script.text === undef ||
+        script.text === null ||
+        script.text.match(/^\s*$/)) {
+        return;
+    }
     var original_script_window = $master.first_script_window;
     // debug("lis",original_script_window,original_script_window.isInner);
     // debug("XX",window,window.isInner);
@@ -346,6 +352,8 @@ $env.loadInlineScript = function(script){
     } catch(e) {
         $env.error("error evaluating script: "+script.text);
         $env.error(e);
+        // try { throw new Error("here") } catch(b) { $env.error(b.stack); }
+        // throw e;
     }
     // $master.first_script_window = original_script_window;
     // debug("lis",original_script_window,original_script_window.isInner);
