@@ -8,6 +8,46 @@ var HTMLScriptElement = function(ownerDocument) {
 };
 HTMLScriptElement.prototype = new HTMLElement;
 __extend__(HTMLScriptElement.prototype, {
+    setAttribute: function(name,value) {
+      var result = HTMLElement.prototype.setAttribute.apply(this,arguments);
+      // print("set src",this,this.executed);
+      if (name === "src" && !this.executed && value && !value.match(/^\s*$/)) {
+        var pn = this;
+        while(pn.parentNode) {
+          pn = pn.parentNode;
+        }
+        if(pn === this.ownerDocument) { 
+          this.executed = true;
+          var $env = this.ownerDocument._parentWindow.$envx;
+          // print("on src change");
+          $env.loadLocalScript(this);
+        }
+      }
+      return result;
+    },
+
+    appendChild: function(node,ref) {
+      var result = HTMLElement.prototype.appendChild.apply(this,arguments);
+      // print("check",this,this.ownerDocument.in_inner_html);
+      if (!this.executed) {
+          var pn = this;
+          while(pn.parentNode) {
+            pn = pn.parentNode;
+          }
+          if(pn === this.ownerDocument) { 
+            var text = this.text;
+            // print("T:", text);
+            if (text && !text.match(/^\s*$/)) {
+              this.executed = true;
+              var $env = this.ownerDocument._parentWindow.$envx;
+              // print("on text change");
+              $env.loadInlineScript(this);
+            }
+          }
+      }
+      return result;
+    },
+
     get text(){
         // text of script is in a child node of the element
         // scripts with < operator must be in a CDATA node
@@ -24,9 +64,10 @@ __extend__(HTMLScriptElement.prototype, {
 
     },
     set text(value){
-        this.nodeValue = value;
-        var $env = this.ownerDocument._parentWindow.$envx;
-        $env.loadInlineScript(this);
+      while (this.firstChild) {
+        this.removeChild(this.firstChild);
+      }
+      this.appendChild(this.ownerDocument.createTextNode(value));
     },
     get htmlFor(){
         return this.getAttribute('for');
@@ -73,3 +114,9 @@ __extend__(HTMLScriptElement.prototype, {
 });
 
 // $w.HTMLScriptElement = HTMLScriptElement;
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// End:

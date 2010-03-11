@@ -264,7 +264,7 @@ try{
       return $env.location('./');
     },
     get URL(){ return this._parentWindow.location.href;  },
-    set URL(url){ this._parentWindow.location.href = url;  }
+    set URL(url){ this._parentWindow.location.href = url;  },
 });
 
 var __elementPopped__ = function(ns, name, node){
@@ -279,17 +279,25 @@ try{
     var type = ( node.type === null ) ? "text/javascript" : node.type;
     try{
         if(node.nodeName.toLowerCase() == 'script' && type == "text/javascript"){
-            //$env.debug("element popped: script\n"+node.xml);
-            // unless we're parsing in a window context, don't execute scripts
-            if (doc.parentWindow){
-                //p.replaceEntities = true;
-                var okay = $env.loadLocalScript(node, null);
-                // only fire event if we actually had something to load
-                if (node.src && node.src.length > 0){
-                    var event = doc.createEvent();
-                    event.initEvent( okay ? "load" : "error", false, false );
-                    node.dispatchEvent( event, false );
-                  }
+            // print(node,doc.in_inner_html);
+            if (doc.in_inner_html) {
+                // this is a fib, but ...
+                // print("ignore",node);
+                // node.executed = true;
+            } else {
+                //$env.debug("element popped: script\n"+node.xml);
+                // unless we're parsing in a window context, don't execute scripts
+                // this probably doesn't do anything ...
+                if (true /*doc.parentWindow && !node.ownerDocument.is_innerHTML*/){
+                    //p.replaceEntities = true;
+                    var okay = $env.loadLocalScript(node, null);
+                    // only fire event if we actually had something to load
+                    if (node.src && node.src.length > 0){
+                            var event = doc.createEvent();
+                        event.initEvent( okay ? "load" : "error", false, false );
+                        node.dispatchEvent( event, false );
+                    }
+                }
             }
         }
         else if (node.nodeName.toLowerCase() == 'frame' ||
@@ -343,3 +351,9 @@ try{
 };
 
 //$w.HTMLDocument = HTMLDocument;
+
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// End:

@@ -44,17 +44,42 @@ __extend__(HTMLElement.prototype, {
             var doc = new HTMLDocument(this.ownerDocument.implementation,
                                         this.ownerDocument._parentWindow,
                                         "");
-            this.ownerDocument._parentWindow.parseHtmlDocument(html,doc,null,null,true);
-            var parent = doc.body;
+// print("innerHTML",html);
+// try { throw new Error; } catch(e) { print(e.stack); }
+            var docstring = '<html><head></head><body>'+
+                '<envjs_1234567890 xmlns="envjs_1234567890">'
+                +html+
+                '</envjs_1234567890>'+
+                '</body></html>';
+            doc.in_inner_html = true;
+            this.ownerDocument._parentWindow.parseHtmlDocument(docstring,doc,null,null,true);
+            var parent = doc.body.childNodes[0];
 			while(this.firstChild != null){
 			    this.removeChild( this.firstChild );
 			}
 			var importedNode;
-			while(parent.firstChild != null){
+
+            var pn = this;
+            while(pn.parentNode) {
+                pn = pn.parentNode;
+            }
+            // print(this,pn,this.ownerDocument);
+            try{
+                if (pn === this.ownerDocument) {
+                    this.ownerDocument.in_inner_html = true;
+                    // print("yup");
+                }
+			    while(parent.firstChild != null){
 	            importedNode = this.importNode( 
 	                parent.removeChild( parent.firstChild ), true);
-			    this.appendChild( importedNode );   
-		    }
+			        this.appendChild( importedNode );   
+		        }
+            } finally {
+                if (pn === this.ownerDocument) {
+                    // print("nope");
+                    this.ownerDocument.in_inner_html = false;
+                }
+            }
 		    //Mark for garbage collection
 		    doc = null;
 		},
@@ -173,8 +198,55 @@ __extend__(HTMLElement.prototype, {
 	    },
 		onmouseup: function(event){
             return __eval__(this.getAttribute('onmouseup')||'', this);
-	    }
+	    },
+
+    appendChild: function( newChild, refChild ) {
+        var rv = DOMElement.prototype.appendChild.apply(this, arguments);
+        var node = newChild;
+        var pn = this;
+        while(pn.parentNode) {
+            pn = pn.parentNode;
+        }
+        if(pn === node.ownerDocument) { 
+           __exec_script_tags__(newChild);
+        }
+        return rv;
+    }
 });
+
+var __exec_script_tags__ = function(node) {
+    var $env =  __ownerDocument__(node)._parentWindow.$envx;
+    var doc = __ownerDocument__(node);
+    var type = ( node.type === null ) ? "text/javascript" : node.type;
+    // print("check exec",node,node.ownerDocument.in_inner_html);
+    // print(node,node.childNodes.length);
+    if(node.nodeName.toLowerCase() == 'script' && type == "text/javascript"){
+        // print("check",node,node.src,node.text,node.ownerDocument.in_inner_html,doc.parentWindow,node.executed);
+        if (node.ownerDocument.in_inner_html) {
+            //print("ignore",node);
+            node.executed = true;
+        } else if (doc.parentWindow &&
+                   !node.ownerDocument.in_inner_html &&
+                   !node.executed && (
+                       (node.src && !node.src.match(/^\s*$/)) ||
+                        (node.text && !node.text.match(/^\s*$/))
+                   ) ) {
+            node.executed = true;
+            //p.replaceEntities = true;
+            //print("exec",node);
+            var okay = $env.loadLocalScript(node, null);
+            // only fire event if we actually had something to load
+            if (node.src && node.src.length > 0){
+                var event = doc.createEvent();
+                event.initEvent( okay ? "load" : "error", false, false );
+                node.dispatchEvent( event, false );
+            }
+        }
+    }
+    for(var i=0; i < node.childNodes.length; i++) {
+        __exec_script_tags__(node.childNodes[i]);
+    }
+};
 
 var __recursivelyGatherText__ = function(aNode) {
     var accumulateText = "";

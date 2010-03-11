@@ -45,8 +45,8 @@ var Envjs = function(){
     //set this if you want to get some internal log statements
     $env.logLevel = $env.INFO;
     $env.logLevel = $env.ERROR;
-    $env.logLevel = $env.WARN;
     $env.logLevel = $env.DEBUG;
+    $env.logLevel = $env.WARN;
     
     $env.debug  = function(msg){
 		if($env.logLevel >= $env.DEBUG) {
@@ -153,6 +153,8 @@ var Envjs = function(){
     $env.onScriptLoadError = $env.onScriptLoadError || function(){};
     $env.loadLocalScript = function(script, parser){
         $env.debug("loading script ");
+// print("loadloacl");
+// try{throw new Error}catch(e){print(e.stack);}
         var types, type, src, i, base, 
             docWrites = [],
             write = document.write,
@@ -177,7 +179,7 @@ var Envjs = function(){
                                 }
                             }
                             base = "" + window.location;
-                            var filename = $env.location(script.src.match(/([^\?#]*)/)[1], base );
+                            var filename = $env.location(script.src, base );
                             try {                      
                               load(filename);
                             } catch(e) {
