@@ -136,7 +136,14 @@ __extend__($w,{
   get status(){return $status;},
   set status(_status){$status = _status;},
   get top(){return $top || $window;},
-  get window(){return $window;} /*,
+  get window(){return $window;},
+
+  // DOM0
+
+  Image: function() {
+    return document.createElement("img");
+  }
+  /*,
   toString : function(){
       return '[object Window]';
   } FIX SMP */
