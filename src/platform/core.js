@@ -45,8 +45,8 @@ var Envjs = function(){
     //set this if you want to get some internal log statements
     $env.logLevel = $env.INFO;
     $env.logLevel = $env.ERROR;
-    $env.logLevel = $env.DEBUG;
     $env.logLevel = $env.WARN;
+    $env.logLevel = $env.DEBUG;
     
     $env.debug  = function(msg){
 		if($env.logLevel >= $env.DEBUG) {
@@ -166,7 +166,7 @@ var Envjs = function(){
                 for(i=0;i<types.length;i++){
                     if($env.scriptTypes[types[i]]){
 						if(script.src){
-                            $env.info("loading allowed external script :" + script.src);
+                            $env.info("loading allowed external script: " + script.src);
                             //lets you register a function to execute 
                             //before the script is loaded
                             if($env.beforeScriptLoad){
