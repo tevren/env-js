@@ -11,7 +11,6 @@ DTD/xhtml1-transitional.dtd
 DTD/xhtml1.dcl
 Makefile
 Manifest.txt
-README
 README.rdoc
 Rakefile
 Wakefile
