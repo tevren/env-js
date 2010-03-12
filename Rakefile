@@ -1,8 +1,35 @@
 require 'rubygems'
-require 'rake'
 
-# task :default => "rhino:test"
-task :default => "johnson:test"
+gem 'hoe', '>= 2.5'
+require 'hoe'
+
+Hoe.plugin :debugging, :doofus, :git
+Hoe.plugins.delete :rubyforge
+
+Hoe.spec "envjs" do
+
+  developer 'John Resig', 'jeresig@gmail.com'
+  developer 'Chris Thatcher', 'thatcher.christopher@gmail.com'
+  developer 'Steven Parkes', 'smparkes@smparkes.net'
+
+  self.readme_file              = 'README.rdoc'
+  self.extra_rdoc_files         = Dir['*.rdoc']
+  self.history_file             = "CHANGELOG.rdoc"
+  self.readme_file              = "README.rdoc"
+
+  self.extra_deps = [
+    ['johnson', '>= 2.0.0.pre3']
+  ]
+
+end
+
+# task :test => :check_dependencies
+
+namespace :gemspec do
+  task :generate => "johnson:compile"
+end
+
+task :default => :test
 
 namespace :rhino do
   desc "run tests aginst rhino"
@@ -14,8 +41,6 @@ namespace :rhino do
     exec "java -cp #{classpath} org.apache.tools.ant.Main -emacs all"
   end
 end
-
-task :test => "rhino:test"
 
 namespace :johnson do
 
@@ -163,33 +188,8 @@ namespace :johnson do
 end
 
 desc "run tests on all platforms"
-task :test => "rhino:test"
+# task :test => "rhino:test"
 task :test => "johnson:test"
-
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |s|
-    s.name = "envjs"
-    s.executables = "envjsrb"
-    s.summary = "Browser environment for javascript interpreters"
-    s.email = "smparkes@smparkes.net" # Just for the ruby part ...
-    s.homepage = "http://github.com/smparkes/env-js"
-    s.description = "Browser environment for javascript interpreters"
-    s.authors = ["John Resig", "Chris Thatcher", "Steven Parkes" ]
-    s.add_dependency "johnson", ">= 2.0.0.pre3"
-    s.files = 
-      FileList[ "",
-                "{bin,generators,lib,test}/**/*", 'lib/jeweler/templates/.gitignore']
-  end
-rescue LoadError
-  puts "Jeweler, or one of its dependencies, is not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
-end
-
-task :test => :check_dependencies
-
-namespace :gemspec do
-  task :generate => "johnson:compile"
-end
 
 # Local Variables:
 # mode:ruby

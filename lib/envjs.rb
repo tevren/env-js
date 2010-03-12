@@ -1,5 +1,7 @@
 module Envjs
 
+  VERSION = "0.2.0"
+
   def self.js_exception_stack e
     result = %(Exception: )+e.to_s
     e.stack.to_s.split(%(\n)).each do |line|
