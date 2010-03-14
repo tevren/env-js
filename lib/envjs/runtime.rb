@@ -270,7 +270,7 @@ EOJS
         end
       }
 
-      def load *files
+      ( class << self; self; end ).send :define_method, :load do |*files|
         files.map { |f|
           # Hmmm ...
 
@@ -285,7 +285,16 @@ EOJS
           uri_s = uri.to_s.sub %r(^file:/([^/])), 'file:///\1'
           
           if uri.scheme == "file"
-            super uri.path
+            begin
+              super uri.path
+            rescue Exception => e
+              if outer["$inner"]["onerror"]
+                # outer["$inner"]["onerror"].call e
+                evaluate("function(fn,scope,e){fn.call(scope,e)}").call(outer["$inner"]["onerror"], outer["$inner"], e)
+              else
+                raise e
+              end
+            end
           elsif uri.scheme == "data"
             raise "implement 1"
           else

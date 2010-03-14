@@ -224,13 +224,11 @@ $w.dispatchEvent = function(event, bubbles){
 };
 
 $w.__defineGetter__('onerror', function(){
-  return function(){
-   //$w.dispatchEvent('error');
-  };
+    return $onerror;
 });
 
 $w.__defineSetter__('onerror', function(fn){
-  //$w.addEventListener('error', fn);
+    return $onerror = fn;
 });
 
 /*$w.__defineGetter__('onload', function(){

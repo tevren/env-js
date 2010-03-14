@@ -138,19 +138,13 @@ if ARGV.length > 0
       uri_s = uri.to_s.sub %r(^file:/([^/])), 'file:///\1'
 
       if uri.scheme == "about" and uri.opaque == "blank"
+        # $stderr.puts "wait before set about"
         RUNTIME.wait
         RUNTIME.evaluate("window.location = 'about:blank'", "(comand line)", 1)
         about_blank = true
       elsif uri.path =~ /\.x?html?$/ || uri.scheme =~ %r(^https?)
-
-        # this might want to go alway; jazrb does it manually now, which I think was the use case
-        # that wanted this
-        if !about_blank
-          RUNTIME.wait
-          RUNTIME.evaluate("window.location = 'about:blank'", "(comand line)", 1)
-        end
-
-        RUNTIME.wait
+        # $stderr.puts "wait before set real" if RUNTIME.evaluate("window.location.href") != "about:blank"
+        RUNTIME.wait if RUNTIME.evaluate("window.location.href") != "about:blank"
         # RUNTIME.evaluate("window.location = 'file://#{Pathname.new(file).realpath}'", file, 1)
         RUNTIME.evaluate("window.location = '#{uri_s}'", file, 1)
         about_blank = false

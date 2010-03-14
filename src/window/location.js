@@ -34,7 +34,8 @@ $w.__defineSetter__("location", function(url){
   }
   // print("ft",window.location.href,$location,url);
   }
-  if( !$location || $location == "about:blank" ) {
+  // debug("l",url,$w.location);
+  if( !$location || ( $location == "about:blank" && url !== "about:blank" ) ) {
     // $w.__loadAWindowsDocument__(url);
     $env.load(url);
   } else {
