@@ -1,3 +1,8 @@
+=== 0.3.0 / 2010-03-29
+
+* minor changes for dependences and cleanup
+* Tweak reload on about:blank and default waiting
+
 === 0.1.0 / 2010-03-11
 
 * First Hoe build
