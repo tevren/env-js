@@ -281,7 +281,5 @@ test/unit/proxy.js
 test/unit/scope.js
 test/unit/timer.js
 test/unit/window.js
-test/vendor/jQuery/README
-test/vendor/prototype-1.6.0.3.js
 test/x.js
 test/y.js
