@@ -1,3 +1,4 @@
+var alert = $error;
 // ENVJS changes:
 // DOM_ => DOMNode.
 // case insensitive test on node names

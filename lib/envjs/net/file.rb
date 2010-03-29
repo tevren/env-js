@@ -4,10 +4,6 @@ require 'envjs/net'
 
 class Envjs::Net::File < Net::Protocol
 
-  class << self
-    attr_accessor :on_open
-  end
-
   class Get
     attr_accessor :path
     def initialize path
@@ -36,8 +32,6 @@ class Envjs::Net::File < Net::Protocol
   class Response
     def initialize path
       @path = path
-      on_open = Envjs::Net::File.on_open
-      on_open and on_open.call( path )
       @file = File.new @path
       @body = @file.read
       @code = @file.nil? ? "404" : "200";

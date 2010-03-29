@@ -151,6 +151,7 @@ if ARGV.length > 0
       else
         RUNTIME.top_level_load uri_s
         RUNTIME.load uri_s
+        RUNTIME.top_level_load nil
       end
     end
   rescue Johnson::Error => je
@@ -161,6 +162,14 @@ if ARGV.length > 0
   end
 
   RUNTIME.wait
+
+  if !$wake_info.empty?
+    puts "<wake><![CDATA["
+    puts $wake_info.join("\n")
+    puts "]]></wake>"
+    $stdout.flush
+  end
+
 
 else
 

@@ -1,11 +1,11 @@
 require 'optparse'
 
-$envjsrb_deps = nil
+$envjsrb_wake = false
 
 OptionParser.new do |o|
 
-  o.on("--deps path") do |path|
-    $envjsrb_deps = path
+  o.on("--wake") do |path|
+    $envjsrb_wake = true
   end
 
 end.parse!
