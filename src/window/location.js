@@ -64,7 +64,7 @@ $w.__defineGetter__("location", function(url){
 			_hash = _hash.indexOf('#')===0?_hash:"#"+_hash;	
 			$location = this.protocol + this.host + this.pathname + 
 				this.search + _hash;
-			setHistory(_hash, "hash");
+			__setHistory__(_hash, "hash");
 		},
 		get host(){
 			return this.hostname + ((this.port !== "")?":"+this.port:"");

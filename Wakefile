@@ -2,7 +2,7 @@
 
 ignore "src/parser/html5*"
 
-jslintrb "src/**/*"
+# jslintrb "src/**/*"
 
 watch %r{(^src/.*)\.js$}  do
   cmd = "rake johnson:compile"
