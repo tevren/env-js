@@ -1,3 +1,8 @@
+=== 0.3.1 / 2010-03-30
+
+* fix problem with set history fn name
+* add jslintrb infra
+
 === 0.3.0 / 2010-03-29
 
 * minor changes for dependences and cleanup
