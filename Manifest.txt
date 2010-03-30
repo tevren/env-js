@@ -198,6 +198,7 @@ test/base64.js
 test/call-load-test.js
 test/data.js
 test/debug.js
+test/dmathieu/index.html
 test/firebug/errorIcon.png
 test/firebug/firebug.css
 test/firebug/firebug.html
