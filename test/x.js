@@ -1,1 +1,1 @@
-/home/collegeterrace/smparkes/x.js
+debug("**");
