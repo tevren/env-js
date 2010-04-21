@@ -28,21 +28,27 @@ __extend__(HTMLOptionElement.prototype, {
                 return;
             }
             HTMLInputCommon.prototype.setAttribute.call(this, 'selected', selectedValue);
+            var parent = this.parentNode;
+            while (parent.tagName === "OPTGROUP") {
+                parent = parent.parentNode;
+            }
             if (value) {
                 // set select's value to this option's value (this also 
                 // unselects previously selected value)
-                this.parentNode && (this.parentNode.value = this.value);
+                parent && (parent.value = this.value);
             } else {
                 // if no other option is selected, select the first option in the select
                 var i, anythingSelected;
-                for (i=0; i<this.parentNode.options.length; i++) {
-                    if (this.parentNode.options[i].selected) {
-                        anythingSelected = true;
-                        break;
+                if (parent.options) {
+                    for (i=0; i<parent.options.length; i++) {
+                        if (parent.options[i].selected) {
+                            anythingSelected = true;
+                            break;
+                        }
                     }
                 }
-                if (!anythingSelected) {
-                    this.parentNode.value = this.parentNode.options[0].value;
+                if (!anythingSelected && parent.options) {
+                    parent.value = parent.options[0].value;
                 }
             }
         }
