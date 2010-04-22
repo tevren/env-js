@@ -1,3 +1,8 @@
+=== 0.3.4 / 2010-04-22
+
+* Hack file prot urls with hash change (for now); add hash change test
+* add test; otherwise formating only
+
 === 0.3.3 / 2010-04-21
 
 * fix case where option parent missing (during parse)
