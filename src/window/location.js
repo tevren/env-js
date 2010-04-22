@@ -61,8 +61,13 @@ $w.__defineGetter__("location", function(url){
 		set hash(_hash){
 			//setting the hash is the only property of the location object
 			//that doesn't cause the window to reload
+            var prot = this.protocol;
+            // FIXME this is a hack until the new url stuff is integrated
+            if (prot === "file:") {
+                prot = "file:///";
+            }
 			_hash = _hash.indexOf('#')===0?_hash:"#"+_hash;	
-			$location = this.protocol + this.host + this.pathname + 
+			$location = prot + this.host + this.pathname + 
 				this.search + _hash;
 			__setHistory__(_hash, "hash");
 		},
@@ -137,3 +142,8 @@ $w.__defineGetter__("location", function(url){
     };
 });
 
+// Local Variables:
+// espresso-indent-level:4
+// c-basic-offset:4
+// tab-width:4
+// End:
