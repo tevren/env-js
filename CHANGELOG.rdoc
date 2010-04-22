@@ -1,3 +1,7 @@
+=== 0.3.3 / 2010-04-21
+
+* handle preventDefault (at least simple cases)
+
 === 0.3.2 / 2010-04-21
 
 * don't error out on empty options and handle options within optgroups
