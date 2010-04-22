@@ -17,6 +17,7 @@ var Event = function(options){
       $target = options.target?options.target:null,
       $timestamp = options.timestamp?options.timestamp:new Date().getTime().toString(),
       $type = options.type?options.type:"";
+  this.$preventDefault = false;
   return __extend__(this,{
     get bubbles(){return $bubbles;},
     get cancelable(){return $cancelable;},
@@ -31,8 +32,15 @@ var Event = function(options){
       $bubbles=bubbles?bubbles:$bubbles;
       $cancelable=cancelable?cancelable:$cancelable;
     },
-    preventDefault: function(){return;/* TODO */},
-    stopPropagation: function(){return;/* TODO */}
+    stopPropagation: function(){
+      if($cancelable){
+        this.$cancelled = true;
+        $bubbles = false;
+      }
+    },
+    preventDefault: function(){
+      this.$preventDefault = true;
+    }
   });
 };
 
