@@ -1,5 +1,6 @@
 === 0.3.3 / 2010-04-21
 
+* fix case where option parent missing (during parse)
 * handle preventDefault (at least simple cases)
 
 === 0.3.2 / 2010-04-21
