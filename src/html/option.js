@@ -29,7 +29,7 @@ __extend__(HTMLOptionElement.prototype, {
             }
             HTMLInputCommon.prototype.setAttribute.call(this, 'selected', selectedValue);
             var parent = this.parentNode;
-            while (parent.tagName === "OPTGROUP") {
+            while (parent && parent.tagName === "OPTGROUP") {
                 parent = parent.parentNode;
             }
             if (value) {
