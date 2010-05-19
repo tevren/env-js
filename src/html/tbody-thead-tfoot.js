@@ -10,6 +10,7 @@ var HTMLTableSectionElement = function(ownerDocument) {
 HTMLTableSectionElement.prototype = new HTMLElement;
 __extend__(HTMLTableSectionElement.prototype, {    
     
+    /* commented out upstream
     appendChild : function (child) {
     
         // disallow nesting of these elements.
@@ -19,7 +20,7 @@ __extend__(HTMLTableSectionElement.prototype, {
             return DOMNode.prototype.appendChild.apply(this, arguments);
         }
 
-    },
+    }, */
     
     get align() {
         return this.getAttribute("align");
