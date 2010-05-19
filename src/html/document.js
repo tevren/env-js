@@ -19,7 +19,12 @@ var HTMLDocument = function(implementation, docParentWindow, docReferrer) {
 };
 HTMLDocument.prototype = new DOMDocument;
 __extend__(HTMLDocument.prototype, {
-    loadXML : function(xmlString) {
+    loadXML : function(xmlString, url) {
+        if (url) {
+            var $env =  this._parentWindow.$envx;
+            $env.__url(url);
+        }
+
         // create DOM Document
 /*
         if(this === $document){

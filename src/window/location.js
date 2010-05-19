@@ -5,6 +5,9 @@
 $debug("Initializing Window Location.");
 //the current location
 var $location = '';
+$env.__url = function(url){
+    $location = url;
+};
 
 $w.__defineSetter__("location", function(url){
   if (false) {

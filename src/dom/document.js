@@ -167,7 +167,7 @@ __extend__(DOMDocument.prototype, {
                         "</body></html>");
             } else {
                 try{
-        	        _this.loadXML(xhr.responseText);
+        	        _this.loadXML(xhr.responseText, xhr.__url);
                     _this.__original_text__ = xhr.responseText;
                     if(xhr.responseHeaders && xhr.responseHeaders["set-cookie"]) {
                         try {
