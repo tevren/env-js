@@ -126,7 +126,7 @@ var inputElements_status = {};
 
 var inputElements_onchange = {
     onchange: function(event){
-        return __eval__(this.getAttribute('onchange')||'', this)
+        return __eval__(this.getAttribute('onchange')||'', this);
     }
 };
 
@@ -248,7 +248,7 @@ __extend__(HTMLTypeValueInputs.prototype, {
                 }
                 parent = parent.parentNode;
             }
-            if(parent.tagName == "FORM") {
+            if(parent && parent.tagName == "FORM") {
                 var xpath = './/input[@type="radio" and @name="'+this.name+'"]';
                 var nodes =
                     this.ownerDocument.evaluate(xpath,parent, null, XPathResult.ANY_TYPE,null );
