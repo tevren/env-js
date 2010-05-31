@@ -47,8 +47,6 @@ $w.removeEventListener = function(type, fn){
     __removeEventListener__(this, type, fn)
 };
 
-
-
 function __dispatchEvent__(target, event, bubbles){
     try{
         $debug("dispatching event " + event.type);
@@ -173,7 +171,7 @@ function __dispatchEvent__(target, event, bubbles){
                 }
                 data = $master["static"].__formSerialize__(target,undefined,boundary);
                 var options = {method: target.method || "get", referer: this.location.href};
-                if (options.method === "post" || options.method === "put") {
+                if (options.method.toLowerCase() === "post" || options.method.toLowerCase() === "put") {
                     options.data = data;
                     var undef;
                     data = undef;
