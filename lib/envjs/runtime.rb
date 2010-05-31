@@ -274,7 +274,7 @@ EOJS
 
       inner.load = lambda { |*files|
         files.each do |f|
-          master.load.call f, inner
+          master['load'].call f, inner
         end
       }
 
@@ -322,7 +322,7 @@ EOJS
         outer[k] = v
       end
 
-      master.load.call Envjs::EVENT_LOOP, global
+      master['load'].call Envjs::EVENT_LOOP, global
       
       static = new_global
       
@@ -334,10 +334,10 @@ EOJS
 
       # fake it ...
       static["isInner"] = true
-      master.load.call Envjs::STATIC, static
+      master['load'].call Envjs::STATIC, static
       master["static"] = static
 
-      master.load.call Envjs::ENVJS, inner
+      master['load'].call Envjs::ENVJS, inner
 
       inner = nil
     end
