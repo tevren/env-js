@@ -18,7 +18,9 @@ __extend__(HTMLSelectElement.prototype, {
         if (namespaceURI) {
             throw new Error("unexpected namespaceURI");
         }
-        this.setAttribute(qualifiedName, value);
+        if (qualifiedName != "type") {
+          this.setAttribute(qualifiedName, value);
+        }
     },
     getAttributeNS : function(namespaceURI, qualifiedName) {
         if (namespaceURI) {

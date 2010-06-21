@@ -8,6 +8,7 @@ window.addEventListener("load",function(){
   load("test/unit/dom.js");
   load("test/unit/window.js");
   load("test/unit/elementmembers.js");
+  load("test/unit/insertion.js");
   if (multiwindow) {
     load("test/unit/onload.js");
     load("test/unit/scope.js");   // must come before frame.js changes page content
