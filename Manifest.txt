@@ -273,6 +273,7 @@ test/unit/elementmembers.js
 test/unit/events.js
 test/unit/fixtures/external_script.js
 test/unit/iframe.js
+test/unit/insertion.js
 test/unit/multi-window.js
 test/unit/nu.validator.js
 test/unit/onload.js
