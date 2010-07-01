@@ -18,9 +18,7 @@ __extend__(HTMLSelectElement.prototype, {
         if (namespaceURI) {
             throw new Error("unexpected namespaceURI");
         }
-        if (qualifiedName != "type") {
-          this.setAttribute(qualifiedName, value);
-        }
+        this.setAttribute(qualifiedName, value);
     },
     getAttributeNS : function(namespaceURI, qualifiedName) {
         if (namespaceURI) {
@@ -29,7 +27,9 @@ __extend__(HTMLSelectElement.prototype, {
         return this.getAttribute(qualifiedName);
     },
     setAttribute: function(name, value){
-        if (name === "type") {
+        // This is a workaround for now for copying nodes in 
+        if (name === "type" &&
+            HTMLInputCommon.prototype.getAttribute.call(this, "type") !== null) {
             throw new Error("cannot set readonly attribute: "+name);
         } else if (name === "multiple") {
             HTMLInputCommon.prototype.
