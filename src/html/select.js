@@ -28,9 +28,10 @@ __extend__(HTMLSelectElement.prototype, {
     },
     setAttribute: function(name, value){
         // This is a workaround for now for copying nodes in 
-        if (name === "type" &&
-            HTMLInputCommon.prototype.getAttribute.call(this, "type") !== null) {
-            throw new Error("cannot set readonly attribute: "+name);
+        if (name === "type") {
+            if (!this.ownerDocument._performingImportNodeOperation) {
+                throw new Error("cannot set readonly attribute: "+name);
+            }
         } else if (name === "multiple") {
             HTMLInputCommon.prototype.
                 setAttribute.call(this, "type", value ? "select-multiple" : "select-one");
