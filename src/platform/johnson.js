@@ -160,7 +160,12 @@ $env.connection = $master.connection || function(xhr, responseHandler, data){
 	}
 	
         try {
-            connection = Ruby.Net.HTTP.start( url.host, url.port );
+            connection = Ruby.Net.HTTP.new( url.host, url.port );
+            if (url.scheme === "https") {
+                Ruby.eval("require 'net/https'");
+                connection.use_ssl = true;
+            }
+            connection.start();
             resp = connection.request(req);
         } catch(e) {
             $env.warn("XHR net request failed: "+e);
