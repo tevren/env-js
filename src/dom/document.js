@@ -462,10 +462,12 @@ print("xpath failure: " + e);
     },
 	get defaultView(){ 
         var doc = this;
-		return { getComputedStyle: function(elem){
-			return doc._parentWindow.getComputedStyle(elem);
-		}};
-	},
+		return {
+            document: this,
+            getComputedStyle: function(elem){
+			    return doc._parentWindow.getComputedStyle(elem);
+		    }};
+    },
     _genId : function() {
           this._lastId += 1;                             // increment lastId (to generate unique id)
           return this._lastId;
