@@ -13,7 +13,7 @@ __extend__(CSS2Properties.prototype, {
     get cssText(){
         var css = '';
         for(var i=0;i<this.length;i++){
-            css+=this[i]+":"+this.getPropertyValue(this[i])+';'
+            css+=this[i]+":"+this.getPropertyValue(this[i])+';';
         }
         return css;
     },
@@ -167,7 +167,7 @@ var __supportedStyles__ = function(){
         fontVariant:	null,
         fontWeight:	null,
         height:	'1px',
-        left:	null,
+        left:	'0px',
         letterSpacing:	null,
         lineHeight:	null,
         listStyle:	null,
@@ -226,7 +226,7 @@ var __supportedStyles__ = function(){
         textIndent:	null,
         textShadow:	null,
         textTransform:	null,
-        top:	null,
+        top:	'0px',
         unicodeBidi:	null,
         verticalAlign:	null,
         visibility:	null,
