@@ -109,6 +109,7 @@ __extend__(HTMLElement.prototype, {
 		},
 		offsetLeft: 0,
 		offsetRight: 0,
+		offsetTop: 0,
 		get offsetParent(){
 		    /* TODO */
 		    return;
@@ -117,6 +118,7 @@ __extend__(HTMLElement.prototype, {
 		    /* TODO */
 		    return;
 	    },
+		scrollTop: 0,
 		scrollHeight: 0,
 		scrollWidth: 0,
 		scrollLeft: 0, 
