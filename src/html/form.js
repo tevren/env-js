@@ -456,7 +456,7 @@ var __param__= function( array, boundary ) {
                 array[i].value.push(content);
                 array[i].value = array[i].value.join("\r\n");
             }
-            serialized.push('Content-Disposition: form-data; name="'+array[i].name+'"'+fn+'\r\n');
+            serialized.push('Content-Disposition: form-data; name="'+array[i].name+'"'+fn+'\r\n\r\n');
             serialized.push(array[i].value);
             serialized.push( "\r\n" );
         }
