@@ -18,6 +18,7 @@ window.addEventListener("load",function(){
   }
   load("test/unit/parser.js");
   load("test/unit/timer.js");
+  load("test/unit/form.js");
   
   print("Load complete. Running tests.");
 });
