@@ -101,7 +101,8 @@ function __dispatchEvent__(target, event, bubbles){
                 var skip = false;
 
                 if (url[0] === "#") {
-                    // print("return anchor only");
+                    window.location.hash = url;
+                    // print("return anchor only: "+window.location);
                     skip = true;
                 }
 

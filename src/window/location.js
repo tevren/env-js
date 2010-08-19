@@ -10,11 +10,12 @@ $env.__url = function(url){
 };
 
 $w.__defineSetter__("location", function(url){
-  if (false) {
-    if (url[0] === "#") {
-      // print("return anchor only");
+  if (url[0] === "#") {
+      window.location.hash = url;
+      // print("return anchor only: "+window.location.href);
       return;
-    }
+  }
+  if (false) {
     var now = window.location.href.replace(/^file:\/\//,"").replace(/#.*/,"");
     var to = $master.first_script_window && $master.first_script_window.location.href;
     // var to = $env.location(url,window.location.href != "about:blank" ? window.location.href: undefined);
