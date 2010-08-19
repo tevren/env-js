@@ -34,6 +34,9 @@ function __removeEventListener__(target, type, fn){
     target.uuid = $events.length;
     $events[target.uuid] = {};
   }
+  if (!$events[target.uiid]) {
+      return;
+  }
   if ( !$events[target.uuid][type] ){
 		$events[target.uuid][type] = [];
 	}	
