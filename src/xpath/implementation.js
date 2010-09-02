@@ -671,6 +671,7 @@ function TokenExpr(m) {
 }
 
 TokenExpr.prototype.evaluate = function() {
+// print("0 "+arguments.callee+" "+this.value);
   return new StringValue(this.value);
 };
 
@@ -961,12 +962,14 @@ function NodeTestAny() {
 }
 
 NodeTestAny.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   return this.value;
 };
 
 function NodeTestElementOrAttribute() {}
 
 NodeTestElementOrAttribute.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   return new BooleanValue(
       ctx.node.nodeType == DOMNode.ELEMENT_NODE ||
       ctx.node.nodeType == DOMNode.ATTRIBUTE_NODE);
@@ -975,12 +978,14 @@ NodeTestElementOrAttribute.prototype.evaluate = function(ctx) {
 function NodeTestText() {}
 
 NodeTestText.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   return new BooleanValue(ctx.node.nodeType == DOMNode.TEXT_NODE);
 }
 
 function NodeTestComment() {}
 
 NodeTestComment.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   return new BooleanValue(ctx.node.nodeType == DOMNode.COMMENT_NODE);
 }
 
@@ -989,6 +994,7 @@ function NodeTestPI(target) {
 }
 
 NodeTestPI.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   return new
   BooleanValue(ctx.node.nodeType == DOMNode.PROCESSING_INSTRUCTION_NODE &&
                (!this.target || ctx.node.nodeName == this.target));
@@ -1000,6 +1006,7 @@ function NodeTestNC(nsprefix) {
 }
 
 NodeTestNC.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   var n = ctx.node;
   return new BooleanValue(this.regex.match(n.nodeName));
 }
@@ -1010,6 +1017,7 @@ function NodeTestName(name) {
 }
 
 NodeTestName.prototype.evaluate = function(ctx) {
+// print("0 !!! "+arguments.callee);
   var n = ctx.node;
   if (ctx.caseInsensitive || n instanceof HTMLElement) {
     if (n.nodeName.length != this.name.length) return new BooleanValue(false);
@@ -1024,6 +1032,7 @@ function PredicateExpr(expr) {
 }
 
 PredicateExpr.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   var v = this.expr.evaluate(ctx);
   if (v.type == 'number') {
     // NOTE(mesch): Internally, position is represented starting with
@@ -1045,9 +1054,11 @@ FunctionCallExpr.prototype.appendArg = function(arg) {
 };
 
 FunctionCallExpr.prototype.evaluate = function(ctx) {
+  // print("0 "+arguments.callee+" "+this.name.value);
   var fn = '' + this.name.value;
   var f = this.xpathfunctions[fn];
   if (f) {
+    // print("1 "+f);
     return f.call(this, ctx);
   } else {
     xpathLog('XPath NO SUCH FUNCTION ' + fn);
@@ -1121,6 +1132,9 @@ FunctionCallExpr.prototype.xpathfunctions = {
     if (n.length == 0) {
       return new StringValue('');
     } else {
+      if (ctx.caseInsensitive || n[0] instanceof HTMLElement) {
+        return new StringValue(n[0].nodeName.toLowerCase());
+      }
       return new StringValue(n[0].nodeName);
     }
   },
@@ -1398,6 +1412,7 @@ function UnionExpr(expr1, expr2) {
 }
 
 UnionExpr.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   var nodes1 = this.expr1.evaluate(ctx).nodeSetValue();
   var nodes2 = this.expr2.evaluate(ctx).nodeSetValue();
   var I1 = nodes1.length;
@@ -1423,6 +1438,7 @@ function PathExpr(filter, rel) {
 }
 
 PathExpr.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   var nodes = this.filter.evaluate(ctx).nodeSetValue();
   var nodes1 = [];
   if (ctx.returnOnFirstMatch) {
@@ -1451,6 +1467,7 @@ function FilterExpr(expr, predicate) {
 }
 
 FilterExpr.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   // the filter expression should be evaluated in its entirety with no
   // optimization, as we can't backtrack to it after having moved on to
   // evaluating the relative location path. See the testReturnOnFirstMatch
@@ -1479,6 +1496,7 @@ function UnaryMinusExpr(expr) {
 }
 
 UnaryMinusExpr.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   return new NumberValue(-this.expr.evaluate(ctx).numberValue());
 };
 
@@ -1489,6 +1507,7 @@ function BinaryExpr(expr1, op, expr2) {
 }
 
 BinaryExpr.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   var ret;
   switch (this.op.value) {
     case 'or':
@@ -1653,6 +1672,7 @@ function LiteralExpr(value) {
 }
 
 LiteralExpr.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee+" "+this.value);
   return new StringValue(this.value);
 };
 
@@ -1661,6 +1681,7 @@ function NumberExpr(value) {
 }
 
 NumberExpr.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   return new NumberValue(this.value);
 };
 
@@ -1669,6 +1690,7 @@ function VariableExpr(name) {
 }
 
 VariableExpr.prototype.evaluate = function(ctx) {
+// print("0 "+arguments.callee);
   return ctx.getVariable(this.name);
 }
 
