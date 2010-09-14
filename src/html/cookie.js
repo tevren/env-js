@@ -82,10 +82,12 @@ get cookie(c){
 	//case we must check our current location.protocol to make sure it's
 	//https:
 	var allcookies = [], i;
-	return cookieString($cookies.temporary) + cookieString($cookies.persistent); 	
+        return cookieString.call(this, $cookies.temporary) +
+                cookieString.call(this, $cookies.persistent); 	
 }});
 
 var cookieString = function(cookies) {
+    var $w = this._parentWindow;
     var cookieString = "";
     for (var i in cookies) {
         // check if the cookie is in the current domain (if domain is set)
