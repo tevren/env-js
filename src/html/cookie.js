@@ -46,7 +46,7 @@ set cookie(cookie){
 				if(domainValid(value)){
 					cookie['domain']=value;
 				}else{
-					cookie['domain']=$w.location.domain;
+					cookie['domain']=this._parentWindow.location.domain;
 				}
 			} else if(name=='path'){
 				//not sure of any special logic for path
