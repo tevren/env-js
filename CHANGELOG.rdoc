@@ -1,3 +1,16 @@
+=== 0.3.9 / 2010-09-14
+
+* don't use static  variable in cookie processing
+* return name() lower case in html
+* update url even when only hash change
+* don't error out trying to remove event that doesn't exist (orslumen)
+* When serializing multipart/form-data forms we need a pair of \r\n between the boundary and headers and the data value.  Not just one. [Murray Steele]
+* Fix for http://github.com/smparkes/env-js/issues/issue/19 [fiann]
+* rejigger things so the xml parser works on XHR requests; pretty much just moving code
+* add some dimensions that query ui needs to (barely) function
+* include document ref in defaultView
+* add some properties that help d&d simulation
+
 === 0.3.7 / 2010-07-05
 
 * Add support for https (heathkit)

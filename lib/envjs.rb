@@ -1,6 +1,6 @@
 module Envjs
 
-  VERSION = "0.3.7"
+  VERSION = "0.3.8"
 
   def self.js_exception_stack e
     result = %(Exception: )+e.to_s

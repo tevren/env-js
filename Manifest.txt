@@ -272,6 +272,7 @@ test/unit/dom.js
 test/unit/elementmembers.js
 test/unit/events.js
 test/unit/fixtures/external_script.js
+test/unit/form.js
 test/unit/iframe.js
 test/unit/insertion.js
 test/unit/multi-window.js
