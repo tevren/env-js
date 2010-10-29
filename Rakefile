@@ -3,7 +3,7 @@ require 'rubygems'
 gem 'hoe', '>= 2.5'
 require 'hoe'
 
-Hoe.plugin :debugging, :doofus, :git
+Hoe.plugin :debugging, :doofus, :git, :gemspec
 Hoe.plugins.delete :rubyforge
 
 Hoe.spec "envjs" do
