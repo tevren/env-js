@@ -69,6 +69,9 @@ $w.__defineGetter__("location", function(url){
             // FIXME this is a hack until the new url stuff is integrated
             if (prot === "file:") {
                 prot = "file:///";
+            } else {
+                // huh?
+                prot = prot + "//";
             }
 			_hash = _hash.indexOf('#')===0?_hash:"#"+_hash;	
 			$location = prot + this.host + this.pathname + 
