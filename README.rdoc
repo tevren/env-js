@@ -1,3 +1,8 @@
+= THIS FORK OF ENV.JS IS MOTHBALLED
+
+The Johnson fork of env.js is pretty much mothballed (which is already pretty much true of Johnson, given the rise of v8
+and the difficulty moving Johnson to 1.9.*). The current best practices seem to be based on a headless webkit.
+
 = env.js
 
 * http://github.com/smparkes/env-js
