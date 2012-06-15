@@ -29,14 +29,14 @@ This fork is based on the Johnson Ruby gem
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<johnson>, [">= 2.0.0.pre3"])
+      s.add_runtime_dependency(johnson19, [">= 2.0.0.pre3"])
       s.add_development_dependency(%q<hoe>, [">= 2.6.2"])
     else
-      s.add_dependency(%q<johnson>, [">= 2.0.0.pre3"])
+      s.add_dependency(johnson19, [">= 2.0.0.pre3"])
       s.add_dependency(%q<hoe>, [">= 2.6.2"])
     end
   else
-    s.add_dependency(%q<johnson>, [">= 2.0.0.pre3"])
+    s.add_dependency(johnson19, [">= 2.0.0.pre3"])
     s.add_dependency(%q<hoe>, [">= 2.6.2"])
   end
 end
