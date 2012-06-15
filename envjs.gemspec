@@ -1,7 +1,5 @@
-# -*- encoding: utf-8 -*-
-
 Gem::Specification.new do |s|
-  s.name = %q{envjs}
+  s.name = envjs
   s.version = "0.3.8.20101029121421"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
